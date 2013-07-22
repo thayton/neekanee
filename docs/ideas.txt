@@ -1,0 +1,536 @@
++ Update code so that a person can only post one review
+  for a company, but they can go back and later edit that
+  comment as many times as they want to.
+  
++ Write an article highlighting just how few companies
+  advertise what kind of benefits they offer. 
+
++ Update parse_location() to handle countries other than
+  the US. Go back and update plugins that filter on USA
+  only to now handle all country types. Update backend
+  to handle locations without the assumption that everything
+  is city,state,country since that is very USA specific.
+
++ Record vacation amounts in each plugin. Perhaps record
+  it as a list of tuples, where each tuple is the pair
+  (year,num_days) to indicate how many days off you get
+  at each year of employment. The last tuple indicates
+  where the num_days maxes out.
+
++ Idea for neekanee: make it a review site for Recruiters.
+  Each recruiter can have a Facebook like page where they
+  can describe what services they offer and they can post
+  job ads in the recruiter job ad section of Neekanee. Both 
+  companies and job seekers can post reviews/ratings of 
+  recruiters. This way job seekers will know which recruiters
+  are good to work with and same for companies looking to
+  hire new people.
+
++ Use setrlimit() to set CPU resource limits on the plugins
+  so that they can't spin up the CPU to 100% utilization.
+
++ flexoffers.com has pictures of their office that are nice
+  and could be used to incorporate pictures into Neekanee.
+
++ Do a company listing that looks just like job listings
+  except puts number of reviews in the job summary boxes.
+  Like 2 reviews / can then put the stars next to the 
+  company names for companies with 1 or more reviews.
+
++ Allow people to search for jobs at companies offering a 
+  referral bonus. Then allow employers to rate the person
+  who referred the candidate. Essentially allowing everyone
+  to act like a recruiter and motivate them by giving them
+  with referral money.
+
++ Password change/reset/etc. pages currently do not use https
+  but they should. Should be a contrib plugin for this...
+
++ Add reCaptcha comment spam filtering for company reviews.
+
++ Replace radio-buttons on review pages with stars
+  and use stars on the review reports page. 
+
++ Add pagination for comments.
+
++ Bugfix: make sure search results don't contain
+  companies with 0 jobs.
+
++ Add help, about, FAQ pages.
+
++ Add 'Hide/Show Filter' to all screens.
+
++ Search box in local_nav_row should show what the 
+  current search filters are.
+
++ Feature: Right now search radius of 25 miles is
+  hardcoded - make this configurable.
+
++ Bugfix: The location that the user enteres is
+  queried against all locations in the database. If
+  the location isn't in the database an exception
+  is thrown. Fix is to first search for location in
+  database, and if not found, then search using 
+  geopy to get the lat/lng.
+
++ Fix location search such that if multiple states
+  are included in results, then the view is jobs
+  by state and jobs by city otherwise.
+
++ Feature where I can filter out jobs I have already
+  looked at before. Feature where I can filter out
+  all jobs from a given company.
+
++ You look up reviews before you buy a car, you lookup
+  reviews for restaurant. Considering how much time you
+  spend at work, shouldn't you read the reviews first
+  when finding job.
+
++ Need a way to detect when scraping doesn't return any
+  job results. The XML file is > 0 in these cases but
+  the only thing they contain is the company info and
+  an empty pair of <jobs></jobs> tags.
+
++ Fix vanquish.com job scraping - it's pulling in some
+  bad listings.
+
++ Post-to-form trick to handle cookies ends up causing
+  a pop-up window to be displayed when you hit the back
+  button from a job ad: "Are you sure you want to send
+  a form again." This is because the post-to-form is
+  triggered onload. We only need to do this post-to-form
+  once to get the required cookie onto the user's browser
+  so figure out a way to see if this has been done once
+  and then don't do it again.
+
++ Fix Location(): New York, NY gets translaed to NY, NY
+
++ Add ability to do incremental scans. Track list of
+  plugins that have been completed. That way when plugins
+  loaded, sites that have been scanned won't be scanned
+  again.
+
++ Could have a "hybrid" job search engine, which combines
+  elements of both Indeed and Monster. You could have a
+  traditional job board which consists only of ads from
+  recruiters. Your main job board would still be made up
+  of ads pulled straight off of company web sites.
+
+  By doing hybrid could keep recruiter ads off of the
+  main page entirely.
+
+  Additional products and services you could provided are:
+  - Ability for users to synch their resumes to ATS's
+  - An ATS for companies to buy
+
+  If companies buy your ATS as opposed to Kenexa, Resumator,
+  etc. then they get listed higher by default in job search
+  results.
+
+  Or you could give your ATS away for free in hopes that
+  companies would then pay to get their job posts ranked 
+  higher.
+
+  Or instead of giving away any software at all is do hosted
+  ATS for companies. These hosted results would automatically
+  get listed in the neekanee search results. If you do
+  hosted ATS could you use open-source ATS?
+
++ Blog posting entry ideas:
+
+ - One post could be about how much of our lives we spend
+   at work. Show it in percentages and a pie chart of time
+   spent at work relative to eating sleaping. Include commute
+   times. Point being that we spend most of our lives at work,
+   so it should be a place we enjoy being at.
+
+ - One post would show two job postings for the same type
+   of position (eg. both for an Administrative Assistant)
+   The catch would be that one add would be from a company
+   with very high ratings (on GlassDoor or BPTW), and the
+   other would be at a company with the poorest ratings.
+   Post would show how these jobs look no different from
+   each other on traditional job search engine boards.
+   As in with traditional job boards you can't tell whether
+   the company is a good place to work or not.
+
++ Entire portfolio of products would be the search engine,
+  an Applicant Tracking System for companies to use, and
+  the resume syncher for applicants to use to synch their
+  resume to any Applicant Tracking System.
+
++ Is it possible to do some sort of word frequency measurement
+  to see what sorts of jobs show up in which parts of the country.
+  For instance, more embedded jobs in California, more jobs 
+  requiring clearances show up in DC, etc.?
+
++ The site http://www.usertesting.com might be a way to get
+  usability testing done and advertise neekanee at the same
+  time.
+  
+  This site also shows how you might pay people to write
+  plugins for you. Their site pays people to be usability
+  testers using PayPal at a rate of $10/site.
+
++ The load_plugins module currently takes a list of directories
+  from which plugins should be loaded. Add another paramaters
+  which is a list of directories/plugins to exclude / not load
+  plugins from:
+
+  load_plugins(include_dirs=[...], exclude_dirs=[...])
+
++ Put more logging in so we can tell when plugins are hanging
+  versus just being slow. Especially necessary for .edu plugins
+  as these seem to take forever because of mechanize.
+
++ For plugins like brassring, taleo, etc. where the columns
+  containing the job title, location, etc change. Have an
+  interface where the caller can register a callback function
+  each time another row is encountered. The callback function
+  will be responsible for extracting the job title. Another
+  one would be responsible for extracting the location.
+
++ Having a "Most Viewed Jobs" and "Least Viewed Jobs" might
+  be interesting
+
++ The page at http://code.activestate.com/recipes/langs/python/
+  looks good for displaying 'tables' of results. Maybe something
+  we can copy for neekanee job results pages.
+
++ Create classes for JobScore and Resumator ATS's
+
++ More refactoring:
+  - Should all plugins inherit from a CompanyJobsParser() class?
+
+    CompanyJobsCrawler:
+      def __init__(self):
+        self.c = Company(caller.COMPANY, caller.HQ, ...)
+        self.s = soupify(caller.URL)
+
+    Plugins that use PeopleAdmin, Resumator, etc.
+
+    PeopleAdminCrawler(CompanyJobsCrawler):
+      def __init__(self):
+        super(__init__)
+        self.ats = 'PeopleAdmin'
+      
+  - c = Company(..)
+    s = soupify(webcli.get(url))
+
++ Better integration with social networks like LinkedIn:
+  - LinkedIn should see that the people I worked with at
+    Ericsson went on to companies like Juniper, Cisco, Tellabs.
+    Therefore it should suggest jobs at these companies.
+
+    Should see that people who work at Tenable, worked at
+    Enterasys before joining Tenable, and went to places
+    like SAINT, sourcefire, etc. when they left. Again
+    these should be first on the list for suggested jobs.
+
++ Incorporate google maps to answer things like:
+  - How long will commute be from the search location
+    to company location. How long with traffic?
+  - Is the company location near a metro stop?
+
++ Idea for DBs in neekanee:
+  - Two DBs for job data:
+    1 DB is for job data being read
+    1 DB is waiting to be filled with new job data
+  - One DB telling front-end which job DB to read from
+ 
++ Additional ideas for neekanee:
+  - Start tracking the type of Application Tracking
+    System (ATS) used at each company (taleo, peopleadmin, 
+    etc.)
+
+  - Additional idea would be a resume form-builder that
+    would publish a resume to multiple companies application
+    tracking systems. This way a user does not have to 
+    repeatedly fill in a new resume for every single 
+    company they want to apply to. 
+
+  - For sites that don't use an ATS, the company description
+    that comes up for each job should include the email
+    address used for job applications. In these cases 
+    Neekanee would allow job hunter to use a generic cover
+    letter that would be filled in by Neekanee with things
+    like the company name, job title, etc. In other words,
+    would allow job hunters to send their resume to multiple
+    companies more easily by automating some of the process
+    like handling of cover letters, finding the email address
+    used for resume submission, etc.
+
++ Plugin names with more than one dot ('.') in them seem
+  to cause problems for loader.py. For example, when the 
+  plugin hazard.kctcs.py is imported, loader.py seems to
+  interprent hazard as a parent module.
+
+  Solution might be to change how we name plugins and 
+  use dashes (hazard-kctcs.py) instead of dots.
+ 
++ Need faster way to import data. Using mysqldump to create
+  a SQL file takes forever to reload. Perhaps a per-table 
+  CSV file would be easier.
+
++ Change the way location is displayed on front-end. Instead
+  of listing the same location in every row, at the top show
+  the parent location like:
+
+  US > MD > Bethesda        or
+  US > Maryland > Bethesda
+
++ To move onto webfaction:
+  - Go through MySQL tutorial on local machine
+  - Update jobs_page_parser.py to also handle MySQL connection
+  - Update front-end code to also handle MySQL connection
+  - Test out using only .com plugins on local machine
+  - Once working create DB on webfaction
+  - Import DB from local machine to webfaction host
+  - Import PHP scripts for front-end 
+  - Test out DB front-end on webfaction
+
++ http://www.higheredjobs.com/institution/
+
++ Change the way you do links. Instead of just having a url also
+  use a data field to handle POST requests. Similar to how the
+  urllib2 Request class works. The backend database would pick
+  up the 'data' field and the url field and build POST forms when
+  needed and regular GET/<a> links other times.
+
++ Job tracking systems
+  - Taleo
+  - Jobvite
+  - PeopleAdmin
+
++ Click Fortune with second checkbox allowing for companies that
+  were best places in any of the past rankings.
+
++ Look at Glassdoor top places to work for info on other types of
+  company awards:
+  - Top 25 Workplaces for Women in the February 2008 issue of Arizona Woman magazine
+  - Grand Prize in the 2008 Workplace Excellence Awards from the Society for Human Resources Management of Greater Tucson
+  - 2008 Culture and People Award from the Arizona Small Business Association
+  - AICPA's PCPS for our work/life balance initiatives in 2008.
+  - 2009 AARP Best Employers for Workers Over 50 : http://irtc-hq.com/site/2009_AARP.php
+  - Working Mother's Magazine awards
+  - Best Places to Work for LGBT Equality, Human Rights Campaign, 2010
+  - Top 50 Companies for Diversity, DiversityInc, 2010
+  - World’s Most Admired Companies, Fortune, 2009
+  - Top Companies for Leaders, Fortune, 2009
+  - Diversity Elite 60, Hispanic Business, 2009
+  - Top 10 Companies for Asian Americans List (#3), DiversityInc, 2009
+  - Best Companies for Multicultural Women, Working Mother, 2009
+  - Best Employers for Healthy Lifestyles (Silver), National Business Group on Health, 2009
+  - Top 50 Companies for Executive Women, National Association for Female Executives, 2009
+  - Top 50 Corporations for Supplier Diversity, Hispanic Enterprise, 2009
+  - Most Admired Companies for Minority Professionals, Hispanic Engineer, 2009
+  - Top Entry Level Employers, CollegeGrad, 2009
+  - Top 500 Green Companies, Newsweek, 2009
+  - India’s Best Companies to Work For, Great Place to Work Institute, 2008
+  - One of Arizona’s Most Admired Companies, Arizona Business Magazine
+  - One of the Best Places to Work, Charlotte Business Journal
+  - DiversityInc Top 50 Companies for Diversity
+  - Best Places to Work for LBGT Equality
+
++ Cursor for table display
+
++ PDF support for companies like braingate and eka systems.
+
++ Do company "recommendations" the way Amazon does recommendations.
+  LinkedIn shows on company profiles where people at that people
+  come from and where then end up going to. Something like this 
+  could be used to recommond other companies to people assuming
+  they want to stay within their field.
+
++ The code for du, oregonstate, etc. is all the same because
+  they are all using PeopleAdmin applicant tracking software.
+  Put this common code into a class for reuse instead of duplicating
+  code between plugins.
+
++ Additional best places to work filters:
+
+  http://www.bestplacestoworkinpa.com/ 
+  http://www.washingtonian.com/packages/placestowork2007/index.html
+
++ Write a script to archive Craigslist postings
+  for various cities.
+
++ http://www.leoniemorse.com/ shows arrows you 
+  should use for doing next/prev for job listings.
+
++ http://getsatisfaction.com/ is the software for
+  incorporating customer feedback
+
++ List of ycombinator companies at http://yclist.com/
+
++ Would be nice to filter on 'contract/consulting' jobs
+
++ When searching for jobs at search.php we currently 
+  only group by Company. Also provide the option of
+  grouping by City. Display it like you do the grouping
+  by company but the number of jobs would represent the
+  number of jobs in that city. When you click on the
+  number it would then take you to the groupings by
+  company. 
+
+  ----------+-----------------
+  City      | # Matching Jobs
+  ----------+-----------------
+  Bethesda  | 2
+  Rockville | 8
+  Columbia  | 3
+  ----------+-----------------
+
+  Clicking on the '2' in Bethesda would then take you
+  to a listing showing the companies who have matching
+  jobs in Bethesda:
+
+  ----------+-----------------
+  Company   | # Matching Jobs
+  ----------+-----------------
+  Viasat    | 2
+  Hughes    | 8
+  SAINT     | 3
+  ----------+-----------------
+
+  Might also be neat to add another column showing a
+  'My Commute' time.
+
+  Might also be neat to do 'group by city' and 
+  'group by state' as a bar graph. PHP charting library
+  available at http://pchart.sourceforge.net/. Would
+  need to do horizontal bar graph to be able to handle
+  URL/Company names well since they wouldn't look nice
+  displayed vertically.
+
++ When jobs_page_parser.py runs it should drop all the 
+  tables from the old database (or rebuild the database).
+  Each run should rebuild the database from scratch.
+
++ Put Squid (or some proxy) in front of Neekanee instead of
+  trying to handle caching/etc. yourself. That way we 
+  retrieve pages faster.
+
++ Filter on best places to work.
+
++ Have reward system where companies that fill in information
+  about themselves will have their results listed earlier. Most
+  valuable information would be benefits info : vacation time,
+  sick leave, 401k, etc.
+
++ City names need to be either all upper or all lower so that
+  matching can be done on them without requiring that the 
+  user uses the same case.
+
++ Make a "University Only" search where only jobs at a university
+  are queried. Maybe something like "site:edu" the way google does.
+
++ Use a filter for BeautifulSoup to always strip out comments,
+  styles, script tags
+
++ Create a function for the following code it comes up so much:
+
+  unescape(' '.join(t.findAll(text=True)))
+
++ Locations are messed up. Need to be able to handle a variety
+  of ways that locations are specified:
+
+    Columbia MD
+    Columbia, MD
+    Columbia, Maryland
+    MD-Columbia
+
++ Have company information like the company name, home page and
+  jobs page URL get populated from the plugins themselves.
+
++ Web Hosting: WebFaction http://www.webfaction.com/?affiliate=hbien
+
++ Nice addition to BeautifulSoup would be an "until" parameter
+  to find() and findAll() that works like the limit parameter 
+  in that it ends the search but differs in that it allways you
+  to specify a patter for tags/text. Like 'find all tags until
+  tag 'span' is encountered'.
+
++ We need a way to handle cookies and currently get_page()
+  and openAnything() don't provide a way to do that. The
+  wirelessmatrix.py plugin right now is not functional until
+  a way to send cookies along in the request is found - until
+  then the page returns with an error about the browser needing
+  to allow cookies.
+
++ Some of the job posting software requires sending a POST
+  and not a GET. How do we handle this with openAnything?
+
++ Fix location handling for www.quantumtechee.com
+  - Silver Spring MD
+  - Trenton, NJ
+  - Northern VA
+
++ Shady Grove Fertility job titles show the location but should
+  only show the job title
+
++ Handling all the different formats for locations is challenging. Look at
+  Data Direct Networks job locations:
+
+  - Colorado Springs, CO
+  - Chatsworth or Mountain View, CA
+  - New York, Boston, Chicago
+
+  Note that the last one does not even list the states for each city.
+  Need a very intelligent Location class that can determine whether the string
+  it's given is a city, state, provence, etc...
+
++ Perhaps have a new database created for *next* day, like jobs-09-09-2010.db,
+  which gets created on 09-08-2010 and then at some point on 09-09-2010
+  the queries transition to that database. In the meantime, 09-10-2010 would
+  be being built.
+
++ Write a script that rebuilds the whole database
+  1) Remove old jobs.db
+  2) Create new jobs.db
+  3) Add company information for companies we have
+     plugins for
+  4) Run jobs_page_parser.py to fill in jobs
+  5) Copy jobs.db to /Library/WebServer/Documents/
+
++ Companies go through 3 stages:
+  1) Companies where we don't even know where the jobs page is
+  2) Companies whose jobs page we've discovered but not plugin is yet written for
+  3) Companies for which we've written a plugin to parse the jobs page
+
+  Each of these three stages should get its own table instead of storing
+  all of the companies in one database. That way the search for keywords
+  only involves companies for which we know we've parsed their jobs page.
+
++ For jobs at Tenable Security there's no location specified. But as a person
+  viewing the job site you'd know that the jobs are located in Columbia, MD
+  since it's a small company and they only have one office (which is located
+  in Columbia, MD).
+
+  So when savings jobs, if job.location is not set, then we could default
+  to using the company location for the job. This will end up being inaccurate
+  some of the time, but so what.
+
++ Plugin loader should be able to recursively descend a top-level directory
+  looking for plugins.
+
++ We don't handle NULLs well. For example if a job doesn't have a location
+  specified then it won't show up in the search results even if there's
+  matches on the keyword search because of the NATURAL JOIN on JOB_LOCATIONS.
+  If JOB_LOCATIONS is NULL for that job then there will be no match.
+
++ Fix URLServer to only return URLs one time. Right now the cursor doesn't
+  seem to remember where it last left off and when all the jobs are returned
+  then the next time it's called it starts back at the beginning.
+
++ Remove the entity references that show up in descriptions (&nbsp;)
+
++ Use getopt() to add a test option (-t) to plugins that specifiy that the
+  test/pages/ files should be used
+
++ Rewrite jobs_page_finder.py using BeautifulSoup
+
++ Load up DB with jobs from SAINT site (ie, very small data set) and then
+  write the front-end for the job search engine. 
+
++ Document jobs_page_finder.py and jobs_page_parser.py using flowcharts
