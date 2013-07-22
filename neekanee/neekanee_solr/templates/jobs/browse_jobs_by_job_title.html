@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load neek_extras %}
+
+{% block title_content %} Browse Jobs by Job Title {% endblock %}
+
+{% block body_content %}
+<div class="row">
+  <div class="span12">
+    {% include "jobs/jobs_search_bar.html" %}
+  </div>
+</div>
+
+<hr />
+
+<div class="row">
+  <div class="span12">
+    <ul class="breadcrumb">
+      <li>
+        <a href="/">Home</a> <span class="divider">/</span>
+      </li>
+      <li>
+        <a href="/browse_jobs">Browse Jobs</a> <span class="divider">/</span>
+      </li>
+      <li>
+        <a href="/browse_jobs#by_job_title">Job Titles</a> <span class="divider">/</span>
+      </li>
+      <li class="active">{{ title_startswith }}</li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <table class="table table-bordered table-striped">
+      <tbody>
+      {% for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"|make_list %}
+        {% if forloop.counter0|modulus:13 == 0 %}
+        <tr>
+        {% endif %}
+          {% if letter == title_startswith %}
+          <td>{{ letter }}</td>
+          {% else %}
+          <td><a href="/browse_jobs/by_job_title/{{ letter }}/">{{ letter }}</a></td>
+          {% endif %}
+        {% if forloop.counter0|modulus:13 == 12 %}
+        </tr>
+        {% endif %}
+      {% endfor %}
+      </tbody>
+    </table>
+
+    <table class="table table-bordered table-striped">
+      <tbody>
+        {% for title in job_titles %}
+          {% if forloop.counter0|modulus:3 == 0 %}
+            <tr>
+          {% endif %}
+              <td><a href="/{{ title|slugify }}-jobs">{{ title }}</a></td>
+          {% if forloop.counter0|modulus:3 == 2 %}
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div><!--.span12-->
+</div><!--.row-->
+
+{% endblock %}

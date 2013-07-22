@@ -1,0 +1,310 @@
+{% extends "base.html" %}
+{% load neek_extras %}
+
+{% block title_content %}
+  {{ company.name }} Company Profile
+{% endblock %}
+
+{% block head_content %}
+    <script type="text/javascript"
+      src="http://maps.googleapis.com/maps/api/js?key=AIzaSyC5QcNOeQBfPf5qpl_qIlqhuC9eO8a3cb4&sensor=false">
+    </script>
+
+    <script type="text/javascript">
+      function initialize() {
+        var myOptions = {
+          center: new google.maps.LatLng({{ company.location.lat }}, {{ company.location.lng }}),
+          zoom: 8,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+
+        var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+        map.initialZoom = true;
+
+        var bounds = new google.maps.LatLngBounds();
+        var position = new google.maps.LatLng({{ company.location.lat }}, {{ company.location.lng }});
+
+        var marker = new google.maps.Marker({
+          position: position,
+          title:"{{ company.location }}"
+        });
+
+        marker.setMap(map);
+        bounds.extend(position);
+
+        google.maps.event.addListener(map, 'zoom_changed', function() {
+            zoomChangeBoundsListener = 
+              google.maps.event.addListener(map, 'bounds_changed', function(event) {
+                if (this.getZoom() > 15 && this.initialZoom == true) {
+                  // Change max/min zoom here
+                  this.setZoom(10);
+                  this.initialZoom = false;
+                }
+                google.maps.event.removeListener(zoomChangeBoundsListener);
+              });
+        });
+
+        map.fitBounds(bounds);
+      }
+    </script>
+    <link rel="canonical" href="/companies/{{ company.name_slug }}">
+{% endblock %}
+
+{% block body_content %}
+<div class="row">
+  <div class="span12">
+    {% include "companies/company_search_bar.html" %}
+  </div>
+</div>
+
+<hr />
+
+<div class="row">
+  <div class="span12">
+    <ul class="breadcrumb">
+      <li>
+        <a href="/">Home</a> <span class="divider">/</span>
+      </li>
+      <li>
+        <a href="/companies/">Companies</a> <span class="divider">/</span>
+      </li>
+      <li class="active">
+        {{ company.name }}
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+    {% if company.logo %}
+    <img style="max-width: 17em;" src="{{ company.logo.url }}" alt="{{ company.name }} Logo" />
+    <br />
+    {% else %}
+    <h2 id="overview">{{ company.name }}</h1>
+    {% endif %}
+    <hr />
+  </div>
+</div>
+<div class="row">
+  <div class="span3">
+    <h3>General Information</h3>
+    <table width="100%">
+      <tr>
+        <td><strong>Website</strong></td>
+        <td align="right">
+          <a href="{{ company.home_page_url }}" target="_blank">{{ company.home_page_url|remove_scheme|truncatestr:20 }}</a>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Jobsite</strong></td>
+        <td align="right">
+          <a href="{{ company.jobs_page_url }}" target="_blank">{{ company.jobs_page_url|remove_scheme|truncatestr:20 }}</a>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Benefits</strong></td>
+        <td align="right">
+          <a href="{{ company.benefits_page_url }}" target="_blank">{{ company.benefits_page_url|remove_scheme|truncatestr:20 }}</a>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Size</strong></td>
+        <td align="right">
+          {{ company.empcnt }}
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Jobs</strong></td>
+        <td align="right">
+          <a href="/jobs-at-{{ company.name_slug }}"> {{ company.job_set.all.count }}</a>
+        </td>
+      </tr>
+    </table>
+    <br />
+  </div>
+
+  <div class="span6">
+    <h3>{{ company.name }}</h3>
+    <p>
+      {{ company.description }}
+    </p>
+  </div>
+
+  <div class="span3">
+    <h3>Tags</h3>
+    {% for tag in company.companytag_set.all %}
+      <a href="/companies/?tags={{ tag }}">#{{ tag }}</a>{% if not forloop.last %},{% endif %}
+    {% endfor %}
+    <br />
+    <h3>Social Media</h3>
+    <table width="100%">
+      {% if company.blog %}
+      <tr>
+        <td><strong>Blog</strong></td>
+        <td align="right">
+          <a href="{{ company.blog }}" target="_blank">{{ company.blog|remove_scheme|truncatestr:20 }}</a>
+        </td>
+      </tr>
+      {% endif %}
+      {% if company.twitter %}
+      <tr>
+        <td><strong>Twitter</strong></td>
+        <td align="right">
+          <a href="https://twitter.com/#!/{{ company.twitter }}" target="_blank">@{{ company.twitter|truncatestr:20 }}</a>
+
+        </td>
+      </tr>
+      {% endif %}
+      {% if company.facebook %}
+      <tr>
+        <td><strong>Facebook</strong></td>
+        <td align="right">
+          <a href="https://www.facebook.com/{{ company.facebook }}" target="_blank">{{ company.facebook|truncatestr:20 }}</a>
+        </td>
+      </tr>
+      {% endif %}
+    </table>
+    <br />
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <h2 id="locations">Locations</h1>
+    <hr />
+  </div>
+</div>
+{% comment %} Company headquarters should always be 1st location {% endcomment %}
+{% for company_location in company.companylocation_set.all|slice:":4" %}
+<div class="row">
+  <div class="span9">
+    {% if company.location.country == 'us' %}
+      <h3>{{ company_location.location.city|title}}, {{ company_location.location.state|upper }} {% if company_location.location == company.location %} (HQ){% endif %}</h3>
+    {% else %}
+      <h3>{{ company_location.location.city|title }}, {{ company_location.location.country|upper }} {% if company_location.location == company.location %} (HQ){% endif %}</h3>
+    {% endif %}
+    <div style="height: 180px; margin-bottom: 40px;" id="map_canvas"></div>
+  </div>
+  <div class="span3">
+    <h3>Location Tags</h3>
+    {% for tag in company_location.companylocationtag_set.all %}
+      <p>{{ tag }}</p>
+    {% endfor %}
+    </h3>
+  </div>
+</div>
+<div class="row">
+  <div class="span12">
+    <ul class="thumbnails">
+    {% for location_photo in company_location.companylocationphoto_set.all %}
+      <li class="span3">
+        <a href="#" class="thumbnail">
+          <img src="{{ location_photo.photo.url }}" />
+        </a>
+      </li>
+    {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endfor %}
+
+<div class="row">
+  <div class="span12">
+    <h2 id="worklife">WorkLife at {{ company.name }}</h1>
+    <hr />
+  </div>
+</div>
+<div class="row">
+  <div class="span12">
+    {% if company.companyaward_set.all.count > 0 %}
+    <h3>Awards</h3>
+    <ul class="unstyled">
+    {% for award in company.companyaward_set.all %}
+      <li>
+        <a href="{{ award.award.url }}">{{ award.award.name }} {{ award.year }}</a>
+      </li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <h2 id="benefits">Benefits</h1>
+    <hr />
+  </div>
+</div>
+<div class="row">
+  <div class="span3">
+    {% if company.vacationaccrual_set.count > 0 %}
+    <h3>Vacation</h3>
+    <table width="100%" class="table table-striped table-bordered">
+      <tr>
+        <th>Year</th>
+        <th>Days</th>
+      </tr>
+      {% for item in company.vacationaccrual_set.all %}
+      <tr>
+        <td>{{ item.year }}</td>
+        <td>{{ item.days }}</td>
+      </tr>
+      {% endfor %}
+    {% endif %}
+    </table>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <h2 id="company_jobs">Jobs at {{ company.name }}</h1>
+    <hr />
+    <p><small>Jobs 1 to {{ company.job_set.all|slice:"5"|length }} of {{ company.job_set.all.count }}</small></p>
+  </div>
+</div>
+<div class="row">
+  <div class="span12">
+    <table class="table table-striped" style="table-layout: fixed;">
+      <tbody>
+        {% for j in company.job_set.all|slice:"5" %}
+        <tr>
+          <td style="word-wrap: break-word;">
+            {% if j.url_data %}
+            {% comment %}
+
+            Build a link to the job description. Generally this will will be
+            a GET link. But some links require a POST form to be submitted. 
+            For these cases, we create the form using the job_url_data field 
+            to determine the fields of the form.
+            
+            {% endcomment %}
+
+            <form class="form_as_link" name="job_{{ forloop.counter }}" method="post" action="{{ j.url }}" target="_blank">
+              {% for key,val in j.url_data|parse_url_qs %}
+              <input type="hidden" name="{{ key }}" value="{{ val.0 }}" />
+              {% endfor %}
+              {% comment %} white-space: normal required to get the text to wrap! {% endcomment %}
+              <input class="input_as_link" type="submit" value="{{ j.title }}"/>
+            </form>
+            {% else %}
+            <a rel="nofollow" href="{{ j.url }}" target="_blank"><b>{{ j.title }}</b></a>
+            {% endif %}
+            {% if j.location.country == 'us' %}
+            <p><a href="/companies/{{ j.company.name_slug }}/">{{ j.company.name }}</a> - {{ j.location.city|title }}, {{ j.location.state|upper }}</p>
+            {% else %}
+            <p><a href="/companies/{{ j.company.name_slug }}/">{{ j.company.name }}</a> - {{ j.location.city|title }}, {{ j.location.country|country_abbrev_to_name|title }}</p>
+            {% endif %}
+            {% autoescape off %}
+            {{ j.desc|truncatestr:280 }}
+            {% endautoescape %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <a href="/jobs-at-{{ company.name_slug }}"> + See all jobs at {{ company.name }}</a>
+  </div>
+</div>
+
+{% endblock %}

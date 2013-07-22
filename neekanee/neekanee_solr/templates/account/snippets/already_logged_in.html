@@ -1,0 +1,16 @@
+{% load i18n %}
+{% load account %}
+
+{% user_display user as user_display %}
+<div class="alert alert-block">
+  <p><strong>{% trans "Note" %}: </strong>you are already logged in as 
+    <a href="/account/profile/">
+      {% if user.first_name and user.last_name %} 
+        {{ user.first_name }} {{ user.last_name }} ({{ user }})
+      {% else %}
+        {{ user }}
+      {% endif %}
+    </a>
+  </p>
+</div>
+

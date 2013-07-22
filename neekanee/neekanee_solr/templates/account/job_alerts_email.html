@@ -1,0 +1,60 @@
+{% load neek_extras %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Neekanee Job Alerts</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+
+  <body style="font-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 13px; line-height:18px; color: #333;">
+    <p style="font-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 14px; margin:10px 0; line-height:18px;">
+      Neekanee Job Alert for Query: <strong>{{ job_alert.query|qstring_del:"lat&lng&radius" }}</strong>
+    </p>
+    <p>
+      <small style="font-size: 11px; color: #999;">Jobs 1 to {{ jobs|length }}</small>
+    </p>
+    <table style="table-layout: fixed; width: 100%; max-width: 100%; border-collapse: collapse; border-spacing: 0; background-color: transparent;">
+      <tbody>
+        {% for listing in sponsored_listings %}
+        <tr>
+          <td style="word-wrap: break-word; padding: 8px; line-height: 18px; text-align: left; vertical-align: top; background-color: #D0E9C6; border-top: 1px solid #DDD; ">
+            <a rel="nofollow" href="{{ listing.job_title_link }}" target="_blank">{{ listing.job_title }}</a>             
+            {% if forloop.first %}
+              <span style="float: right; color: #999;">Ads by LinkUp</span>
+            {% endif %}
+            <p>{{ listing.job_company }} - {{ listing.job_location }}</p>
+            {% autoescape off %}
+            {{ listing.job_description }}
+            {% endautoescape %}
+          </td>
+        </tr>
+        {% endfor %}
+
+        {% for j in jobs %}
+          <tr>
+            <td style="word-wrap: break-word; padding: 8px; line-height: 18px; text-align: left; vertical-align: top; {% if not forloop.counter|divisibleby:2 %} background-color: #F9F9F9; {% endif %} border-top: 1px solid #DDD; ">
+              <a rel="nofollow" href="{{ j.url }}" target="_blank"><b>{{ j.title }}</b></a>
+              {% if j.country == 'us' %}
+                <p><a href="http://www.neekanee.com/companies/{{ j.company.id }}/">{{ j.company.name }}</a> - {{ j.city|title }}, {{ j.state|upper }}</p>
+              {% else %}
+                <p><a href="http://www.neekanee.com/companies/{{ j.company.id }}/">{{ j.company.name }}</a> - {{ j.city|title }}, {{ j.country|country_abbrev_to_name|title }}</p>
+              {% endif %}
+              {% autoescape off %}
+                {{ j.highlight }}
+              {% endautoescape %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <hr />
+    <p>
+      <a href="http://www.neekanee.com/delete_job_alert/{{ job_alert.key }}">Delete This Job Alert</a>
+    </p>
+    <p>
+      Explore more job opportunities at <a href="http://www.neekanee.com">Neekanee.com</a>
+    </p>
+  </body>
+</html>

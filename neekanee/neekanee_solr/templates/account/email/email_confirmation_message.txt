@@ -1,0 +1,13 @@
+{% load account_tags %}
+{% load i18n %}
+
+{% autoescape off %}
+
+Thanks for signing up at Neekanee!
+
+Please click on the following link to verify your email address:
+
+{{ activate_url }}
+
+{% endautoescape %}
+

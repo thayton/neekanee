@@ -1,0 +1,57 @@
+{% extends "account/base.html" %}
+
+{% load url from future %}
+{% load i18n %}
+{% load bootstrap %}
+{% load account_tags %}
+{% load socialaccount_tags %}
+
+{% block title_content %} Login {% endblock %}
+
+{% block body_content %}
+    
+      <div class="row">
+        <div class="span12">
+          {% include "jobs/jobs_search_bar.html" %}
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="span12">
+          <ul class="breadcrumb">
+            <li>
+              <a href="/">Home</a> <span class="divider">/</span>
+            </li>
+            <li class="active">
+              Login
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="span12">
+          {% if not user.is_authenticated %}
+            {% if socialaccount.providers  %}
+              <p>Sign in with <a title="LinkedIn" class="socialaccount_provider linkedin" href="{% provider_login_url "linkedin" %}">LinkedIn</a> or 
+                <a href="{{ signup_url }}">sign up</a> for a Neekanee account and sign in below:
+              </p>
+            {% endif %}
+          {% endif %}
+
+          {% if user.is_authenticated %}
+            {% include "account/snippets/already_logged_in.html" %}
+          {% endif %}
+
+          <form class="well" method="post" action="{% url 'account_login' %}">{% csrf_token %}
+          {{ form|bootstrap }}
+          {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+          {% endif %}
+            <button class="btn btn-primary" type="submit">{% trans "Sign In" %}</button>
+            <a class="btn" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+         </form>
+	</div>
+      </div>
+{% endblock %}
+

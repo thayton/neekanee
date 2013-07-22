@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load neek_extras %}
+
+{% block title_content %} 
+  Company Profiles
+{% endblock %}
+
+{% block body_content %}
+
+<div class="row">
+  <div class="span12">
+    {% include "companies/company_search_bar.html" %}
+  </div>
+</div>
+
+<hr />
+
+<div class="row">
+  <div class="span12">
+    <ul class="breadcrumb">
+      <li>
+        <a href="/">Home</a> <span class="divider">/</span>
+      </li>
+      <li class="active">
+        Companies
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span3">
+    <div class="sidebar-nav">
+      {% include "companies/sidebar.html" %}
+    </div>
+  </div>
+
+  <div class="span6">
+    <p><small>Companies {{ page.start_index }} to {{ page.end_index }} of {{ page.paginator.count }}</small></p>
+    <table class="table table-striped table-hover">
+      <tbody>
+        {% for c in companies %}
+        <tr>
+          <td>
+            <a href="/companies/{{ c.name_slug }}/"><b>{{ c.name }}</b></a>
+            <p>
+              {{ c.description|truncatestr:210 }}
+            </p>
+            {% for tag in c.companytag_set.all %}
+              {% if query.tags %}
+                <a href="?{{ query.tags|split_and_remove:tag.tag.name|append:tag.tag.name|join:'+'|prepend:'tags='|qstring_set:query.urlencode }}">
+              {% else %}
+                <a href="?{{ 'tags='|add:tag.tag.name|qstring_set:query.urlencode }}">
+              {% endif %}
+              #{{ tag.tag.name }}</a>{% if not forloop.last %},{% endif %}
+            {% endfor %}
+          </td>
+        </tr>
+        {% endfor %}
+        <tr>
+      </tbody>
+    </table>
+
+    <div class="pagination">
+      {% include "paginator.html" %}
+    </div>
+  </div>
+
+  <div class="span3">
+    <div class="well">
+      <h6 style="margin-bottom: 10px;" align="center">Company Tags</h6>
+      <ul style="list-style: none none; margin: 0;">
+        {% for tag,cnt in facet_counts.company_tags|slice:":32" %}
+        <li>
+          {% if query.tags %}
+            <a href="?{{ query.tags|split_and_remove:tag|append:tag|join:'+'|prepend:'tags='|qstring_set:query.urlencode }}">
+          {% else %}
+            <a href="?{{ 'tags='|add:tag|qstring_set:query.urlencode }}">
+          {% endif %}
+          #{{ tag }}
+              <span class="facet-count">{{ cnt }}</span>
+            </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

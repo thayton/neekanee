@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title_content %} About Neekanee {% endblock %}
+
+{% block body_content %}
+      <div class="row">
+        <div class="span12">
+          {% include "jobs/jobs_search_bar.html" %}
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="row">
+        <div class="span12">
+	  <ul class="breadcrumb">
+	    <li>
+	      <a href="/">Home</a> <span class="divider">/</span>
+	    </li>
+	    <li class="active">
+	      About
+	    </li>
+	  </ul>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="span12">
+          <div class="hero-unit">
+            <h2>About Neekanee</h2>
+            <p>
+              Neekanee is a job search engine that collects jobs directly from company web sites. 
+
+              Unlike traditional job boards, companies do not have to pay to have their jobs listed
+              on Neekanee and job seekers do not have to wade through the spam that plagues traditional
+              job boards.
+
+              All of the links in the search results take you directly to the original job description on 
+              a company's website. 
+            </p>
+          </div>
+        </div><!--.span12-->
+      </div><!--.row-->
+{% endblock %}

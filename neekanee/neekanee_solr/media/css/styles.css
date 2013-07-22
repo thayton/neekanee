@@ -1,0 +1,706 @@
+/*****************************************************************
+ * main_layout - use a table to layout each page into global_nav, 
+ * local_nav, body, and footer. The width/height are 100% so that 
+ * the table fills the viewport.
+ ****************************************************************/
+table#main_layout {
+  margin:0; 
+  height: 100%; 
+  width: 100%;
+  font-size: 14px;   /* ignored from body for some reason */
+  border-spacing: 0; /* no spacing between cells */
+}
+
+/*****************************************************************
+ * global_nav_row 
+ ****************************************************************/
+table#main_layout tr#global_nav_row {
+  height: 2%;
+  background-color: #234B6F; 
+  color: white;
+}
+
+table#main_layout tr#global_nav_row > td {
+  padding: 0;
+}
+
+table#main_layout tr#global_nav_row > td div#container div {
+  padding-top: 5px;     /* space above global_nav_row */
+  padding-bottom: 5px;  /* space below global_nav_row */
+
+}
+
+/*****************************************************************
+ * global_nav_row section links
+ *
+ * Links are not underlined by default.
+ *
+ * When mouse hovers over links, or links are clicked, link text
+ * becomes white.
+ ****************************************************************/
+#global_nav_row a.logo:link       { color: pink; }
+#global_nav_row a:link            { color: #C3CCD9; }
+#global_nav_row a:visited         { color: #C3CCD9; }
+#global_nav_row a:hover, a:active { color: white;   }
+
+/*****************************************************************
+ * "local_nav_row" 
+ ****************************************************************/
+table#main_layout tr#local_nav_row {
+  background-color: #4E7BA3;
+  padding-top: 30px;
+  padding-bottom: 30px;
+
+  height: 1%;
+}
+
+table#main_layout tr#local_nav_row > td {
+  height: 128px;
+
+  border-top-width: 1px;
+  border-top-style: solid;
+  border-top-color: #6C9CC7;
+
+  border-bottom-color: #427EB4;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+}
+
+/*****************************************************************
+ * The jobs search bar appears within the local-nav section
+ ****************************************************************/
+#jobs_search_bar form { 
+  margin-bottom: 0;  
+}
+
+#jobs_search_bar form table { 
+  border-spacing: 0; 
+}
+
+#jobs_search_bar form table th {
+  font-size: 16px;
+  font-family: arial;
+  font-style: normal;
+  font-weight: normal;
+  text-align: left; 
+  color: #C3CCD9;
+}
+
+#jobs_search_bar a {
+  font-size: 14px;
+  font-family: arial;
+  font-style: normal;
+  font-weight: normal;
+  text-align: left; 
+  color: #C3CCD9;
+}
+
+#jobs_search_bar a:hover {
+  color: white;
+}
+
+/*****************************************************************
+ * body_row - contains main content of the page
+ ****************************************************************/
+table#main_layout tr#body_row {
+/*  background-color: #E5ECF3;*/
+    background-color: white;
+} 
+
+/* White box surrounding the main content of the page */
+#white_outer_box {
+  background-color: white;
+  padding: 10px 10px;
+}
+
+/* links in main content get underline when mouse hovers over them */
+table#main_layout tr#body_row a:hover {
+  text-decoration: underline;
+/*  color: #234B6F;  */
+}
+
+/*****************************************************************
+ * footer_row 
+ ****************************************************************/
+table#main_layout tr#footer_row {
+  height: 115px;
+  background-color: #222;
+/*  background-color: #717883;*/
+}
+
+#footer_content {
+  width: 100%;
+  margin: 0;
+  font-size: 16px;   /* ignored from body for some reason */
+  border-spacing: 0; 
+  color: #888;
+  text-align: left; 
+}
+
+#footer_content a {
+  margin: 0 60px 0 0;
+}
+
+/*****************************************************************
+ * "footer" section links
+ *
+ * Links are not underlined by default.
+ *
+ * When mouse hovers over links, or links are clicked, link text
+ * becomes white.
+ ****************************************************************/
+#footer_content a:link            { color: #888; }
+#footer_content a:visited         { color: #888; }
+#footer_content a:hover, a:active { color: white;   }
+
+/*****************************************************************
+ * Pagination 
+ ****************************************************************/ 
+.pages {
+  position: relative;
+  background-color: #EFEFEF;
+  margin: 0px;
+  padding: 8px 5px 7px 5px;
+  font-size: 90%;
+  height: 1.4em;
+}
+
+.pages-top {
+  border-bottom: 1px dotted #888;
+}
+
+.pages-bottom {
+  border-top: 1px dotted #888;
+}
+
+.pages .paginator {
+  position: absolute;
+  bottom: 0.4em;
+  bottom: 0.6em;
+  right: 5px;
+}
+
+.paginator a {
+  text-decoration: none;
+  border: 1px solid #ccc;
+  padding: 2px 6px;
+}
+
+.paginator span {
+  padding: 2px 6px;
+}
+
+.paginator a:hover {
+  text-decoration: none;
+  color: white;
+  background-color: #808080;
+}
+
+.paginator .prev {
+  margin-right: 20px;
+}
+
+.paginator .next {
+  margin-left: 20px;
+}
+
+.paginator a.prev,
+.paginator a.next {
+  border-width: 2px;
+}
+
+.paginator span.prev,
+.paginator span.next {
+  border: 2px solid transparent; /* keep the spacing the same */
+}
+
+.pages .paginator span.this-page {
+  font-weight: bold;
+}
+
+.pages span.results {
+  color: gray;
+  font-size: 90%;
+}
+
+.pages .disabled {
+  color: gray;
+}
+
+/*****************************************************************
+ * Tagbar of locations
+ ****************************************************************/ 
+div#tagbar {
+  margin-bottom: 10px;
+}
+
+div#tagbar,
+div#tagbar form,
+div#tagbar span {
+  vertical-align: middle;
+}
+
+div#tagbar>span {
+  display: inline-block;
+  height: 22px;
+  margin: 0px;
+  padding: 0px;
+  white-space: nowrap;
+  background: #444;
+}
+
+div#tagbar>span.start {
+  background: #326C9F;
+  color: #ffffff;
+}
+
+div#tagbar>span.start a {
+  color: #ffffff;
+}
+
+div#tagbar>span.newtags {
+  background: #EFEFEF;
+}
+
+img.tagbar_arrow {
+  vertical-align: middle;
+  display:inline;
+  margin: 0px;
+}
+
+/*****************************************************************
+ * Job summary boxes
+ ****************************************************************/ 
+.odd  { background-color: white;   }
+.even { background-color: #EFEFEF; }
+
+ul.jobs {
+  list-style: none none;
+  padding: 0;
+  margin: 0;
+}
+
+div.job-summary-compact {
+  line-height: 1.2em;
+
+  padding-bottom: 5px;
+  padding-left: 3px;
+  padding-right: 3px;
+  padding-top: 5px;
+}
+
+span.job-title {
+  line-height: 1.8em;
+  font-weight: bold;
+}
+
+div.job-summary-box, div.job-summary-caption {
+  line-height: normal;
+  text-align: center;
+  vertical-align: bottom;
+}
+
+div.job-summary-box {
+  background-attachment: scroll;
+  background-color: gray;
+  background-image: none;
+  background-position: 0 0;
+  background-repeat: repeat;
+ 
+  color: white;
+  float: left;
+  font-size: 1.85em;
+  line-height: 0.8;
+
+  padding-bottom: 3px;
+  padding-left: 1px;
+  padding-right: 1px;
+  padding-top: 7px;
+
+  width: 4ex;
+}
+
+div.job-summary-score {
+  margin-bottom: 0;
+  margin-left: 3px;
+  margin-right: 8px;
+  margin-top: 0;
+}
+
+div.job-summary-caption {
+  font-size: 0.5em;
+}
+
+/*****************************************************************
+ * Container is used to center content into a space 960px wide.
+ ****************************************************************/
+#container {
+  margin-top: 0;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 0;
+  width: 960px; 
+/*  width: 100%; */
+}
+
+body, table {
+  line-height: 1.4em;
+  color: #333333;
+  font-family: arial, helvetica, clean, sans-serif; 
+  font-size: 14px;
+  margin: 0; /* no margin between viewport and body */
+}
+
+/*****************************************************************
+ * All links by default have no underline on them until the
+ * mouse hovers over them. When the mouse clicks on them the
+ * link becomes black.
+ ****************************************************************/
+:link, :visited { 
+  text-decoration: none;
+  color: rgb(46,94,134);
+}
+
+:link:active, :visited:active {
+  color: black;
+}
+
+:hover {
+/*  text-decoration: underline;*/
+  text-decoration: none;
+}
+
+.result_filter {
+  padding-top: 10px;
+  padding-left: 10px;
+}
+
+.result_filter ul {
+  list-style: none none;
+  padding: 0px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+/*****************************************************************
+ * Jobs sidebar
+ ****************************************************************/
+table#main_layout tr#body_row .sidebar a:hover { 
+  text-decoration: underline;
+  color: 234B6F;
+}
+
+/*****************************************************************
+ * Jobs description
+ ****************************************************************/
+table#main_layout tr#body_row .job-description { 
+  font-size: 13px;
+}
+
+table#main_layout tr#body_row .job-description em { 
+  font-style: normal;
+  font-weight: bold;
+}
+
+/*****************************************************************
+ * Make buttons in the sidebar appear as links
+ ****************************************************************/
+form input.input_as_link[type="submit"] {
+  background: none;
+  border: none;
+  color: #2E5E86;
+  text-decoration: none;
+  font-family: arial;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+}
+
+form input.input_as_link[type="submit"]:hover {
+/*  text-decoration: none;*/
+  text-decoration: underline;
+  color: #234B6F;  
+}
+
+label.refine_search {
+  background: none;
+  border: none;
+  color: #2E5E86;
+  text-decoration: none;
+  font-family: arial;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+}
+
+/* 
+ * The 'REMOVE' string is made invisible until hover
+ * by setting its color to be the same as the sidebar 
+ * background
+ */
+a.refine_search .remove_filter_label { 
+  color: #EFEFEF; 
+}
+
+a.refine_search:hover {
+  text-decoration: none;
+  color: #234B6F;  
+}
+
+a.refine_search:hover .remove_filter_label {
+  color: #234B6F;  
+}
+
+.sponsored-job {
+  background-color: #F8F8F8;
+}
+
+/*****************************************************************
+ * Landing page
+ ****************************************************************/
+#logo {
+  width: 100%; 
+  margin-top: 10px;  
+  font-size: 32px;
+}
+
+#logo h1 {
+  margin-bottom: 40px; 
+  margin-top: 40px; 
+  color: #4E7BA3; 
+  text-shadow: 0px 2px 3px #555;
+}
+
+#wrapper {
+  margin-bottom: 30px;
+  background-color: #F2F6F9; 
+  border: 1px solid #C9D5DF; 
+  -webkit-border-radius: 6px;
+}
+
+#wrapper h2 {
+  text-align: center; 
+  margin-bottom: 20px; 
+  font-family: Helvetica; 
+  font-size: 24px; 
+  font-weight: 300;
+}
+
+ul#features {
+  margin-top: 20px; 
+  margin-left: 240px; 
+  padding: 0; 
+  display: block; 
+  list-style: none none;
+  text-align: center;
+}
+
+ul#features h3 {
+  font-family: Helvetica; 
+  font-size: 16px; 
+  margin-bottom: 12px;
+}
+
+#searchbox {
+  margin-top: 30px; 
+  width: 100%; 
+}
+
+#search_form {
+  margin: 0 auto;
+}
+
+#search_form input[type="submit"].btn {
+  padding:0; 
+  margin: 20px 0 30px 400px; 
+  width:140px; 
+  height:35px;
+}
+
+#search_form .search_tb_wrap {
+  float: left; 
+}
+   
+#search_form .search_tb_wrap label {
+  font-size: 20px
+  font-weight: 300;
+}
+    
+#search_form .search_tb_wrap input {
+  padding: 3px; 
+  width: 380px; 
+  height: 35px; 
+  display: block; 
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 100%;
+}
+
+#search_form .search_tb_wrap .tip {
+  font-size: 12px; 
+  color: #666;
+}
+
+#frame1 {
+  background-repeat: no-repeat; 
+  background-position: center center; 
+  margin: 0 0 18px; 
+  width: 220px; 
+  height: 170px; 
+  display: block; 
+  background-image: url(/media/images/screenshot3.png);
+}
+
+#frame2 {
+  background-repeat: no-repeat; 
+  background-position: center center; 
+  margin: 0 0 18px; 
+  width: 220px; 
+  height: 170px; 
+  display: block; 
+  background-image: url(/media/images/screenshot1.png);
+}
+
+/****************************************************************
+ * Search bar
+ ***************************************************************/
+#search_bar {
+  margin: 20px 0 20px 0;
+}
+
+#search_bar .search_tb_wrap {
+  float: left; 
+}
+   
+#search_bar .search_tb_wrap label {
+  font-size: 16px;
+  font-weight: 300;
+  color: #C3CCD9;
+}
+    
+#search_bar .search_tb_wrap input {
+  padding: 3px; 
+  width: 280px; 
+  height: 24px; 
+  display: block; 
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 95%;
+}
+
+#search_bar .search_tb_wrap .tip {
+  font-size: 12px; 
+  color: #C3CCD9;
+}
+
+#search_bar input[type="submit"].btn {
+  padding: 0; 
+  margin: 25px 0 0 20px; 
+  width: 90px; 
+  height: 24px;
+  float: left;
+}
+
+.btn {
+  display: inline-block;
+  padding: 4px 10px 4px;
+  margin-bottom: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: #333333;
+  text-align: center;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+  vertical-align: middle;
+  background-color: #f5f5f5;
+  background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -ms-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));
+  background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: linear-gradient(top, #ffffff, #e6e6e6);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#e6e6e6', GradientType=0);
+  border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+  border: 1px solid #ccc;
+  border-bottom-color: #bbb;
+/*  -webkit-border-radius: 4px;*/
+/*  -moz-border-radius: 4px;*/
+/*  border-radius: 4px;*/
+  -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+  -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+  *margin-left: .3em;
+}
+
+.btn:hover,
+.btn:active,
+.btn.active,
+.btn.disabled,
+.btn[disabled] {
+  background-color: #e6e6e6;
+}
+
+.btn:active, .btn.active {
+  background-color: #cccccc \9;
+}
+
+.btn:first-child {
+  *margin-left: 0;
+}
+
+.btn:hover {
+  color: #333333;
+  text-decoration: none;
+  background-color: #e6e6e6;
+  background-position: 0 -15px;
+  -webkit-transition: background-position 0.1s linear;
+  -moz-transition: background-position 0.1s linear;
+  -ms-transition: background-position 0.1s linear;
+  -o-transition: background-position 0.1s linear;
+  transition: background-position 0.1s linear;
+}
+
+.btn:focus {
+  outline: thin dotted #333;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+
+.btn-large {
+  padding: 9px 14px;
+  font-size: 15px;
+  line-height: normal;
+/*  -webkit-border-radius: 5px;*/
+/*  -moz-border-radius: 5px;*/
+/*  border-radius: 5px;*/
+}
+
+.btn-large [class^="icon-"] {
+  margin-top: 1px;
+}
+
+button.btn, input[type="submit"].btn {
+  *padding-top: 2px;
+  *padding-bottom: 2px;
+}
+
+button.btn::-moz-focus-inner, input[type="submit"].btn::-moz-focus-inner {
+  padding: 0;
+  border: 0;
+}
+
+button.btn.large, input[type="submit"].btn.large {
+  *padding-top: 7px;
+  *padding-bottom: 7px;
+}
+
+button.btn.small, input[type="submit"].btn.small {
+  *padding-top: 3px;
+  *padding-bottom: 3px;
+}

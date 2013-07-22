@@ -1,0 +1,42 @@
+{% extends "account/user.html" %}
+{% load neek_extras %}
+
+{% block user_content %}
+  <p><small>{{ user.jobbookmark_set.all.count }} Job{{ user.jobbookmark_set.all.count|pluralize }} in Job Basket</small></p>
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Job Title</th>
+        <th>Location</th>
+        <th>Company</th>
+        <th>Date Added</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for job_bookmark in user.jobbookmark_set.all %}
+      <tr>
+        <td>
+          <a target="_blank" href="{{ job_bookmark.job.url }}">{{ job_bookmark.job.title }}</a>
+        </td>
+        <td>
+          {% with job_bookmark.job.location as location %}
+            {% if location.country == 'us' %}
+              {{ location.city|title }}, {{ location.state|upper }}
+            {% else %}
+              {{ location.city|title }}, {{ location.country|country_abbrev_to_name|title }}
+            {% endif %}
+          {% endwith %}
+        </td>
+        <td>
+          <a href="/companies/{{ job_bookmark.job.company.name_slug }}/">{{ job_bookmark.job.company.name }}</a>
+        </td>
+        <td>{{ job_bookmark.ctime }}</td>
+        <td>
+          <a class="btn btn-danger" href="/account/job_basket/{{ job_bookmark.id }}/delete/"><i class="icon-remove icon-white"></i></a>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

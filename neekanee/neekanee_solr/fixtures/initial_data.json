@@ -1,0 +1,82 @@
+[
+  {
+    "model": "neekanee_solr.CompanySize",
+    "pk": 1,
+    "fields": {
+      "lo": "1",
+      "hi": "10"
+    }
+  },
+  {
+    "model": "neekanee_solr.CompanySize",
+    "pk": 2,
+    "fields": {
+      "lo": "11",
+      "hi": "50"
+    }
+  },
+  {
+    "model": "neekanee_solr.CompanySize",
+    "pk": 3,
+    "fields": {
+      "lo": "51",
+      "hi": "200"
+    }
+  },
+  {
+    "model": "neekanee_solr.CompanySize",
+    "pk": 4,
+    "fields": {
+      "lo": "201",
+      "hi": "500"
+    }
+  },
+  {
+    "model": "neekanee_solr.CompanySize",
+    "pk": 5,
+    "fields": {
+      "lo": "501",
+      "hi": "1000"
+    }
+  },
+  {
+    "model": "neekanee_solr.CompanySize",
+    "pk": 6,
+    "fields": {
+      "lo": "1001",
+      "hi": "5000"
+    }
+  },
+  {
+    "model": "neekanee_solr.CompanySize",
+    "pk": 7,
+    "fields": {
+      "lo": "5001",
+      "hi": "10000"
+    }
+  },
+  {
+    "model": "neekanee_solr.CompanySize",
+    "pk": 8,
+    "fields": {
+      "lo": "10001",
+      "hi": "100000"
+    }
+  },
+  {
+    "model": "neekanee_solr.Award",
+    "pk": 1,
+    "fields": {
+      "name": "Chronicle Great Colleges to Work For",
+      "url": "http://www.chroniclegreatcolleges.com"
+    }
+  },
+  {
+    "model": "neekanee_solr.Award",
+    "pk": 2,
+    "fields": {
+      "name": "FORTUNE 100 Best Companies to Work For",
+      "url": "http://www.greatplacetowork.com/best-companies/100-best-companies-to-work-for"
+    }
+  }
+]

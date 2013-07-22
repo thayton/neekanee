@@ -1,0 +1,63 @@
+{% extends "account/user.html" %}
+{% load neek_extras %}
+
+{% block user_content %}
+  <p><small>{{ user.jobalert_set.all.count }} Job Alert{{ user.jobalert_set.all.count|pluralize }} </small></p>
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Query</th>
+        <th>Created</th>
+<!--        <th>Frequency</th>-->
+<!--        <th>Status</th>-->
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for alert in user.jobalert_set.all %}
+      <tr>
+        <td>
+          <a href="/jobs/?{{ alert.query }}">{{ alert.query|qstring_del:"lat&lng&radius"|truncatestr:64 }}</a>
+          {% with alert.query|q_to_query_dict as query_dict %}
+          <dl class="dl-horizontal">
+            {% if query_dict.q %}<dt>Keywords:</dt><dd>{{ query_dict.q }}</dd>{% endif %}
+            {% if query_dict.loc %}<dt>Location:</dt><dd>{{ query_dict.loc }}</dd>{% endif %}
+            {% if query_dict.country %}<dt>Country:</dt><dd>{{ query_dict.country|country_abbrev_to_name|title }}</dd>{% endif %}
+            {% if query_dict.state %}<dt>State:</dt><dd>{{ query_dict.state|state_abbrev_to_name }}</dd>{% endif %}
+            {% if query_dict.city %}<dt>City:</dt><dd>{{ query_dict.city|title }}</dd>{% endif %}
+            {% if query_dict.company %}<dt>Company:</dt><dd>{{ query_dict.company }}</dd>{% endif %}
+            {% if query_dict.tld %}<dt>Top Level Domain:</dt><dd>{{ query_dict.tld }}</dd>{% endif %}
+            {% if query_dict.tags %}<dt>Company Tags:</dt><dd>{{ query_dict.tags }}</dd>{% endif %}
+            {% if query_dict.ltags %}<dt>Location Tags:</dt><dd>{{ query_dict.ltags }}</dd>{% endif %}
+          </dl>
+        {% endwith %}
+        </td>
+        <td>{{ alert.ctime }}</td>
+<!--
+        <td>
+	  <form method="post" class="form_as_link" action="/account/job_alerts/{{ alert.id }}/edit/">{% csrf_token %}
+	    <input type="hidden" name="query" value="{{ alert.query }}" />
+	    <input type="hidden" name="active" value="{{ alert.active }}" />
+	    <input type="hidden" name="frequency" value="{% if alert.frequency = 'W' %}D{% else %}W{% endif %}" />	    
+	    <input style="font-weight: normal;" type="submit" value="{{ alert.get_frequency_display }}" />
+	  </form>
+	</td>
+
+        <td>
+	  <form method="post" class="form_as_link" action="/account/job_alerts/{{ alert.id }}/edit/">{% csrf_token %}
+	    <input type="hidden" name="query" value="{{ alert.query }}" />
+	    <input type="hidden" name="frequency" value="{{ alert.frequency }}" />	    
+	    <input type="hidden" name="active" value="{% if alert.active %}False{% else %}True{% endif %}" />
+	    <input style="font-weight: normal;" type="submit" value="{% if alert.active %}Active{% else %}Paused{% endif %}" />
+	  </form>
+	</td>
+-->
+        <td>
+          <a class="btn btn-danger" href="/account/job_alerts/{{ alert.id }}/delete/"><i class="icon-remove icon-white"></i></a>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+{% endblock %}

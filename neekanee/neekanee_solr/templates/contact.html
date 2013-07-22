@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title_content %} Contact Neekanee {% endblock %}
+
+{% block body_content %}
+      <div class="row">
+        <div class="span12">
+          {% include "jobs/jobs_search_bar.html" %}
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="row">
+        <div class="span12">
+	  <ul class="breadcrumb">
+	    <li>
+	      <a href="/">Home</a> <span class="divider">/</span>
+	    </li>
+	    <li class="active">
+	      Contact
+	    </li>
+	  </ul>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="span12">
+          <div class="hero-unit">
+            <h2>Contact Neekanee</h2>
+            <p>
+              Comments, questions and other feedback may be sent to 
+              <script type='text/javascript'>
+                a = 'feedback'
+                b = '@'
+                c = 'neekanee.com'
+                m = a + b + c
+                document.write('<a href="mailto:' + m + '">' + m + '</a>')
+              </script>
+
+              <noscript>
+                You must have Javascript enabled to view contact email address.
+              </noscript>
+            </p>
+          </div>
+        </div><!--.span12-->
+      </div><!--.row-->
+
+{% endblock %}
