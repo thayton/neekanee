@@ -1,0 +1,50 @@
+<ul>
+  {% if not page.has_previous %} 
+    <li class="disabled"><a>Prev</a></li> 
+  {% else %}
+    <li>
+      <a {% if page.previous_page_number != 1 %} 
+           rel="nofollow" href="{{request.path}}?page={{ page.previous_page_number }}{{ query_string|yesno:'&,' }}{{ query_string }}" 
+         {% else %} 
+           href="{% if query_string %}?{{ query_string }}{% else %}.{% endif %}"
+         {% endif %}
+      >Prev</a>
+    </li>
+  {% endif %}
+
+  {% if page.paginator.num_pages != 1 %}
+    {% if page.number == 1 %}
+      <li class="active"><a>{{ page.number }}</a></li>
+    {% else %}
+      <li><a href="{% if query_string %}?{{ query_string }}{% else %}.{% endif %}">1</a></li>
+    {% endif %}
+
+    {% if page.number >= 5 %}
+      <li><a>...</a></li>
+    {% endif %}
+
+    {% for p in pages %}
+      {% if p == page.number %}
+        <li class="active"><a>{{ page.number }}</a></li>
+      {% else %}
+        <li><a {% if p != 1 %} rel="nofollow" {% endif %} href="{{request.path}}?page={{ p }}{{ query_string|yesno:'&,' }}{{ query_string }}">{{ p }}</a></li>
+      {% endif %}
+
+      {% if forloop.last and page.paginator.num_pages > p|add:"1" %}
+        <li><a>...</a></li>
+      {% endif %}
+    {% endfor %}
+
+    {% if page.number == page.paginator.num_pages %}
+      <li class="active"><a>{{ page.number }}</a></li>
+    {% else %}
+      <li><a rel="nofollow" href="{{request.path}}?page={{ page.paginator.num_pages }}{{ query_string|yesno:'&,' }}{{ query_string }}">{{ page.paginator.num_pages }}</a></li>
+    {% endif %}
+  {% endif %}
+
+  {% if not page.has_next %}
+    <li class="disabled"><a>Next</a></li> 
+  {% else %}
+    <li><a rel="nofollow" href="{{request.path}}?page={{ page.next_page_number }}{{ query_string|yesno:'&,' }}{{ query_string }}">Next</a></li>
+  {% endif %}
+</ul>

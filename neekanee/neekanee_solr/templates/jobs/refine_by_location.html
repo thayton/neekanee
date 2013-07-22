@@ -1,0 +1,59 @@
+{% extends "jobs/jobs_base.html" %}
+{% load neek_extras %}
+
+{% comment %}
+
+Refine by location is the same as the sidebar, except that all fields but the location
+name are hidden and all of the locations are listed and not just the first few.
+
+{% endcomment %}
+
+{% block sidebar_content %}
+          {% include "jobs/sidebar.html" %}
+{% endblock %}
+
+{% block jobs_content %}
+          <p><small>Locations {{ page.start_index }} to {{ page.end_index }} of {{ page.paginator.count }}</small></p>
+          <table class="table table-striped">
+            <tbody>       
+              {% if locations|length > 0 %}
+                {% for location,count in locations %}
+                <tr>
+                  <td>
+                    <div class="job-summary-compact">
+                      <div class="job-summary-box job-summary-score">
+                        {% if count > 1000 %}
+                          {{ count|divide:"1000" }}<small>k</small>
+                        {% else %}
+                          {{ count }} 
+                        {% endif %}
+                        <div class="job-summary-caption">job{{ count|pluralize }}</div>   
+                      </div>
+                      <span class="job-title">
+                        {% if location_field == 'city' %}
+                          <a href="/jobs/?{{ location_field|add:'='|add:location|qstring_set:query.urlencode }}">
+                        {% else %}       
+                          <a href="?{{ location_field|add:'='|add:location|qstring_set:query.urlencode }}">
+                        {% endif %}       
+                          {% if location_field == 'country' %}
+                            {{ location|country_abbrev_to_name|title }}
+                          {% else %}
+                            {% if location_field == 'state' %}
+                              {{ location|state_abbrev_to_name }}
+                            {% else %}
+                              {{ location|title }}
+                            {% endif %}
+                          {% endif %}
+                        </a> 
+                      </span>
+                      <div style="clear: both"></div>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              {% endif %}
+            </tbody>
+          </table>
+{% endblock %}
+
+

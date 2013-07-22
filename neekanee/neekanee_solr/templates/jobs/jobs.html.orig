@@ -1,0 +1,84 @@
+{% extends "jobs/jobs_base.html" %}
+{% load neek_extras %}
+
+{% block breadcrumb_content %}
+            <li class="active">
+              <a href="/jobs/">Jobs</a>
+            </li>
+{% endblock %}
+
+{% block sidebar_content %}
+          {% include "jobs/sidebar.html" %}
+{% endblock %}
+
+{% block jobs_content %}
+          <p><small>Jobs {{ page.start_index }} to {{ page.end_index }} of {{ page.paginator.count }}</small></p>
+	  {% if sponsored_listings|length > 0 %}
+          <table class="table" style="table-layout: fixed;">
+	    <body>
+	      {% for listing in sponsored_listings %}
+	      <tr class="success">
+                <td style="word-wrap: break-word;">
+                  <a rel="nofollow" href="{{ listing.job_title_link }}" target="_blank">{{ listing.job_title }}</a>		  
+		  {% if forloop.first %}
+		    <span class="pull-right muted">Ads by LinkUp</span>
+		  {% endif %}
+		  <p>{{ listing.job_company }} - {{ listing.job_location }}</p>
+                  {% autoescape off %}
+  		  {{ listing.job_description }}
+                  {% endautoescape %}
+		</td>
+	      </tr>
+	      {% endfor %}
+	    </body>
+	  </table>
+	  {% endif %}
+
+          <table class="table table-striped table-hover" style="table-layout: fixed;">
+            <tbody>
+              {% for j in jobs %}
+                <tr>
+                  <td style="word-wrap: break-word;">
+                    {% if j.url_data %}
+                      {% comment %}
+
+                      Build a link to the job description. Generally this will will be
+                      a GET link. But some links require a POST form to be submitted. 
+                      For these cases, we create the form using the job_url_data field 
+                      to determine the fields of the form.
+
+                      {% endcomment %}
+
+                      <form class="form_as_link" name="job_{{ forloop.counter }}" method="post" action="{{ j.url }}" target="_blank">
+                        {% for key,val in j.url_data|parse_url_qs %}
+                          <input type="hidden" name="{{ key }}" value="{{ val.0 }}" />
+                        {% endfor %}
+                        {% comment %} white-space: normal required to get the text to wrap! {% endcomment %}
+                        <input class="input_as_link" type="submit" value="{{ j.title }}"/>
+                      </form>
+                    {% else %}
+                      <a rel="nofollow" href="{{ j.url }}" target="_blank"><b>{{ j.title }}</b></a>
+                    {% endif %}
+                    {% if j.country == 'us' %}
+                      <p><a href="/companies/{{ j.company.name_slug }}">{{ j.company.name }}</a> - {{ j.city|title }}, {{ j.state|upper }}</p>
+                    {% else %}
+                      <p><a href="/companies/{{ j.company.name_slug }}">{{ j.company.name }}</a> - {{ j.city|title }}, {{ j.country|country_abbrev_to_name|title }}</p>
+                    {% endif %}
+                    {% autoescape off %}
+                      {{ j.highlight }}
+                    {% endautoescape %}
+
+                    <div style="color: #46a546;">
+                      from {{ j.company.home_page_url|remove_scheme }}
+		    </div>
+		    <br />
+                    <div style="color: #46a546;">
+		      {% include "jobs/huntsy_add_job.html" %}
+                      <a rel="nofollow" style="position: relative; float:right;" href="/account/job_basket/add/{{ j.id }}/">+ Save Job</a>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+{% endblock %}

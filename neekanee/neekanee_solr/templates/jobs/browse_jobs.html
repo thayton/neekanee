@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load neek_extras %}
+
+{% block title_content %} Browse Jobs {% endblock %}
+
+{% block body_content %}
+<div class="row">
+  <div class="span12">
+    {% include "jobs/jobs_search_bar.html" %}
+  </div>
+</div>
+
+<hr />
+
+<div class="row">
+  <div class="span12">
+    <ul class="breadcrumb">
+      <li>
+	<a href="/">Home</a> <span class="divider">/</span>
+      </li>
+      <li class="active">
+	Browse Jobs
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <h3 id="by_company">Browse Jobs by Company</h3>
+    <br />
+    <table class="table table-bordered table-striped">
+      <tbody>
+      {% for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"|make_list %}
+	{% if forloop.counter0|modulus:13 == 0 %}
+	<tr>
+	{% endif %}
+          <td><a href="/browse_jobs/by_company/{{ letter }}/">{{ letter }}</a></td>
+	{% if forloop.counter0|modulus:13 == 12 %}
+	</tr>
+	{% endif %}
+      {% endfor %}
+      </tbody>
+    </table>
+    <h3 id="by_job_title">Browse Jobs by Job Title</h3>
+    <br />
+    <table class="table table-bordered table-striped">
+      <tbody>
+      {% for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"|make_list %}
+	{% if forloop.counter0|modulus:13 == 0 %}
+	<tr>
+	{% endif %}
+          <td><a href="/browse_jobs/by_job_title/{{ letter }}/">{{ letter }}</a></td>
+	{% if forloop.counter0|modulus:13 == 12 %}
+	</tr>
+	{% endif %}
+      {% endfor %}
+      </tbody>
+    </table>
+    <h3 id="by_category">Browse Jobs by Category</h3>
+    <br />
+    <table class="table table-bordered table-striped">
+      <tbody>
+	{% for category in job_categories %}
+	{% if forloop.counter0|modulus:3 == 0 %}
+	<tr>
+	{% endif %}
+	  <td><a href="/browse_jobs/by_category/{{ category|urlencode:"" }}/">{{ category }}</a></td>
+	{% if forloop.counter0|modulus:3 == 2 %}
+	</tr>
+	{% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+    <h3 id="by_tld">Browse Jobs by Top-Level-Domain</h3>
+    <br />
+    <table class="table table-bordered table-striped">
+      <tbody>
+	{% for tld in company_tlds %}
+	{% if forloop.counter0|modulus:3 == 0 %}
+	<tr>
+	{% endif %}
+	  <td><a href="/jobs/?tld={{ tld }}">{{ tld }}</a></td>
+	{% if forloop.counter0|modulus:3 == 2 %}
+	</tr>
+	{% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+    <h3 ="by_company_size">Browse Jobs by Company Size</h3>
+    <br />
+    <table class="table table-bordered table-striped">
+      <tbody>
+	{% for size in company_sizes %}
+	{% if forloop.counter0|modulus:4 == 0 %}
+	<tr>
+	{% endif %}
+	  <td><a href="/jobs/?size={{ size.pk }}">{{ size.pk|company_size_string }}</a></td>
+	{% if forloop.counter0|modulus:4 == 3 %}
+	</tr>
+	{% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+    <h3 id="by_company_tag">Browse Jobs by Company Tags</h3>
+    <br />
+    <table class="table table-bordered table-striped">
+      <tbody>
+	{% for tag in company_tags %}
+	{% if forloop.counter0|modulus:3 == 0 %}
+	<tr>
+	{% endif %}
+	  <td><a href="/jobs/?tags={{ tag|urlencode:"" }}">{{ tag }}</a></td>
+	{% if forloop.counter0|modulus:3 == 2 %}
+	</tr>
+	{% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div><!--.span12-->
+</div><!--.row-->
+
+{% endblock %}

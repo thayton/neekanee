@@ -1,0 +1,65 @@
+{% extends "jobs/jobs_base.html" %}
+{% load neek_extras %}
+
+{% comment %}
+
+Refine by company is the same as the sidebar, except that all fields but the company
+name are hidden and all of the companies are listed and not just the first few.
+
+{% endcomment %}
+
+{% block breadcrumb_content %}
+            <li>
+              <a href="/jobs/?{{ query.urlencode }}">Jobs</a> <span class="divider">/</span>
+            <li>
+            <li class="active">
+              <a>Jobs by Company</a>
+            </li>
+{% endblock %}
+
+{% block sidebar_content %}
+          {% include "jobs/sidebar.html" %}
+{% endblock %}
+
+{% block jobs_content %}
+          <p><small>Companies {{ page.start_index }} to {{ page.end_index }} of {{ page.paginator.count }}</small></p>
+          <table class="table table-striped">
+            <tbody>       
+              {% for company,count in companies %}
+                <tr>
+                  <td>
+                    <div class="job-summary-compact">
+                      <div class="job-summary-box job-summary-score">
+                        {% if count > 1000 %}
+                          {{ count|divide:"1000" }}<small>k</small>
+                        {% else %}
+                          {{ count }} 
+                        {% endif %}
+                        <div class="job-summary-caption">job{{ count|pluralize }}</div>   
+                      </div>
+                      <span class="job-title">
+                        <a href="/jobs/?{{ company|urlencode|prepend:'company='|qstring_set:query.urlencode }}">
+                          {{ company }} 
+                        </a> 
+                      </span>
+                      <p>
+                      {% for tag in company.companytag_set.all %}
+                        {% if query.tags %}
+                          <a href="?{{ query.tags|split_and_remove:tag.tag.name|append:tag.tag.name|join:'+'|prepend:'tags='|qstring_set:query.urlencode }}">
+                        {% else %}
+                          <a href="?{{ 'tags='|add:tag.tag.name|qstring_set:query.urlencode }}">
+                        {% endif %}
+                            #{{ tag }}
+			  </a>
+                      {% endfor %}
+                      <div style="clear: both"></div>
+		      </p>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+{% endblock %}
+
+

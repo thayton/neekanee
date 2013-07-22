@@ -1,0 +1,55 @@
+{% extends "account/user.html" %}
+
+{% load i18n %}
+{% load url from future %}
+{% load account %}
+
+{% block user_content %}
+    <div class="row">
+      <div class="span1">
+        <p><strong>User</strong></p>
+      </div>
+      <div class="span11">
+	{% user_display user as user_display %}
+        {{ user_display }}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="span1">
+        <p><strong>Email</strong></p>
+      </div>
+      <div class="span11">
+        {% if user.emailaddress_set.all %}
+          {% for emailaddress in user.emailaddress_set.all %}
+            {% if emailaddress.primary %}
+              {{ emailaddress.email }}
+              {% if emailaddress.verified %}
+                <span class="verified text-success">{% trans "Verified" %}</span>
+              {% else %}
+                <span class="unverified text-error">{% trans "Unverified" %}</span>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          <p class="text-error">Email address not configured.</p>
+        {% endif %}
+        <div>
+        <a href="{% url 'account_email' %}">Manage Email Addresses</a>
+        </div>
+      </div>
+    </div>
+
+    {% if user.has_usable_password %}
+    <div class="row">
+      <div class="span1">
+        <p><strong>Password</strong></p>
+      </div>
+      <div class="span11">
+        <div><a href="{% url 'account_change_password' %}">Change Password</a></div>
+        <a href="{% url 'account_reset_password' %}">Reset Password</a>
+      </div>
+    </div>
+    {% endif %}
+
+{% endblock %}

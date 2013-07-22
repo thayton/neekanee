@@ -1,0 +1,127 @@
+span.facet-count {
+  position: relative; 
+  float: right; 
+  font-size: 11px; 
+  color: #999999;
+}
+
+div.job-summary-compact {
+  line-height: 1.2em;
+
+  padding-bottom: 5px;
+  padding-left: 3px;
+  padding-right: 3px;
+  padding-top: 5px;
+}
+
+span.job-title {
+  line-height: 1.8em;
+  font-weight: bold;
+}
+
+div.job-summary-box, div.job-summary-caption {
+  line-height: normal;
+  text-align: center;
+  vertical-align: bottom;
+}
+
+div.job-summary-box {
+  background-attachment: scroll;
+  background-color: gray;
+  background-image: none;
+  background-position: 0 0;
+  background-repeat: repeat;
+ 
+  color: white;
+  float: left;
+  font-size: 1.85em;
+  line-height: 0.8;
+
+  padding-bottom: 3px;
+  padding-left: 1px;
+  padding-right: 1px;
+  padding-top: 7px;
+
+  width: 4ex;
+}
+
+div.job-summary-score {
+  margin-bottom: 0;
+  margin-left: 3px;
+  margin-right: 8px;
+  margin-top: 0;
+}
+
+div.job-summary-caption {
+  font-size: 0.5em;
+}
+
+/*****************************************************************
+ * Some job sites require us to submit a form to see a job's
+ * description. This means some of our links are really forms
+ * that must be styled to look like a link.
+ ****************************************************************/
+form.form_as_link {
+  margin: 0; 
+}
+
+form.form_as_link input[type="submit"], input.input_as_link {
+  background: none;
+  border: none;
+  font-weight: bold;
+  color: #08C;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  white-space: normal; 
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+
+form.form_as_link input[type="submit"]:hover, input.input_as_link:hover {
+  color: #005580;
+  text-decoration: underline;
+}
+
+#landing-page-search-form {
+  border:none; 
+  background-color: #222; 
+  background: rgba(0, 0, 0, .75); 
+  border-radius: 0;
+}
+
+a.tag-link > span.label {
+  padding: 4px;
+}
+
+a.tag-link:hover {
+  text-decoration: none;
+}
+
+a.tag-link:hover > span.label {
+  background-color: #34789a;
+}
+
+.site-background {
+  background: url(/media/images/Neekanee-white-line.png) repeat-y center center fixed; background-color: #eee;
+}
+
+#landing-page.site-background {
+  background: url(/media/images/desk.jpg) no-repeat center center fixed; background-size: cover;
+}
+
+.huntsy_job_form {
+  display: none;
+}
+
+#jobs-sidebar-left i.icon-chevron-right, i.icon-chevron-down {
+  float: right;
+  opacity: 0.25;
+}
+
+#jobs-sidebar-right i.icon-chevron-right, i.icon-chevron-down {
+  float: right;
+  opacity: 0.25;
+}

@@ -1,0 +1,22 @@
+<!--
+  Necessary because Oracle ATS requires you visit the job list page before
+  viewing each job entry.
+
+  Once the iframe is done loading, then use javascript to submit the form.
+-->
+
+<script type="text/javascript">
+  function myFunc() {
+    var frm = document.getElementById("job_1");
+    frm.submit();
+  }
+</script>
+
+<!-- Replace src with job.url (should be same as form action at real site) -->
+<iframe width="0" height="0" src="https://careers.partners.org/psc/EA/EMPLOYEE/HRMS/c/HRS_HRAM.HRS_CE.GBL" onload="myFunc();">
+</iframe>
+
+<!-- Replace action with job.url and use job.url_data to create inputs -->
+<form name="job_1" id="job_1" method="POST" action="https://careers.partners.org/psc/EA/EMPLOYEE/HRMS/c/HRS_HRAM.HRS_CE.GBL">
+  <input type="hidden" name="ICAction" value="POSTINGTITLE$7">
+</form>

@@ -1,0 +1,42 @@
+import re, urlparse, webcli
+
+from location import parse_location
+from soupify import soupify, get_all_text, get_mailto
+
+COMPANY = {
+    'name': 'RAXCO Software',
+    'hq': parse_location('Gaithersburg, MD'),
+
+    'benefits': {'vacation': []},
+
+    'home_page_url': 'http://perfectdisk.raxco.com',
+    'jobs_page_url': 'http://perfectdisk.raxco.com/about-us/careers',
+
+    'empcnt': [11,50]
+}
+
+def get_jobs(c, url=COMPANY['jobs_page_url']):
+
+    s = soupify(webcli.get(url))
+    d = s.find(text=re.compile(r'Open Positions'))
+    d = d.parent.parent
+    r = re.compile(r'careers')
+
+    for a in d.findAll('a', href=r):
+        job = {}
+        job['title'] = a.text.strip()
+        job['link'] = urlparse.urljoin(url, a['href'])
+        c['jobs'].append(job)
+
+    for job in c['jobs']:
+        s = soupify(webcli.get(job['link']))
+        d = s.html.find('div', attrs={'class': 'column-two'})
+
+        job['desc'] = get_all_text(d)
+
+        l = d.find(text=re.compile(r'Location:'))
+        l = l.split('Location:')[1]
+        l = parse_location(l)
+
+        job['location'] = l
+        job['contact'] = get_mailto(s)

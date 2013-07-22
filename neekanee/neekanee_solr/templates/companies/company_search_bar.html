@@ -1,0 +1,6 @@
+<center>
+  <form method="get" action="/companies/" class="form-inline well" align="center" style="background-color: #eeeeee;" >
+    <input name="name" class="span5" type="text" {% if query.name %} value="{{ query.name }}" {% else %} placeholder="Company Name" {% endif %} >
+    <button type="submit" class="btn btn-primary"><i class="icon-search icon-white"></i></button>
+  </form>
+</center>

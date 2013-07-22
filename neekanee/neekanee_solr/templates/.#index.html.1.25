@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title_content %} Global Job Search Engine | Neekanee {% endblock %}
+{% block meta_description_content %}Search thousands of jobs from over 50 countries all collected directly from company websites.{% endblock %}
+
+{% block head_content %}
+    <script type="text/javascript"
+      src="http://maps.googleapis.com/maps/api/js?key=AIzaSyC5QcNOeQBfPf5qpl_qIlqhuC9eO8a3cb4&sensor=false">
+    </script>
+
+    <script type="text/javascript">
+      var geocoder = null;
+
+      function getcoord(form) {
+        if (form.loc.value.length > 0) {
+            geocoder.geocode({ 'address': form.loc.value },
+              function(results, status) { 
+                if (status == google.maps.GeocoderStatus.OK) {
+                  var coord = results[0].geometry.location;
+                  var components = results[0].address_components;
+
+                  //
+                  // Use lat/lng if location is at the city level, and filter
+                  // queries otherwise
+                  //
+                  if (results[0].types[0] == 'locality') {
+                    form.lat.value = coord.lat();
+                    form.lng.value = coord.lng();
+                    form.radius.value = 25;
+                  } else if (results[0].types[0] == 'administrative_area_level_1') {
+                    form.loc.value = '';
+                    if (results[0].address_components[0].types[0] == results[0].types[0]) {
+                      var state_code = components[0].short_name.toLowerCase();
+                      form.state.value = state_code;
+                    }
+                  } else if (results[0].types[0] == 'country') {
+                    form.loc.value = '';
+                    if (results[0].address_components[0].types[0] == results[0].types[0]) {
+                      var country_code = components[0].short_name.toLowerCase();
+                      form.country.value = country_code;
+                    }
+                  }
+                } 
+                form.submit();
+              }
+            );
+            return false;
+        } 
+        return true;
+      }
+
+      function initialize() {
+        geocoder = new google.maps.Geocoder();
+      }
+    </script>
+{% endblock %}
+
+{% block body_id %}landing-page{% endblock %}
+
+{% block body_content %}
+        <div id="landing-page-search" class="row">
+          <div class="span7">
+            <h1>Search from thousands of jobs from over 50 countries.</h1>
+          </div>
+          <div class="span5">
+            <center>
+              <form id="landing-page-search-form" method="get" action="/search" class="form-inline well" onsubmit="return getcoord(this);">
+                <div class="control-group">
+                  <div class="controls">
+                    <input class="span4" name="q" type="text" placeholder="Keywords: Ruby, Rails, Django">
+                  </div>
+                </div>
+                <div class="controls-group">
+                  <div class="controls">
+                    <input name="loc" class="span3" type="text" placeholder="Location: City, State, Zip">
+                    <input type="hidden" name="lat" />
+                    <input type="hidden" name="lng" />
+                    <input type="hidden" name="radius" />
+                    <input type="hidden" name="state" />
+                    <input type="hidden" name="country" />
+                    <button type="submit" class="btn btn-primary">Search</button>
+                  </div>
+                </div>
+              </form>
+            </center>
+          </div>
+        </div>
+{% endblock %}

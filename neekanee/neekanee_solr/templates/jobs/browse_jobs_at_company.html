@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% load neek_extras %}
+
+{% block title_content %} Browse Jobs by Company {{ name_startswith }}{% endblock %}
+
+{% block body_content %}
+<div class="row">
+  <div class="span12">
+    {% include "jobs/jobs_search_bar.html" %}
+  </div>
+</div>
+
+<hr />
+
+<div class="row">
+  <div class="span12">
+    <ul class="breadcrumb">
+      <li>
+        <a href="/">Home</a> <span class="divider">/</span>
+      </li>
+      <li>
+        <a href="/browse_jobs">Browse Jobs</a> <span class="divider">/</span>
+      </li>
+      <li>
+        <a href="/browse_jobs#by_company">Companies</a> <span class="divider">/</span>
+      </li>
+      <li>
+	<a href="/browse_jobs/by_company/{{ name_startswith }}/">{{ name_startswith }}</a> <span class="divider">/</span>
+      </li>
+      
+      <li {% if not country %} class="active" {% endif %}>
+	<a href="/browse_jobs/by_company/{{ name_startswith }}/{{ company.name_slug }}/">{{ company.name }}</a> 
+      </li>
+
+      {% if country %}
+      <span class="divider">/</span>
+      <li {% if not state and not city %} class="active" {% endif %}>
+	<a href="/browse_jobs/by_company/{{ name_startswith }}/{{ company.name_slug }}/{{ country }}/">{{ country|country_abbrev_to_name|title }}</a>
+      </li>
+      {% endif %}
+
+      {% if state %}
+      <span class="divider">/</span>
+      <li {% if not city %} class="active" {% endif %}>
+	<a href="/browse_jobs/by_company/{{ name_startswith }}/{{ company.name_slug }}/{{ country }}/{{ state }}/">{{ state|state_abbrev_to_name|title }}</a>
+      </li>
+      {% endif %}
+
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <table class="table table-bordered table-striped">
+      <tbody>
+      {% for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"|make_list %}
+        {% if forloop.counter0|modulus:13 == 0 %}
+        <tr>
+        {% endif %}
+          {% if letter == name_startswith %}
+          <td>{{ letter }}</td>
+          {% else %}
+          <td><a href="/browse_jobs/by_company/{{ letter }}/">{{ letter }}</a></td>
+          {% endif %}
+        {% if forloop.counter0|modulus:13 == 12 %}
+        </tr>
+        {% endif %}
+      {% endfor %}
+      </tbody>
+    </table>
+
+    {% if not country %}
+    <h3>Countries</h3>
+    <table class="table table-bordered table-striped">
+      <tbody>
+        {% for country in countries %}
+          {% if forloop.counter0|modulus:3 == 0 %}
+            <tr>
+          {% endif %}
+              <td><a href="/browse_jobs/by_company/{{ name_startswith }}/{{ company.name_slug }}/{{ country }}/">{{ country|country_abbrev_to_name|title }}</a></td>
+          {% if forloop.counter0|modulus:3 == 2 %}
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+    {% elif states %}
+    <h3>States</h3>
+    <table class="table table-bordered table-striped">
+      <tbody>
+        {% for state in states %}
+          {% if forloop.counter0|modulus:3 == 0 %}
+            <tr>
+          {% endif %}
+              <td><a href="/browse_jobs/by_company/{{ name_startswith }}/{{ company.name_slug }}/{{ country }}/{{ state }}/">{{ state|state_abbrev_to_name|title }}</a></td>
+          {% if forloop.counter0|modulus:3 == 2 %}
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <h3>Cities</h3>
+    <table class="table table-bordered table-striped">
+      <tbody>
+        {% for city in cities %}
+          {% if forloop.counter0|modulus:3 == 0 %}
+            <tr>
+          {% endif %}
+              <td><a href="/jobs-at-{{company.name_slug}}-in-{{ city }}{% if state %},{{state}}{% endif %},{{ country }}">{{ city|title }}</a></td>
+          {% if forloop.counter0|modulus:3 == 2 %}
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </div><!--.span12-->
+</div><!--.row-->
+
+{% endblock %}

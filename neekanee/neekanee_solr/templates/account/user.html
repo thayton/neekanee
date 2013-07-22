@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load neek_extras %}
+{% load account %}
+
+{% block title_content %} {{ user.username }} Account {% endblock %}
+
+{% block body_content %}
+      <div class="row">
+        <div class="span12">
+          {% include "jobs/jobs_search_bar.html" %}
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="span12">
+          <ul class="breadcrumb">
+            <li>
+              <a href="/">Home</a> <span class="divider">/</span>
+            </li>
+            <li class="active">
+	      {% user_display user as user_display %}
+	      Account ({{ user_display }})
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="row">
+	<div class="span12">
+          <ul class="nav nav-tabs">
+            <li {% ifequal request.path "/account/profile/" %} class="active" {% endifequal %} >
+              <a href="/account/profile/">Profile</a>
+            </li>
+            <li {% ifequal request.path "/account/email/" %} class="active" {% endifequal %} >
+              <a href="/account/email/">Email</a>
+            </li>
+            <li {% ifequal request.path "/account/job_alerts/" %} class="active" {% endifequal %} >
+              <a href="/account/job_alerts/">Job Alerts</a>
+            </li>
+            <li {% ifequal request.path "/account/job_basket/" %} class="active" {% endifequal %} >
+              <a href="/account/job_basket/">Job Basket</a>
+            </li>
+	  </ul>
+
+	  {% block user_content %}{% endblock %}
+	</div>
+      </div>
+
+{% endblock %}

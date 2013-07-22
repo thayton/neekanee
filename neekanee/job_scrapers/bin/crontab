@@ -1,0 +1,9 @@
+# Crontab for nightly job scraping runs
+# 30 2 * * * /Users/toddhayton/Projects/padalert/padalert.py
+PATH=/usr/bin:/bin:/usr/local/bin
+PLUGINS_DIR=/Users/toddhayton/Projects/jobsearch/job_scrapers/plugins/
+RESULTS_DIR=/Users/toddhayton/Projects/jobsearch/job_scrapers/bin/results
+PYTHONPATH=/Users/toddhayton/Projects/jobsearch/job_scrapers/util/:/Users/toddhayton/Projects/jobsearch/job_scrapers/
+
+00 23 * * * /Users/toddhayton/Projects/jobsearch/job_scrapers/bin/scrape_jobs.py $PLUGINS_DIR $RESULTS_DIR
+18 13 * * * (cd /Users/toddhayton/Projects/jobsearch/; ./backup-locations.sh > /Users/toddhayton/log.txt 2>&1)

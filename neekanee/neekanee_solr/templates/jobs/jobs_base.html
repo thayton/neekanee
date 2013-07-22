@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+{% load neek_extras %}
+
+{% block title_content %} 
+  {% if query.title %} 
+    {{ query.title }} 
+  {% else %}
+    {% if query.q %} 
+      {{ query.q|title }} 
+    {% else %}
+      {% if query.tld %}
+        {{ query.tld|title }}
+      {% endif %}
+    {% endif %} 
+  {% endif %} 
+
+  Jobs 
+
+  {% if query.loc or query.city or query.state or query.country %} in {% endif %}
+
+  {% if query.loc %} 
+    {{ query.loc|title }} 
+  {% else %}
+    {% if query.city %} {{ query.city|title }} {% endif %}    
+    {% if query.state %} {{ query.state|state_abbrev_to_name }} {% endif %}    
+    {% if query.country %} {{ query.country|country_abbrev_to_name|title }} {% endif %}    
+  {% endif %}
+
+  {% if query.company %} 
+    at {{ query.company|title }} 
+  {% else %}
+    {% if query.tags %} 
+      at {{ query.tags|title }} companies
+    {% endif %}
+  {% endif %}
+{% endblock %}
+
+{% block meta_description_content %}
+  Find 
+
+  {% if query.q %} 
+    {{ query.q|title }} 
+  {% else %}
+    {% if query.tags %} 
+      {{ query.tags|title }} 
+    {% else %}
+      {% if query.tld %}
+        {{ query.tld|title }}
+      {% endif %}
+    {% endif %}
+  {% endif %} 
+
+  Jobs 
+
+  {% if query.loc or query.city or query.state or query.country %} in {% endif %}
+  {% if query.loc %} 
+    {{ query.loc|title }} 
+  {% else %}
+    {% if query.city %} {{ query.city|title }} {% endif %}    
+    {% if query.state %} {{ query.state|state_abbrev_to_name }} {% endif %}    
+    {% if query.country %} {{ query.country|country_abbrev_to_name|title }} {% endif %}    
+  {% endif %}
+
+  {% if query.company %} at {{ query.company|title }} {% endif %}
+{% endblock %}
+
+{% block head_content %}
+    <script type="text/javascript"
+      src="http://maps.googleapis.com/maps/api/js?key=AIzaSyC5QcNOeQBfPf5qpl_qIlqhuC9eO8a3cb4&sensor=false">
+    </script>
+
+    <script type="text/javascript">
+      var geocoder = null;
+
+      function getcoord(form) {
+        if (form.loc.value.length > 0) {
+            geocoder.geocode({ 'address': form.loc.value },
+              function(results, status) { 
+                if (status == google.maps.GeocoderStatus.OK) {
+                  var coord = results[0].geometry.location;
+                  var components = results[0].address_components;
+
+                  //
+                  // Use lat/lng if location is at the city level, and filter
+                  // queries otherwise
+                  //
+                  if (results[0].types[0] == 'locality') {
+                    form.lat.value = coord.lat();
+                    form.lng.value = coord.lng();
+                    form.radius.value = 25;
+                  } else if (results[0].types[0] == 'administrative_area_level_1') {
+                    form.loc.value = '';
+                    if (results[0].address_components[0].types[0] == results[0].types[0]) {
+                      var state_code = components[0].short_name.toLowerCase();
+                      form.state.value = state_code;
+                    }
+                  } else if (results[0].types[0] == 'country') {
+                    form.loc.value = '';
+                    if (results[0].address_components[0].types[0] == results[0].types[0]) {
+                      var country_code = components[0].short_name.toLowerCase();
+                      form.country.value = country_code;
+                    }
+                  }
+                } 
+                form.submit();
+              }
+            );
+            return false;
+        } 
+        return true;
+      }
+
+      function initialize() {
+        var usa = new google.maps.LatLng(37.09024, -95.712891);
+        var myOptions = {
+          {% if query.lat and query.lng %}
+            center: new google.maps.LatLng({{ query.lat }}, {{ query.lng }}),
+          {% else %}
+            center: usa,
+          {% endif %}
+          zoom: 8,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+
+        var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+
+        {% if facet_counts.country|length > 0 %}
+          var bounds = new google.maps.LatLngBounds();
+
+          {% for place,coord in latlng.items %}
+            position = new google.maps.LatLng({{ coord.0 }}, {{ coord.1 }});
+
+            var markerOptions = {
+              {% if facet_counts.country|length > 1 %}
+                url: '?{{ 'country='|add:place|qstring_set:query.urlencode|safe }}',
+              {% else %}
+                {% if facet_counts.state|length > 1 %}
+                  url: '?{{ 'state='|add:place|qstring_set:query.urlencode|safe }}',
+                {% else %}
+                  url: '/jobs/?{{ 'city='|add:place|qstring_set:query.urlencode|safe }}',
+                {% endif %}
+              {% endif %}
+              position: position,
+              map: map
+            };
+
+            var marker = new google.maps.Marker(markerOptions);
+
+            google.maps.event.addListener(marker, 'click', function() {
+              window.location.href = this.url;
+            });
+
+            bounds.extend(position);
+          {% endfor %}
+
+          google.maps.event.addListener(map, 'zoom_changed', function() {
+            zoomChangeBoundsListener = 
+              google.maps.event.addListener(map, 'bounds_changed', function(event) {
+                if (this.getZoom() > 15 && this.initialZoom == true) {
+                  // Change max/min zoom here
+                  this.setZoom(10);
+                  this.initialZoom = false;
+                }
+                google.maps.event.removeListener(zoomChangeBoundsListener);
+              });
+          });
+
+          map.initialZoom = true;
+          map.fitBounds(bounds);
+
+        {% endif %}
+
+        geocoder = new google.maps.Geocoder();
+      }
+    </script>
+
+    {% if page.paginator.count > 0 %}
+    <link rel="canonical" href="/{% if query.q %}{{ query.q|slugify }}-{% elif query.title %}{{ query.title|slugify }}-{% endif %}jobs{% if query.company %}-at-{{ query.company|slugify }}{% endif %}{% if query.city or query.state or query.country %}-in{% endif %}{% if query.city %}-{{query.city|slugify}}{% endif %}{% if query.state %}-{{query.state}}{% endif %}{% if not query.state %}{% if query.city and facet_counts.country|length = 1 and facet_counts.country.0.0 == 'us' %}-{{ facet_counts.state.0.0 }}{% endif %}{% endif %}{% if query.country %}-{{query.country}}{% endif %}{% if not query.country %}{% if query.city or query.state %}-{{ facet_counts.country.0.0 }}{% endif %}{% endif %}">
+    {% endif %}
+{% endblock %}
+
+{% block body_content %}
+      <div class="row">
+        <div class="span12">
+          {% include "jobs/jobs_search_bar.html" %}
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="row">
+        <div class="span12">
+          <ul class="breadcrumb">
+            <li>
+              <a href="/">Home</a> <span class="divider">/</span>
+            </li>
+            <li class="active">
+              Jobs
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="span3">
+          {% block sidebar_content %}{% endblock %}
+        </div>
+
+        <div class="span6">
+          <ul class="nav nav-tabs">
+            <li {% ifequal request.path "/jobs/" %} class="active" {% endifequal %}>
+              <a href="/jobs/?{{ query.urlencode }}">Jobs</a>
+            </li>
+            <li {% ifequal request.path "/jobs_by_company/" %} class="active" {% endifequal %}>
+              <a rel="nofollow" href="/jobs_by_company/?{{ query.urlencode }}">Jobs by Company</a>
+            </li>
+            <li {% ifequal request.path "/jobs_by_location/" %} class="active" {% endifequal %}>
+              <a rel="nofollow" href="/jobs_by_location/?{{ query.urlencode }}">Jobs by Location</a>
+            </li>
+          </ul>
+
+          {% block jobs_content %}{% endblock %}
+
+          <div class="pagination">
+            {% include "paginator.html" %}
+          </div>
+        </div><!--.span6-->
+
+        <div class="span3">
+          <div style="height: 180px; margin-bottom: 40px;" id="map_canvas"></div>
+	  {% if user.is_authenticated and query.urlencode != "" %}
+	  <div class="well">
+	    <h6 style="margin-bottom: 10px;" align="center">Email Job Alerts</h6>	    
+	    <p>Get emailed when new jobs match this query.</p>
+	    <div align=center>
+	      <a rel="nofollow" class="btn btn-success" href="/account/job_alerts/create/{{ query.urlencode|qstring_del:'page'|urlencode }}"> Get Alerts</a>
+	    </div>
+	  </div>
+	  {% endif %}
+          <div id="jobs-sidebar-right">
+          <div class="accordion" id="tag-accordion">
+            <div class="accordion-group">
+              <div class="accordion-heading" style="background-color: whiteSmoke">
+                <a class="accordion-toggle" data-toggle="collapse" href="#company-tags"><i class="icon-chevron-right"></i>Company Tags</a>
+              </div>
+              <div id="company-tags" class="accordion-body collapse">
+                <div class="accordion-inner">
+		  <ul style="list-style: none none; margin: 0;">
+		  {% for tag,cnt in facet_counts.company_tags|slice:":32" %}
+                    <li>
+                      <a rel="nofollow" href="/jobs/?{{ query.tags|add_tag:tag|qstring_set:query.urlencode }}">
+			#{{ tag }}
+			<span class="facet-count">{{ cnt }}</span>
+                      </a>
+                    </li>
+		  {% endfor %}
+		  </ul>
+                </div>
+              </div>
+	    </div>
+
+            <div class="accordion-group">
+              <div class="accordion-heading" style="background-color: whiteSmoke">
+                <a class="accordion-toggle" data-toggle="collapse" href="#location-tags"><i class="icon-chevron-right"></i>Location Tags</a>
+              </div>
+              <div id="location-tags" class="accordion-body collapse">
+                <div class="accordion-inner">
+                  <ul style="list-style: none none; margin: 0;">
+                  {% for tag,cnt in facet_counts.company_location_tags|slice:":32" %}
+                    <li>
+                      <a rel="nofollow" href="/jobs/?{{ query.ltags|add_location_tag:tag|qstring_set:query.urlencode }}">
+                        #{{ tag }}
+                        <span class="facet-count">{{ cnt }}</span>
+                      </a>
+                    </li>
+                  {% endfor %}
+                  </ul>
+                </div>
+              </div>
+	    </div>
+
+	    <div style="margin-top:20px;">
+	      <script type="text/javascript">
+		var zfBaseURL=(("https:"==document.location.protocol)
+                ? "https://share.loftresumes.com/mjs/3/66051"
+                : "http://share.loftresumes.com/mjs/3/66051");
+		document.write(unescape("%3Cscript src=" + zfBaseURL
+		+ " type=\"text/javascript\"%3E%3C/script%3E"));
+	      </script>
+	      <noscript>
+		<a href="http://share.loftresumes.com/l/3/66051" title="">
+		  <img src="http://share.loftresumes.com/m/3" alt="" title="" style="border: none"   />
+		</a>
+	      </noscript>            
+	    </div>
+	    </div>
+          </div> <!-- jobs-sidebar-right -->
+        </div>
+      </div><!--.row-->
+{% endblock %}

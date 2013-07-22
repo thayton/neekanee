@@ -1,0 +1,69 @@
+import re, urlparse, urllib, webcli
+import mechanize
+
+from jobscraper import JobScraper
+from location import parse_location
+from soupify import soupify, get_all_text, extract_form_fields
+
+COMPANY = {
+    'name': 'Partners HealthCare',
+    'hq': parse_location('Boston, MA'),
+
+    'benefits': { 'vacation': [] },
+
+    'home_page_url': 'http://www.partners.org',
+    'jobs_page_url': 'http://www.partners.org/Careers/Default.aspx',
+
+    'empcnt': [10001]
+}
+
+class PartnersJobScraper(JobScraper):
+    def __init__(self):
+        super(PartnersJobScraper, self).__init__()
+        self.br = mechanize.Browser()
+        self.br.set_handle_robots(False)
+
+    def scrape_jobs(self, c, url=COMPANY['jobs_page_url']):
+        self.br.open(url)
+        self.br.follow_link(self.br.find_link(text='Search All Open Positions'))
+
+        r = re.compile(r'POSTINGTITLE\$\d+$')
+
+        while True:
+            s = soupify(self.br.response().read())
+            f = s.find('form', attrs={'name': 'win0'})
+
+            for a in s.findAll('a', id=r):
+                job = {}
+                job['title'] = a.text
+                job['link'] = urlparse.urljoin(self.br.geturl(), f['action'])
+                job['data'] = urllib.urlencode({'ICAction': a['name']})
+
+                self.br.select_form(f['name'])
+                self.br.set_all_readonly(False)
+                self.br.form['ICAction'] = a['name']
+                self.br.submit()
+
+                x = soupify(self.br.response().read())
+                t = x.find('table', id='ACE_width')
+        
+                job['desc'] = get_all_text(t)
+                self.br.back()
+
+                c['jobs'].append(job)
+        
+            try:
+                self.br.find_link(text='Next')
+            except mechanize.LinkNotFoundError:
+                break
+
+            self.br.select_form(f['name'])
+            self.br.set_all_readonly(False)
+            self.br.form['ICAction'] = 'HRS_APPL_WRK_HRS_LST_NEXT'
+            self.br.submit()
+
+    def prune_jobs(self, company):
+        pass
+
+def get_scraper():
+    return PartnersJobScraper()

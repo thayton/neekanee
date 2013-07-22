@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title_content %} Neekanee Help {% endblock %}
+
+{% block body_content %}
+      <div class="row">
+        <div class="span12">
+          {% include "jobs/jobs_search_bar.html" %}
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="span12">
+	  <ul class="breadcrumb">
+	    <li>
+	      <a href="/">Home</a> <span class="divider">/</span>
+	    </li>
+	    <li class="active">
+	      Help
+	    </li>
+	  </ul>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="span12">
+	  <table class="table table-bordered">
+	    <thead>
+	      <tr>
+		<th nowrap> Search String </th>
+		<th> Search Results </th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td nowrap valign="top"><a href='/jobs/?q=software+engineer'>software engineer</a></td>
+		<td>
+		  Search for the words <em>software</em> and <em>engineer</em>. As long as at least one of these terms 
+		  shows up in a job description, then that job will be included in the results.
+
+		  <p>
+		    Will find results such as "writes <b>software</b> in Java", "design <b>engineer</b>
+		    needed", and "writes <b>software</b> and works with the hardware <b>engineer</b>"
+		  </p>
+		</td>
+	      </tr>
+	      <tr>
+		<td nowrap valign="top"><a href='/jobs/?q=software+AND+engineer'>software AND engineer</a></td>
+		<td>
+		  Search for the words <em>software</em> and <em>engineer</em>. Because of the AND keyword, both terms
+		  must be present in a job description for it to show up in the results.
+
+		  <p>
+		    Will find results such as "writes <b>software</b> and works with the hardware <b>engineer</b>"
+		    but will <em>not</em> match strings such as "writes <b>software</b> in Java" or "design <b>engineer</b>
+		    needed" since these strings do not contain both of the terms <em>software</em> and <em>engineer</em>.
+		  </p>
+		</td>
+	      </tr>
+	      <tr>
+		<td nowrap valign="top"><a href='/jobs/?q=%2bsoftware+%2bengineer'>+software +engineer</a></td>
+		<td>An alternate way of specifying the previous search.</td>
+	      </tr>
+	      <tr>
+		<td nowrap valign="top"><a href='/jobs/?q="software+engineer"'>"software engineer"</a></td>
+		<td>
+		  Search for the string <em>software engineer</em>. 
+		  <p>
+		    Will find results such as "Rockstar <b>software engineer</b> needed" but will <em>not</em> match 
+		    the string "writes <b>software</b> and works with the hardware <b>engineer</b>" since 
+		    the words <em>software</em> and <em>engineer</em> do not appear consecutively.
+		  </p>
+		</td>
+	      </tr>
+	      <tr>
+		<td nowrap valign="top"><a href='/jobs/?q=ruby+NOT+"ruby+on+rails"'>ruby NOT "ruby on rails"</a></td>
+		<td>
+		  Search for jobs whose descriptions contain the word <em>ruby</em> but which do not contain the string <em>ruby on rails</em>.
+		</td>
+	      </tr>
+	      <tr>
+		<td nowrap valign="top"><a href='/jobs/?q=ruby+-"ruby+on+rails"'>ruby -"ruby on rails"</a></td>
+		<td>An alternate way of specifying the previous search.</td>
+	      </tr>
+	      <tr>
+		<td nowrap valign="top"><a href='/jobs/?q="ruby+on+rails"+OR+%28django+AND+python%29'>"ruby on rails" OR (django AND python)</a></td>
+		<td>Search for jobs whose descriptions either contain the string <em>ruby on rails</em> or contain the 
+		  words <em>django</em> and <em>python</em>
+		</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	</div><!--.span12-->
+      </div><!--.row-->
+
+{% endblock %}

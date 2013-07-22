@@ -1,0 +1,49 @@
+{% extends "account/base.html" %}
+
+{% load url from future %}
+{% load bootstrap %}
+{% load i18n %}
+
+{% block title_content %}{% trans "Signup" %}{% endblock %}
+
+{% block body_content %}
+      <div class="row">
+        <div class="span12">
+          {% include "jobs/jobs_search_bar.html" %}
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="span12">
+          <ul class="breadcrumb">
+            <li>
+              <a href="/">Home</a> <span class="divider">/</span>
+            </li>
+            <li class="active">
+              Sign Up
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="span12">
+          {% if user.is_authenticated %}
+            {% include "account/snippets/already_logged_in.html" %}
+          {% else %}
+            <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
+        
+            <form class="well" id="signup_form" method="post" action="{% url 'account_signup' %}">
+             {% csrf_token %}
+             {{ form|bootstrap }}
+             {% if redirect_field_value %}
+               <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+             {% endif %}
+             <button class="btn btn-primary" type="submit">{% trans "Sign Up" %}</button>
+            </form>
+          {% endif %}
+	</div>
+      </div>
+{% endblock %}
+
+

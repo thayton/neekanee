@@ -1,0 +1,38 @@
+{% extends "account/base.html" %}
+
+{% load i18n %}
+{% load account %}
+
+{% block title_content %}{% trans "Confirm E-mail Address" %}{% endblock %}
+
+
+{% block body_content %}
+
+      <div class="row">
+        <div class="span12">
+          {% include "jobs/jobs_search_bar.html" %}
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="span12">
+          <ul class="breadcrumb">
+            <li>
+              <a href="/">Home</a> <span class="divider">/</span>
+            </li>
+            <li class="active">
+              Email Address Confirmed
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="span12">
+          {% user_display email_address.user as user_display %}
+
+          <p>{% blocktrans with email_address.email as email %}You have confirmed that <a href="mailto:{{email}}">{{ email }}</a> is an e-mail address for user {{ user_display }}.{% endblocktrans %}</p>
+        </div>
+      </div>
+
+{% endblock %}

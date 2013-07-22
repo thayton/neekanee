@@ -1,0 +1,335 @@
+{% load neek_extras %}
+
+  <div id="jobs-sidebar-left">
+    <div class="accordion" id="tag-accordion">
+      {% if query %}
+      <div class="accordion-group">
+        <div class="accordion-heading" style="background-color: whiteSmoke">
+          <a class="accordion-toggle" data-toggle="collapse" href="#current-filters"><i class="icon-chevron-down"></i>Current Filters</a>
+        </div>
+        <div id="current-filters" class="accordion-body collapse in">
+          <div class="accordion-inner">
+            <ul class="nav nav-list">
+              {% if query.vacation %}
+              <li>
+                <a rel="nofollow" href="/jobs/?{{ query.urlencode|qstring_del:'vacation' }}">
+                  {{ query.vacation }}-{{ query.vacation|add:4 }} days
+                  <span class="close">&times</span>
+                </a>
+              </li>
+              {% endif %}
+
+              {% if query.q %}
+              <li>
+                <a rel="nofollow" href="/jobs/?{{ query.urlencode|qstring_del:'q' }}">
+                  q:{{ query.q }}
+                  <span class="close">&times</span>
+                </a>
+              </li>
+              {% endif %}
+
+              {% if query.tags %}
+                {% for tag in query.tags|split %}
+                  <li>
+                    {% if query.tags|split_and_remove:tag|length > 0 %}
+                      <a rel="nofollow" href="/jobs/?{{ query.tags|split_and_remove:tag|join:'+'|prepend:'tags='|qstring_set:query.urlencode }}">
+                    {% else %}
+                      <a rel="nofollow" href="/jobs/?{{ query.urlencode|qstring_del:'tags' }}">
+                    {% endif %}
+                      #{{ tag }}
+                      <span class="close">&times</span>
+                    </a>
+                  </li>
+                {% endfor %}
+              {% endif %}
+
+              {% if query.ltags %}
+                {% for tag in query.ltags|split %}
+                  <li>
+                    {% if query.ltags|split_and_remove:tag|length > 0 %}
+                      <a rel="nofollow" href="/jobs/?{{ query.ltags|split_and_remove:tag|join:'+'|prepend:'ltags='|qstring_set:query.urlencode }}">
+                    {% else %}
+                      <a rel="nofollow" href="/jobs/?{{ query.urlencode|qstring_del:'ltags' }}">
+                    {% endif %}
+                      #{{ tag }}
+                      <span class="close">&times</span>
+                    </a>
+                  </li>
+                {% endfor %}
+              {% endif %}
+
+              {% if query.awards %}
+                {% for award in query.awards|split %}
+                  <li>
+                    {% if query.awards|split_and_remove:award|length > 0 %}
+                      <a rel="nofollow" href="/jobs/?{{ query.awards|split_and_remove:award|join:'+'|prepend:'awards='|qstring_set:query.urlencode }}">
+                    {% else %}
+                      <a rel="nofollow" href="/jobs/?{{ query.urlencode|qstring_del:'awards' }}">
+                    {% endif %}
+                      {{ award|award_string }}
+                      <span class="close">&times</span>
+                    </a>
+                  </li>
+                {% endfor %}
+              {% endif %}
+
+              {% if query.size %}
+              <li>
+                <a rel="nofollow" href="/jobs/?{{ remove_filter.size }}">{{ query.size|company_size_string }}
+                  <span class="close">&times</span>
+                </a>
+              </li>
+              {% endif %}
+
+              {% if query.company %}
+              <li>
+                <a rel="nofollow" href="/jobs/?{{ remove_filter.company }}">
+                  {{ query.company|slice:"20" }}{% if query.company|length > 20 %}...{% endif %}
+                  <span class="close">&times</span>
+                </a>
+              </li>
+              {% endif %}
+
+              {% if query.title %}
+              <li>
+                <a rel="nofollow" href="/jobs/?{{ remove_filter.title }}">
+                  {{ query.title|slice:"20" }}{% if query.title|length > 20 %}...{% endif %}
+                  <span class="close">&times</span>
+                </a>
+              </li>
+              {% endif %}
+
+              {% if query.tld %}
+              <li>
+                <a rel="nofollow" href="/jobs/?{{ remove_filter.tld }}">{{ query.tld }}
+                  <span class="close">&times</span>
+                </a>
+              </li>
+              {% endif %}
+
+              {% if query.city %}
+              <li>
+                <a rel="nofollow" href="/jobs/?{{ remove_filter.city }}">{{ query.city|title }} 
+                  <span class="close">&times</span>
+                </a>
+              </li>
+              {% endif %}
+
+              {% if query.state %}
+              <li>
+                <a rel="nofollow" href="/jobs/?{{ remove_filter.state }}">{{ query.state|state_abbrev_to_name }}
+                  <span class="close">&times</span>
+                </a>
+              </li>
+              {% endif %}
+
+              {% if query.country %}
+              <li>
+                <a rel="nofollow" href="/jobs/?{{ remove_filter.country }}">{{ query.country|country_abbrev_to_name|title }}
+                  <span class="close">&times</span>
+                </a>
+              </li>
+              {% endif %}
+            </ul>
+          </div> <!-- accordion-inner -->
+        </div> <!-- current-filters -->
+      </div> <!-- accordion-group -->                                 
+      {% endif %}
+
+      <div class="accordion-group">
+        <div class="accordion-heading" style="background-color: whiteSmoke">
+          <a class="accordion-toggle" data-toggle="collapse" href="#top-level-domain"><i class="icon-chevron-right"></i>Top Level Domain</a>
+        </div>
+        <div id="top-level-domain" class="accordion-body collapse">
+          <div class="accordion-inner">
+            <ul class="nav nav-list">
+              {% for tld,cnt in facet_counts.tld %}
+              <li>
+                <a rel="nofollow" href="/jobs/?{{ 'tld='|add:tld|qstring_set:query.urlencode }}">{{ tld }}
+                  <span class="facet-count">{{ cnt }}</span>
+                </a> 
+              </li>          
+              {% endfor %}
+            </ul>
+          </div> <!-- accordion-inner -->
+        </div> <!-- current-filters -->
+      </div> <!-- accordion-group -->                                 
+
+      <div class="accordion-group">
+        <div class="accordion-heading" style="background-color: whiteSmoke">
+          <a class="accordion-toggle" data-toggle="collapse" href="#company-size"><i class="icon-chevron-right"></i>Company Size</a>
+        </div>
+        <div id="company-size" class="accordion-body collapse">
+          <div class="accordion-inner">
+            <ul class="nav nav-list">
+              {% for company_size,cnt in facet_counts.company_size %}
+              <li>
+                <a rel="nofollow" href="/jobs/?{{ 'size='|add:company_size|qstring_set:query.urlencode }}">
+                  {{ company_size|company_size_string }}
+                  <span class="facet-count">{{ cnt }}</span>
+                </a> 
+              </li>    
+              {% endfor %}
+            </ul>
+          </div> <!-- accordion-inner -->
+        </div> <!-- current-filters -->
+      </div> <!-- accordion-group -->                                 
+
+      {% ifnotequal request.path "/jobs_by_location/" %} 
+      <div class="accordion-group">
+        <div class="accordion-heading" style="background-color: whiteSmoke">
+          <a class="accordion-toggle" data-toggle="collapse" href="#location"><i class="icon-chevron-right"></i>Location</a>
+        </div>
+        <div id="location" class="accordion-body collapse">
+          <div class="accordion-inner">
+            <ul class="nav nav-list">
+              {% comment %}
+              The location part of the sidebar is allows a user to drill-down by location. The logic is:
+
+              IF there's more than one country in the results THEN 
+                Show countries 
+              ELSE 
+                /* 
+                 * There's only one country in results, either because the user filtered against this
+                 * country or because the results never contained any other countries in the first place. 
+                 * If it's because of a user filter, then query.country == facet_country.country and 
+                 * we retain this filter with a hidden input.
+                 */
+              Add checked radio box for country if query.country == facet_counts.country
+              IF there's more than one state in the results THEN
+                Show states
+              ELSE
+                /* only one state in results */
+                Add checked radio box for state if query.state == facet_counts.state
+                Show cities
+              {% endcomment %}
+
+              {% if facet_counts.country|length > 1 %}
+                {% for country,cnt in facet_counts.country|slice:":6" %}
+                  <li>
+                    <a href="/jobs/?{{ 'country='|add:country|qstring_set:query.urlencode }}">
+                      {{ country|country_abbrev_to_name|title|slice:"24" }}{% if country|country_abbrev_to_name|length > 24 %}...{% endif %}
+                      <span class="facet-count">{{ cnt }}</span>
+                    </a>
+                  </li>
+                {% endfor %}
+                {% if facet_counts.country|slice:"6:"|length > 0 %}
+                  <li>
+                    <a rel="nofollow" href="/jobs_by_location/?{{ query.urlencode }}">(more)</a>
+                  </li>
+                {% endif %}
+              {% else %}
+                {% if facet_counts.state|length > 1 %}
+                  {% for state,cnt in facet_counts.state|slice:":6" %}
+                    <li>
+                      <a href="/jobs/?{{ 'state='|add:state|qstring_set:query.urlencode }}">
+                        {{ state|state_abbrev_to_name|slice:"24" }}{% if state|state_abbrev_to_name|length > 24 %}...{% endif %}
+                        <span class="facet-count">{{ cnt }}</span>
+                      </a>
+                    </li>
+                  {% endfor %}
+
+                  {% if facet_counts.state|slice:"6:"|length > 0 %}
+                    <li>
+                      <a rel="nofollow" href="/jobs_by_location/?{{ query.urlencode }}">(more)</a>
+                    </li>
+                  {% endif %}
+                {% else %}
+                  {% for city,cnt in facet_counts.city|slice:":6" %}
+                    <li>
+                      <a href="/jobs/?{{ 'city='|add:city|qstring_set:query.urlencode }}">
+                        {{ city|title|slice:"24" }} {% if city|length > 24 %}...{% endif %}
+                        <span class="facet-count">{{ cnt }}</span>
+                      </a>
+                    </li>
+                  {% endfor %}
+
+                  {% if facet_counts.city|slice:"6:"|length > 0 %}
+                    <li><a rel="nofollow" href="/jobs_by_location/?{{ query.urlencode }}">(more)</a></li>
+                  {% endif %}
+                {% endif %}
+              {% endif %}
+
+            </ul>
+          </div> <!-- accordion-inner -->
+        </div> <!-- current-filters -->
+      </div> <!-- accordion-group -->                                 
+      {% endifnotequal %}
+
+      {% ifnotequal request.path "/jobs_by_company/" %} 
+      <div class="accordion-group">
+        <div class="accordion-heading" style="background-color: whiteSmoke">
+          <a class="accordion-toggle" data-toggle="collapse" href="#company"><i class="icon-chevron-right"></i>Company</a>
+        </div>
+        <div id="company" class="accordion-body collapse">
+          <div class="accordion-inner">
+            <ul class="nav nav-list">
+                {% for company,cnt in facet_counts.company_name|slice:":6" %}
+                  <li>
+                    <a href="/jobs/?{{ company|urlencode|prepend:'company='|qstring_set:query.urlencode }}">
+                      {{ company|slice:"24" }}{% if company|length > 24 %}...{% endif %}
+                      <span class="facet-count">{{ cnt }}</span>
+                    </a> 
+                  </li>
+                {% endfor %}
+
+                {% if facet_counts.company_name|slice:"6:"|length > 0 %}
+                  {% comment %} 
+                  Link to full-page company refinement if there's more in the list 
+                  {% endcomment %}        
+                  <li>
+                    <a rel="nofollow" href="/jobs_by_company/?{{ query.urlencode }}">(more)</a>
+                  </li>
+                {% endif %}
+
+            </ul>
+          </div> <!-- accordion-inner -->
+        </div> <!-- current-filters -->
+      </div> <!-- accordion-group -->                                 
+      {% endifnotequal %}
+
+      <div class="accordion-group">
+        <div class="accordion-heading" style="background-color: whiteSmoke">
+          <a class="accordion-toggle" data-toggle="collapse" href="#vacation"><i class="icon-chevron-right"></i>Vacation</a>
+        </div>
+        <div id="vacation" class="accordion-body collapse">
+          <div class="accordion-inner">
+            <ul class="nav nav-list">
+              {% for numdays,cnt in facet_counts.vacation_year_1|slice:":8" %}
+                <li>
+                    <a rel="nofollow" href="/jobs/?{{ 'vacation='|add:numdays|qstring_set:query.urlencode }}">
+                    {{ numdays }}-{{ numdays|add:4 }} days
+                    <span class="facet-count">{{ cnt }}</span>
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div> <!-- accordion-inner -->
+        </div> <!-- current-filters -->
+      </div> <!-- accordion-group -->                                 
+
+      <div class="accordion-group">
+        <div class="accordion-heading" style="background-color: whiteSmoke">
+          <a class="accordion-toggle" data-toggle="collapse" href="#awards"><i class="icon-chevron-right"></i>Awards</a>
+        </div>
+        <div id="awards" class="accordion-body collapse">
+          <div class="accordion-inner">
+            <ul class="nav nav-list">
+              {% for award,cnt in facet_counts.company_awards|slice:":6" %}
+                <li>
+                   {% if query.awards %}
+                    <a rel="nofollow" href="/jobs/?{{ query.awards|split_and_remove:award|append:award|join:'+'|prepend:'awards='|qstring_set:query.urlencode }}">
+                  {% else %}
+                    <a rel="nofollow" href="/jobs/?{{ 'awards='|add:award|qstring_set:query.urlencode }}">
+                  {% endif %}
+                    {{ award|award_string }}
+                    <span class="facet-count">{{ cnt }}</span>
+                  </a> 
+                </li>
+              {% endfor %}
+            </ul>
+          </div> <!-- accordion-inner -->
+        </div> <!-- current-filters -->
+      </div> <!-- accordion-group -->                                 
+    </div> <!-- accordion -->
+  </div>

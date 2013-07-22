@@ -1,0 +1,106 @@
+{% load neek_extras %}
+
+          <div class="sidebar-nav">
+            <ul class="nav nav-list">
+              <li class="nav-header">Current Filters</li>
+              {% if query.vacation %}
+              <li>
+                <a rel="nofollow" href="?{{ query.urlencode|qstring_del:'vacation' }}">
+                  {{ query.vacation }}-{{ query.vacation|add:4 }} days
+                  <span class="close">&times</span>
+                </a>
+              </li>
+              {% endif %}
+
+              {% if query.tags %}
+                {% for tag in query.tags|split %}
+                  <li>
+                    {% if query.tags|split_and_remove:tag|length > 0 %}
+                      <a rel="nofollow" href="?{{ query.tags|split_and_remove:tag|join:'+'|prepend:'tags='|qstring_set:query.urlencode }}">
+                    {% else %}
+                      <a rel="nofollow" href="?{{ query.urlencode|qstring_del:'tags' }}">
+                    {% endif %}
+                      #{{ tag }}
+                      <span class="close">&times</span>
+                    </a>
+                  </li>
+                {% endfor %}
+              {% endif %}
+
+              {% if query.awards %}
+                {% for award in query.awards|split %}
+                  <li>
+                    {% if query.awards|split_and_remove:award|length > 0 %}
+                      <a rel="nofollow" href="?{{ query.awards|split_and_remove:award|join:'+'|prepend:'awards='|qstring_set:query.urlencode }}">
+                    {% else %}
+                      <a rel="nofollow" href="?{{ query.urlencode|qstring_del:'awards' }}">
+                    {% endif %}
+                      {{ award|award_string }}
+                      <span class="close">&times</span>
+                    </a>
+                  </li>
+                {% endfor %}
+              {% endif %}
+
+              {% if query.size %}
+              <li>
+                <a rel="nofollow" href="?{{ query.urlencode|qstring_del:'size' }}">{{ query.size|company_size_string }}
+                  <span class="close">&times</span>
+                </a>
+              </li>
+              {% endif %}
+
+              {% if query.tld %}
+              <li>
+                <a rel="nofollow" href="?{{ query.urlencode|qstring_del:'tld' }}">{{ query.tld }}
+                  <span class="close">&times</span>
+                </a>
+              </li>
+              {% endif %}
+
+              <li class="nav-header">Top Level Domain</li>
+              {% for tld,cnt in facet_counts.tld %}
+              <li>
+                <a rel="nofollow" href="?{{ 'tld='|add:tld|qstring_set:query.urlencode }}">{{ tld }}
+                  <span class="facet-count">{{ cnt }}</span>
+                </a> 
+              </li>          
+              {% endfor %}
+
+              <li class="nav-header">Company Size</li>
+              {% for company_size,cnt in facet_counts.company_size %}
+              <li>
+                <a rel="nofollow" href="?{{ 'size='|add:company_size|qstring_set:query.urlencode }}">
+                  {{ company_size|company_size_string }}
+                  <span class="facet-count">{{ cnt }}</span>
+                </a> 
+              </li>    
+              {% endfor %}
+
+              <li class="nav-header">Vacation *</li>
+              {% for numdays,cnt in facet_counts.vacation_year_1|slice:":8" %}
+                {% if cnt > 0 %}
+                  <li>
+                    <a rel="nofollow" href="?{{ numdays|stringformat:"d"|prepend:'vacation='|qstring_set:query.urlencode }}">
+                      {{ numdays }}-{{ numdays|add:4 }} days
+                      <span class="facet-count">{{ cnt }}</span>
+                    </a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+
+              <li class="nav-header">Company Awards</li>
+              {% for award,cnt in facet_counts.company_awards|slice:":6" %}
+                <li>
+                   {% if query.awards %}
+                    <a rel="nofollow" href="?{{ query.awards|split_and_remove:award|append:award|join:'+'|prepend:'awards='|qstring_set:query.urlencode }}">
+                  {% else %}
+                    <a rel="nofollow" href="?{{ 'awards='|add:award|qstring_set:query.urlencode }}">
+                  {% endif %}
+                    {{ award|award_string }}
+                    <span class="facet-count">{{ cnt }}</span>
+                  </a> 
+                </li>
+              {% endfor %}
+            </ul>
+          </div>

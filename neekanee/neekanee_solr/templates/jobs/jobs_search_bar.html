@@ -1,0 +1,12 @@
+<center>
+  <form method="get" action="/search" class="form-inline well" align="center" style="background-color: #eeeeee;" onsubmit="return getcoord(this);" >
+    <input name="q" class="span5" type="text" {% if query.q %} value="{{ query.q }}" {% else %} placeholder="Keywords: Ruby, Rails, Django" {% endif %} >
+    <input name="loc" class="span5" type="text" {% if query.loc %} value="{{ query.loc }}" {% else %} placeholder="Location: City, State, Zip" {% endif %}>
+    <input type="hidden" name="lat" />
+    <input type="hidden" name="lng" />
+    <input type="hidden" name="radius" />
+    <input type="hidden" name="state" />
+    <input type="hidden" name="country" />
+    <button type="submit" class="btn btn-primary"><i class="icon-search icon-white"></i></button>
+  </form>
+</center>

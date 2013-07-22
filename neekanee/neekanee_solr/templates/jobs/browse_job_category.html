@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load neek_extras %}
+
+{% block title_content %} Browse {{ category }} Jobs {% endblock %}
+
+{% block body_content %}
+<div class="row">
+  <div class="span12">
+    {% include "jobs/jobs_search_bar.html" %}
+  </div>
+</div>
+
+<hr />
+
+<div class="row">
+  <div class="span12">
+    <ul class="breadcrumb">
+      <li>
+        <a href="/">Home</a> <span class="divider">/</span>
+      </li>
+      <li>
+        <a href="/browse_jobs">Browse Jobs</a> <span class="divider">/</span>
+      </li>
+      <li>
+        <a href="/browse_jobs#by_category">Categories</a> <span class="divider">/</span>
+      </li>
+      <li class="active">
+        <a href="/{{ category|slugify }}-jobs">{{ category|title }} Jobs</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <table class="table table-bordered table-striped">
+      <tbody>
+        {% for job_title in job_titles %}
+          {% if forloop.counter0|modulus:3 == 0 %}
+            <tr>
+          {% endif %}
+              <td><a href="/{{ job_title|slugify }}-jobs">{{ job_title }}</a></td>
+          {% if forloop.counter0|modulus:3 == 2 %}
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div><!--.span12-->
+</div><!--.row-->
+
+{% endblock %}

@@ -1,0 +1,117 @@
+#
+# XXX The POST forms from these oracle plugins won't work unless
+# you refresh the main jobs page list (or hit 'Back to results')
+# every time you click on a link. Oracle seems to be maintaining
+# state server-side and if you just submit the POST form "links"
+# it will take you to the same job opening again and again.
+#
+# Solution might be to have a link that takes you to a redirection
+# page. On the redirection page, you load the main jobs list page
+# in a hidden iframe (as this seems sufficient to reset server state
+# or get a new cookie). Then once the page has been loaded, 
+# submit the job form:
+#
+# <script type="text/javascript">
+#   function myFunc() {
+#     var frm = document.getElementById("job_1");
+#     frm.submit();
+#   }
+# </script>
+#
+# <iframe width="0" height="0" src="https://careers.partners.org/psc/EA/EMPLOYEE/HRMS/c/HRS_HRAM.HRS_CE.GBL" onload="myFunc();">
+# </iframe>
+#
+# <form name="job_1" id="job_1" method="POST" action="https://careers.partners.org/psc/EA/EMPLOYEE/HRMS/c/HRS_HRAM.HRS_CE.GBL">
+#   <input type="hidden" name="ICAction" value="POSTINGTITLE$9">
+# </form>
+# 
+import re, urlparse, urllib, mechanize
+
+from jobscraper import JobScraper
+from location import parse_location
+from soupify import soupify, get_all_text, extract_form_fields
+
+from neekanee_solr.models import *
+
+COMPANY = {
+    'name': 'Lahey Clinic',
+    'hq': parse_location('Burlington, MA'),
+
+    'benefits': { 
+        'url': 'http://www.lahey.org/About_Lahey/Careers/Employee_Benefits.aspx',
+        'vacation': [] 
+    },
+
+    'home_page_url': 'http://www.lahey.org',
+    'jobs_page_url': 'http://jobs.lahey.org',
+
+    'empcnt': [5001,10000]
+}
+
+class LaheyJobScraper(JobScraper):
+    def __init__(self):
+        super(LaheyJobScraper, self).__init__(COMPANY)
+
+    def scrape_jobs(self):
+        self.br.open(self.company.jobs_page_url)
+
+        r = re.compile(r'POSTINGTITLE\$\d+$')
+        s = soupify(self.br.response().read())
+        m = s.findAll('meta')[1]
+        m = m['content'].split('=')[1]
+    
+        self.br.open(m)
+
+        s = soupify(self.br.response().read())
+        f = s.find('frame', attrs={'name': 'TargetContent'})
+        u = urlparse.urljoin(self.br.geturl(), f['src'])
+
+        self.br.open(u)
+
+        self.company.job_set.all().delete()
+
+        while True:
+            s = soupify(self.br.response().read())
+            f = s.find('form', attrs={'name': 'win0'})
+
+            for a in s.findAll('a', id=r):
+                tr = a.findParent('tr')
+                td = tr.findAll('td')
+
+                l = self.parse_location(td[-1].text)
+
+                if not l:
+                    continue
+
+                job = Job(company=self.company)
+                job.title = a.text
+                job.url = urlparse.urljoin(self.br.geturl(), f['action'])
+                job.url_data = urllib.urlencode({'ICAction': a['name']})
+
+                job.location = l
+
+                self.br.select_form(f['name'])
+                self.br.set_all_readonly(False)
+                self.br.form['ICAction'] = a['name']
+                self.br.submit()
+
+                x = soupify(self.br.response().read())
+                t = x.find('table', id='ACE_width')
+        
+                job.desc = get_all_text(t)
+                job.save()
+
+                self.br.back()
+        
+            try:
+                self.br.find_link(text='Next')
+            except mechanize.LinkNotFoundError:
+                break
+
+            self.br.select_form(f['name'])
+            self.br.set_all_readonly(False)
+            self.br.form['ICAction'] = 'HRS_APPL_WRK_HRS_LST_NEXT'
+            self.br.submit()
+
+def get_scraper():
+    return LaheyJobScraper()
