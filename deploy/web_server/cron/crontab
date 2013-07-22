@@ -1,0 +1,6 @@
+PATH=/usr/bin:/bin:/usr/local/bin
+PYTHONPATH=/srv/www/neekanee.com/jobsearch/job_scrapers/util/:/srv/www/neekanee.com/jobsearch/job_scrapers/
+
+18 13 * * * (cd /srv/www/neekanee.com/jobsearch/; ./backupdb.sh > /home/thayton/log.txt 2>&1)
+15 7 * * * (cd /srv/www/neekanee.com/jobsearch/; python manage.py send_job_alerts)
+
