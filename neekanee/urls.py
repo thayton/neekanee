@@ -18,7 +18,7 @@ urlpatterns = patterns('',
     (r'^admin/',           include(admin.site.urls)),
 )
 
-urlpatterns += patterns('jobsearch.neekanee_solr.views',
+urlpatterns += patterns('neekanee.neekanee_solr.views',
     # Example:
     # (r'^jobsearch/', include('jobsearch.foo.urls')),
 
