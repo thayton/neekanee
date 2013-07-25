@@ -33,11 +33,6 @@ mysql_create_database 'n33kanee' 'neekanee_solr'
 #
 #echo 'CREATE DATABASE neekanee_solr CHARACTER SET utf8;' | mysql -uroot -p
 
-apt-get -y install emacs
-
-# Install cvs
-apt-get -y install cvs
-
 # Misc dependencies
 apt-get -y install libxml2-dev libxslt-dev
 
@@ -56,20 +51,12 @@ pip install --upgrade virtualenv
 su - thayton
 cd
 
-#
-# Setup CVS_RSH and CVSROOT so we can checkout Neekanee code
-#
-cat >> ~/.profile <<EOF
-export CVSROOT=:ext:thayton@thayton.webfactional.com:/home/thayton/repo/
-export CVS_RSH=ssh
-EOF
-
-. .profile
+git clone git@github.com:thayton/neekanee.git
 
 #
 # Create a virtualenv for neekanee code
 #
-mkdir neekanee && cd neekanee
+cd neekanee
 virtualenv venv --distribute
 source venv/bin/activate
 
@@ -81,8 +68,6 @@ source venv/bin/activate
 #
 source setup_pyqt_venv.sh
 
-cvs co jobsearch
-cp jobsearch/requirements.txt .
 pip install -r requirements.txt
 
 #
