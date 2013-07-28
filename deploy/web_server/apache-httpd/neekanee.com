@@ -10,8 +10,8 @@
      Alias /media /srv/www/neekanee.com/public_html/media/
      Alias /favicon.ico /srv/www/neekanee.com/public_html/favicon.ico
 
-     WSGIScriptAlias / /srv/www/neekanee.com/jobsearch/django.wsgi
-     <Directory /srv/www/neekanee.com/jobsearch/>
+     WSGIScriptAlias / /srv/www/neekanee.com/neekanee/neekanee/django.wsgi
+     <Directory /srv/www/neekanee.com/neekanee/neekanee/>
        Order allow,deny
        Allow from all
      </Directory>
@@ -64,7 +64,7 @@
      Alias /media /srv/www/neekanee.com/public_html/media/
      Alias /favicon.ico /srv/www/neekanee.com/public_html/favicon.ico
 
-     WSGIScriptAlias / /srv/www/neekanee.com/jobsearch/django.wsgi
+     WSGIScriptAlias / /srv/www/neekanee.com/neekanee/neekanee/django.wsgi
 
      Options +FollowSymLinks
      RewriteEngine On
