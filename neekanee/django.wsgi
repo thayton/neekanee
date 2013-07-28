@@ -4,7 +4,7 @@ import sys
 sys.stdout = sys.stderr
 
 sys.path.append('/srv/www/neekanee.com/')
-sys.path.append('/srv/www/neekanee.com/jobsearch/')
+sys.path.append('/srv/www/neekanee.com/neekanee/')
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 
