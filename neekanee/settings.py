@@ -119,8 +119,8 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.admin',
-    'neekanee.neekanee_solr',
 
+    'neekanee_solr',
     'bootstrapform',
     'uni_form',
     'allauth',
