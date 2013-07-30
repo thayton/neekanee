@@ -23,23 +23,21 @@ class LoftwareJobScraper(JobScraper):
         self.br.open(self.company.jobs_page_url)
 
         s = soupify(self.br.response().read())
-        f = lambda x: x.name == 'h3' and x.text == 'Positions available:'
-        h = s.find(f)
-        d = h.findParent('div')
-        r = re.compile(r'^#\w+')
+        d = s.find('div', id='container')
+        x = {'name': True, 'id': True}
         d.extract()
 
         self.company.job_set.all().delete()
 
-        for a in d.findAll('a', href=r):
+        for a in d.findAll('a', attrs=x):
+            h3 = a.findNext('h3')
             job = Job(company=self.company)
-            job.title = a.text
-            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.title = h3.text
+            job.url = urlparse.urljoin(self.br.geturl(), '#' + a['id'])
             job.location = self.company.location
             job.desc = ''
 
-            x = d.find('a', attrs={'name' : a['href'][1:]})
-            x = x.next
+            x = h3
 
             while x:
                 name = getattr(x, 'name', None)
