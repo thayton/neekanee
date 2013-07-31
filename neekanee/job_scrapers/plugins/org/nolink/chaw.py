@@ -49,7 +49,11 @@ class ChawJobScraper(JobScraper):
                     job.desc += x
                 x = x.next
 
-        job.save()
+            job.save()
 
 def get_scraper():
     return ChawJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
