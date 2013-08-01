@@ -1,8 +1,16 @@
 import os
+import socket
+
+PRODUCTION_WEB_SERVER_IP = '69.164.219.250'
+
 # Django settings for jobsearch project.
 
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+if socket.gethostbyname(socket.gethostname()) == PRODUCTION_WEB_SERVER_IP:
+    DEBUG = False
+    TEMPLATE_DEBUG = DEBUG
+else:
+    DEBUG = True
+    TEMPLATE_DEBUG = DEBUG
 
 #SESSION_COOKIE_SECURE = True
 
@@ -73,7 +81,10 @@ MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'neekanee_solr/media/')
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = 'http://127.0.0.1:8000/media/'
+if socket.gethostbyname(socket.gethostname()) == PRODUCTION_WEB_SERVER_IP:
+    MEDIA_URL = 'http://www.neekanee.com/media/'
+else:
+    MEDIA_URL = 'http://127.0.0.1:8000/media/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.

@@ -1,4 +1,6 @@
 import os
+import socket
+
 from django.conf.urls.defaults import *
 from django.views.generic.simple import direct_to_template
 from neekanee_solr.templatetags.isocodes import state_abbrev_to_name
@@ -7,21 +9,21 @@ from neekanee_solr.templatetags.isocodes import state_abbrev_to_name
 from django.contrib import admin
 admin.autodiscover()
 
+PRODUCTION_WEB_SERVER_IP = '69.164.219.250'
 states_regex = '(?:' + '|'.join(['%s' % s.lower() for s in state_abbrev_to_name.keys()])
 
 urlpatterns = patterns('',
-    (r'^media/(?P<path>.*)$', 'django.views.static.serve',
-     { 'document_root': os.path.join(os.path.dirname(__file__), 'neekanee_solr/media/') }),
-
-#    (r'^logout/$',         'django.contrib.auth.views.logout', {'next_page': '/'}),
-#    (r'',                  include('django.contrib.auth.urls')),
     (r'^admin/',           include(admin.site.urls)),
 )
 
-urlpatterns += patterns('neekanee.neekanee_solr.views',
-    # Example:
-    # (r'^jobsearch/', include('jobsearch.foo.urls')),
+# Only on dev machines do we serve static media this way
+if socket.gethostbyname(socket.gethostname()) != PRODUCTION_WEB_SERVER_IP:
+    urlpatterns += patterns('',
+                            (r'^media/(?P<path>.*)$', 'django.views.static.serve',
+                             { 'document_root': os.path.join(os.path.dirname(__file__), 'neekanee_solr/media/') }),
+    )
 
+urlpatterns += patterns('neekanee.neekanee_solr.views',
     (r'^$',        direct_to_template, { 'template': 'index.html'   }),
     (r'^about$',   direct_to_template, { 'template': 'about.html'   }),
     (r'^contact$', direct_to_template, { 'template': 'contact.html' }),
