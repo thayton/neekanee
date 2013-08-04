@@ -47,7 +47,8 @@ class TaleoJobScraper(JobScraper):
                 job.url = urlparse.urljoin(url, q)
                 jobs.append(job)
 
-            a = s.find(title='Go to the next page')
+            r = re.compile(r'^requisitionListInterface')
+            a = s.find('a', id=r, title='Go to the next page')
             selector = a['id'].replace('.', '\.')
 
             result,_ = self.ghost.evaluate(
