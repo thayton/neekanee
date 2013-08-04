@@ -73,22 +73,31 @@ pip install -r requirements.txt
 #
 # Create the database tables for Neekanee
 #
+# Exports are required for syncdb to work on some platforms. Otherwise python can't pick up the locale:
+# >>> locale.getdefaultlocale()   
+# (None, None)
+# 
+# See http://stackoverflow.com/questions/10339963/getdefaultlocale-returning-none-when-running-sync-db-on-django-project-in-pychar
+#
+export LC_ALL=en_GB.UTF-8
+export LANG=en_GB.UTF-8
 python manage.py syncdb
 
-# 
-# Load baseline locations & jobs into database. This data has been
-# genereated using Django's dumpdata command and includes the pk
-# field in the data. We set the value for this field to null in 
-# order to use natural keys defined for these models.
 #
-(cd ../data/dropbox; for f in `ls *.json`; do ./set_pks_null.sh $f; done)
+# Copy location data into loaddata subdirectory and then load baseline 
+# locations & jobs into database. 
+# 
+# This data has been genereated using Django's dumpdata command and 
+# includes the pk field in the data. We set the value for this field 
+# to null in order to use natural keys defined for these models.
+#
+(cd loaddata; ./get_locations_data.sh)
 
-# jobsearch/ directory
-cd ../../ 
-python manage.py loaddata data/dropbox/locations.json
-python manage.py loaddata data/dropbox/null_locations.json
-python manage.py loaddata data/dropbox/location_aliases.json
-python manage.py load_scraped_jobs data/dropbox/scraped_jobs/
+# Load location information into databases
+python manage.py loaddata ../deploy/job_scraper/loaddata/locations.json
+python manage.py loaddata ../deploy/job_scraper/loaddata/null_locations.json
+python manage.py loaddata ../deploy/job_scraper/loaddata/location_aliases.json
+python manage.py load_scraped_jobs ../deploy/job_scraper/loaddata/
 cd -
 
 #
