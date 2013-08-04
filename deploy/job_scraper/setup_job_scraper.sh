@@ -106,7 +106,7 @@ cd -
 # instead of making them world writable
 #
 mkdir /var/log/neekanee/ && chmod o+w /var/log/neekanee/
-mkdir /var/run/meekanee/ && chmod o+w /var/run/neekanee/
+mkdir /var/run/neekanee/ && chmod o+w /var/run/neekanee/
 
 cd job_scrapers/neekanee/geocoder
 python neekanee_geocoder_server.py start
