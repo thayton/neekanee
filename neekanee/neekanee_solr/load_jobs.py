@@ -4,6 +4,7 @@ import json
 from models import *
 from pysolr import Results, Solr
 from urlparse import urlparse, parse_qs, ParseResult
+from django.core.exceptions import ObjectDoesNotExist
 
 def load_jobs_file(jobs_file, add_to_solr=False):
     """
