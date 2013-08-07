@@ -33,6 +33,9 @@ mysql_create_database 'n33kanee' 'neekanee_solr'
 #
 #echo 'CREATE DATABASE neekanee_solr CHARACTER SET utf8;' | mysql -uroot -p
 
+# pdftotext for plugins that that pull down PDF job descriptions
+apt-get -y install poppler-utils
+
 # Misc dependencies
 apt-get -y install libxml2-dev libxslt-dev
 
