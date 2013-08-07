@@ -1,2 +1,3 @@
 #export PYTHONPATH=`pwd`:$(dirname `pwd`):/usr/local/lib/python2.7/site-packages
-export PYTHONPATH=`pwd`:$(dirname `pwd`):../../../venv/lib/python2.7/site-packages/
+#export PYTHONPATH=`pwd`:$(dirname `pwd`):../../../venv/lib/python2.7/site-packages/
+export PYTHONPATH=`pwd`:$(dirname `pwd`):$VIRTUAL_ENV/lib/python2.7/site-packages/
