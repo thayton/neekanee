@@ -1,9 +1,11 @@
 PATH=/usr/bin:/bin:/usr/local/bin
-PLUGINS_DIR=/Users/toddhayton/Projects/jobsearch/job_scrapers/plugins/
-RESULTS_DIR=/Users/toddhayton/Projects/jobsearch/job_scrapers/bin/results
-PYTHONPATH=/Users/toddhayton/Projects/jobsearch/job_scrapers/util/:/Users/toddhayton/Projects/jobsearch/job_scrapers/
+PLUGINS_DIR=/home/thayton/neekanee/neekanee/job_scrapers/plugins/
+RESULTS_DIR=/home/thayton/neekanee/neekanee/job_scrapers/bin/results
+
+D1=/home/thayton/neekanee/
+D2=/home/thayton/neekanee/neekanee/job_scrapers/util/
+D3=/home/thayton/neekanee/neekanee/job_scrapers/bin/neweng/
 
 00 22 * * * (cd $RESULTS_DIR && rm -f *.json)
-00 23 * * * /Users/toddhayton/Projects/jobsearch/job_scrapers/bin/neweng/scrape_jobs.py $PLUGINS_DIR $RESULTS_DIR
-18 13 * * * (cd /Users/toddhayton/Projects/jobsearch/; ./backup-locations.sh > /Users/toddhayton/log.txt 2>&1)
-
+00 23 * * * (cd $D1; source venv/bin/activate; cd $D2 && source $D2/setpythonpath; cd $D3; ./scrape_jobs.py $PLUGINS_DIR $RESULTS_DIR)
+18 13 * * * (cd /home/thayton/neekanee/deploy/job_scraper/cron/; ./backup-locations.sh > /home/thayton/log.txt 2>&1)

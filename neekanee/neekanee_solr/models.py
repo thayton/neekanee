@@ -64,7 +64,7 @@ class LocationAlias(models.Model):
     alias = models.CharField(max_length=256)
 
     def __unicode__(self):
-        return '%s' % (self.alias)
+        return '%s -> %s' % (self.alias, self.location)
 
 class NullLocation(models.Model):
     """
@@ -73,6 +73,9 @@ class NullLocation(models.Model):
     the same text over and over when it's always going to fail.
     """
     text = models.CharField(max_length=256)
+
+    def __unicode__(self):
+        return '%s' % (self.text)
 
 #-----------------------------------------------------------------    
 class AwardManager(models.Manager):
