@@ -12,7 +12,7 @@ COMPANY = {
     'home_page_url': 'http://www.endgame.com',
     'jobs_page_url': 'http://www.endgame.com/careers/',
 
-    'empcnt': [11,50]
+    'empcnt': [51,200]
 }
 
 class EndgameJobScraper(JobScraper):
