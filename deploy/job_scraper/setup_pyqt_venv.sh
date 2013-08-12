@@ -9,7 +9,8 @@ VAR=( $(which -a $PYTHON_VERSION) )
 
 GET_PYTHON_LIB_CMD="from distutils.sysconfig import get_python_lib; print (get_python_lib())"
 LIB_VIRTUALENV_PATH=$(python -c "$GET_PYTHON_LIB_CMD")
-LIB_SYSTEM_PATH=$(${VAR[-1]} -c "$GET_PYTHON_LIB_CMD")
+#LIB_SYSTEM_PATH=$(${VAR[-1]} -c "$GET_PYTHON_LIB_CMD")
+LIB_SYSTEM_PATH=$(${VAR[@]: -1} -c "$GET_PYTHON_LIB_CMD")
 
 for LIB in ${LIBS[@]}
 do
