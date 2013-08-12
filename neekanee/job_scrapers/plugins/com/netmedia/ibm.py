@@ -66,6 +66,9 @@ class IbmJobScraper(JobScraper):
             x = {'class': 'job-summary-page'}
             t = s.find('table', attrs=x)
 
+            if not t:
+                continue
+
             job.desc = get_all_text(t)
             job.save()
 
