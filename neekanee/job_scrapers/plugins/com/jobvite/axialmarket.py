@@ -19,47 +19,8 @@ class AxialMarketJobScraper(JobScraper):
     def __init__(self):
         super(AxialMarketJobScraper, self).__init__(COMPANY)
 
-    def new_url(self, url, jobid):
-        u = urlparse.urlparse(url)
-        l = urlparse.parse_qsl(u.query)
-        x = [ (k,v) for (k,v) in l if k == 'c' ]
-
-        x.append(('page', 'Job Description'))
-        x.append(('j',     jobid))
-
-        u = list(u)
-        u[4] = urllib.urlencode(x)
-        u = urlparse.urlunparse(u)
-
-        return u
-
     def scrape_job_links(self, url):
-        jobs = []
-
-        self.br.open(url)
-
-        s = soupify(self.br.response().read())
-        d = { 'class': 'jvjoblink', 'href': '#' }
-        r = re.compile(r"jvGoToPage\('Job Description','','(.*)'\)")
-
-        for a in s.findAll('a', attrs=d):
-            tr = a.findParent('tr')
-            td = tr.findAll('td')
-        
-            l = self.parse_location(td[-1].text)
-            if not l:
-                continue
-
-            m = re.search(r, a['onclick'])
-            jobid = m.group(1)
-
-            job = Job(company=self.company)
-            job.title = a.text
-            job.url = self.new_url(self.br.geturl(), jobid)
-            job.location = l
-            jobs.append(job)
-
-        return jobs
+        return []
 
     def scrape_jobs(self):
         job_list = self.scrape_job_links(self.company.jobs_page_url)
