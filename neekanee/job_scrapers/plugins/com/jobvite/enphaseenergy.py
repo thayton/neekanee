@@ -57,6 +57,7 @@ import re, urllib, urlparse
 from BeautifulSoup import BeautifulSoup
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
+from neekanee.urlutil import url_query_add
 
 from neekanee_solr.models import *
 
@@ -86,6 +87,7 @@ class EnphaseEnergyJobScraper(JobScraper):
         m = re.search(r, s.prettify())
 
         jvurlargs = m.group(1)
+        jvurlargs = url_query_add(jvurlargs, {'jvprefix': 'http://enphase.com'}.items())
 
         t = s.find('table', attrs={'class': 'jvcontent'})
         r = re.compile(r"jvGoToPage\('(.*)','','(.*)'\)")
