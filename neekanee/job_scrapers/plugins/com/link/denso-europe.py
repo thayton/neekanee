@@ -1,4 +1,4 @@
-import re, urlparse
+import re, urlparse, mechanize
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Kariya, Japan',
 
     'home_page_url': 'http://www.denso-europe.com',
-    'jobs_page_url': 'http://careers.denso-europe.com/',
+    'jobs_page_url': 'http://www.densojobs.com',
 
     'empcnt': [10001]
 }
@@ -23,34 +23,43 @@ class DensoJobScraper(JobScraper):
         jobs = []
 
         def select_form(form):
-            return form.action.endswith('advanced-search.php')
+            return form.attrs.get('id', None) == 'search-banner-form'
 
         self.br.open(url)
         self.br.select_form(predicate=select_form)
         self.br.submit()
 
-        s = soupify(self.br.response().read())
-        d = s.find('div', id='job-results-container')
-        x = {'class': 'job_details'}
-        
-        for v in d.findAll('div', attrs=x):
-            tr = v.table.findAll('tr')[-1]
-            td = tr.findAll('td')[-1]
+        pageno = 2
 
-            p = v.findParent('article')
-            l = self.parse_location(td.text)
+        while True:
+            s = soupify(self.br.response().read())
+            r = re.compile(r'^/jobs/\S+-\d+$')
+            x = {'class': 'job-meta'}
 
-            if not l:
-                continue
+            for a in s.findAll('a', href=r):
+                if a.parent.name != 'h3':
+                    continue
 
-            y = p.find('div', attrs={'class': 'job_read_more'})
-            a = y.a
+                p = a.findParent('li')
+                d = p.find('div', attrs=x)
+                v = d.findAll('div')
+                l = ', '.join(['%s' % x.contents[-1] for x in v[1:3]])
+                l = self.parse_location(l)
 
-            job = Job(company=self.company)
-            job.title = p.h1.text
-            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-            job.location = l
-            jobs.append(job)
+                if not l:
+                    continue
+
+                job = Job(company=self.company)
+                job.title = a.text
+                job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+                job.location = l
+                jobs.append(job)
+
+            try:
+                self.br.follow_link(self.br.find_link(text='%d' % pageno))
+                pageno += 1
+            except mechanize.LinkNotFoundError:
+                break
 
         return jobs
 
@@ -63,7 +72,8 @@ class DensoJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='page_content')
+            x = {'class': 'uWidget uWidget-jobs-detail'}
+            d = s.find('div', attrs=x)
 
             job.desc = get_all_text(d)
             job.save()
