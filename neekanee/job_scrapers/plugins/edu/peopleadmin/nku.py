@@ -1,4 +1,4 @@
-from neekanee.jobscrapers.peopleadmin.PeopleAdminATS import PeopleAdminJobScraper
+from neekanee.jobscrapers.peopleadmin.peopleadmin3 import PeopleAdminJobScraper
 
 COMPANY = {
     'name': 'Northern Kentucky University',
@@ -12,10 +12,14 @@ COMPANY = {
     },
 
     'home_page_url': 'http://www.nku.edu',
-    'jobs_page_url': 'https://jobs.nku.edu/applicants/jsp/shared/Welcome_css.jsp',
+    'jobs_page_url': 'https://jobs.nku.edu',
 
     'empcnt': [1001,5000]
 }
 
 def get_scraper():
     return PeopleAdminJobScraper(COMPANY)
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
