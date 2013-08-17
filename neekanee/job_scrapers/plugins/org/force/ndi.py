@@ -55,8 +55,7 @@ class NdiJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='content')
-            d = d.div
+            d = s.find('div', id='atsJobDetailsBox')
 
             job.desc = get_all_text(d)
             job.save()
