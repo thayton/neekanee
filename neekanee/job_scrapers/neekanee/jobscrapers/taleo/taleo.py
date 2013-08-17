@@ -63,7 +63,12 @@ class TaleoJobScraper(JobScraper):
                 job.desc = self.get_desc_from_s(s)
             else:
                 t = s.find('div', id='taleoContent')
-                t = t.table
+                if t:
+                    t = t.table
+                else:
+                    x = {'role': 'presentation'}
+                    t = s.find('table', attrs=x)
+
                 job.desc = get_all_text(t)
 
             job.save()
