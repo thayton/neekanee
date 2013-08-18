@@ -1,36 +1,41 @@
-from neekanee.jobscrapers.kenexa.kenexa import KenexaJobScraper
+from neekanee.jobscrapers.brassring.brassring import BrassringJobScraper
+from neekanee.htmlparse.soupify import soupify
+
+from neekanee.jobscrapers.brassring.brassring import BrassringJobScraper
 
 COMPANY = {
     'name': 'Duke University',
     'hq': 'Durham, NC',
 
-    'ats': 'Kenexa',
-
-    'benefits': {
-        'url': 'http://www.hr.duke.edu/benefits/index.php',
-        'vacation': [(0,15)],
-        'holidays': 13,
-        'tuition_assistance': True
-    },
-
     'home_page_url': 'http://www.duke.edu',
-    'jobs_page_url': 'https://sjobs.brassring.com/1033/ASP/TG/cim_home.asp?partnerid=25017&siteid=5172',
-
-    'gctw_chronicle': True,
+    'jobs_page_url': 'https://sjobs.brassring.com/TGWebHost/home.aspx?partnerid=25017&siteid=5172',
 
     'empcnt': [10001]
 }
 
-class DukeJobScraper(KenexaJobScraper):
+class DukeJobScraper(BrassringJobScraper):
     def __init__(self):
         super(DukeJobScraper, self).__init__(COMPANY)
 
-    def get_location_from_td(self, td):
-        y = td[4].text
-        if y.find(',') == -1:
-            y += ', NC'
+        self.soupify_search_form = True
 
-        return self.parse_location(y)
+    def get_url_from_formtext(self, x):
+        s = soupify(x['JobTitle'])
+        return s.a
+
+    def get_title_from_formtext(self, x):
+        s = soupify(x['JobTitle'])
+        return s.a.text
+
+    def get_location_from_formtext(self, x):
+        l = x['Location']
+        l = self.parse_location(l)
+
+        return l
 
 def get_scraper():
     return DukeJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
