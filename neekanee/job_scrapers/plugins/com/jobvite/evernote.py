@@ -1,4 +1,4 @@
-import re, urlparse
+import re, urlparse, urllib
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Mountain View, CA',
 
     'home_page_url': 'http://www.evernote.com',
-    'jobs_page_url': 'http://www.evernote.com/about/careers/',
+    'jobs_page_url': 'http://hire.jobvite.com/CompanyJobs/Careers.aspx?c=qec9Vfwe',
 
     'empcnt': [11,50]
 }
@@ -19,21 +19,45 @@ class EvernoteJobScraper(JobScraper):
     def __init__(self):
         super(EvernoteJobScraper, self).__init__(COMPANY)
 
+    def new_url(self, url, jobid):
+        u = urlparse.urlparse(url)
+        l = urlparse.parse_qsl(u.query)
+        x = [ (k,v) for (k,v) in l if k == 'c' ]
+
+        x.append(('page', 'Job Description'))
+        x.append(('j',     jobid))
+
+        u = list(u)
+        u[4] = urllib.urlencode(x)
+        u = urlparse.urlunparse(u)
+
+        return u
+
     def scrape_job_links(self, url):
         jobs = []
 
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id='jobFeed')
-        r = re.compile(r'theresumator\.com/apply/\S+/\S+\.html$')
-        x = {'href': r, 'target': '_blank'}
+        x = {'class': 'jobList'}
+        r = re.compile(r"jvGoToPage\('Job Description','','(.*)'\)")
+        d = s.find('div', attrs=x)
 
-        for a in d.findAll('a', attrs=x):
+        for a in d.findAll('a', href=r):
+            tr = a.findParent('tr')
+            td = tr.findAll('td')
+        
+            l = self.parse_location(td[-1].text)
+            if not l:
+                continue
+
+            m = re.search(r, a['href'])
+            jobid = m.group(1)
+
             job = Job(company=self.company)
             job.title = a.text
-            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-            job.location = self.company.location
+            job.url = self.new_url(self.br.geturl(), jobid)
+            job.location = l
             jobs.append(job)
 
         return jobs
@@ -47,15 +71,14 @@ class EvernoteJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            p = s.find('span', id='resumator-job-location')
-            d = s.find('div', id='main')
-            l = self.parse_location(p.text)
+            f = s.find('form', attrs={'name': 'jvform'})
 
-            if not l:
-                continue
-
-            job.desc = get_all_text(d)
+            job.desc = get_all_text(f)
             job.save()
 
 def get_scraper():
     return EvernoteJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
