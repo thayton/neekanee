@@ -9,10 +9,8 @@ COMPANY = {
     'name': 'Massachusetts Institute of Technology',
     'hq': 'Cambridge, MA',
 
-    'ats': 'Webhire',
-
     'home_page_url': 'http://www.mit.edu',
-    'jobs_page_url': 'http://hrweb.mit.edu/staffing/',
+    'jobs_page_url': 'http://careers.peopleclick.com/careerscp/client_mit/external/search.do',
 
     'empcnt': [5001,10000]
 }
@@ -25,19 +23,35 @@ class MitJobScraper(JobScraper):
         jobs = []
 
         self.br.open(url)
-        self.br.select_form('search')
-        self.br.submit()
 
-        r = re.compile(r'^/servlet/av/jd\?')
-        
+        #
+        # Some of script contents throw off mechanize
+        # and it gives error 'ParseError: OPTION outside of SELECT'
+        # So we soupify it to remove script contents
+        #
+        s = soupify(self.br.response().read())
+
+        html = s.prettify()
+        resp = mechanize.make_response(html, [("Content-Type", "text/html")],
+                                       self.br.geturl(), 200, "OK")
+
+        self.br.set_response(resp)
+        self.br.select_form('searchForm')
+        self.br.form.set_all_readonly(False)
+        self.br.form['com.peopleclick.cp.formdata.hitsPerPage'] = [ '50' ]
+        self.br.submit('input')
+
+        r = re.compile(r'^jobDetails\.do\?functionName=getJobDetail&jobPostId=\d+')
+        pageno = 2
+
         while True:
             s = soupify(self.br.response().read())
 
             for a in s.findAll('a', href=r):
                 tr = a.findParent('tr')
                 td = tr.findAll('td')
-
-                l = self.parse_location(td[4].text)
+            
+                l = self.parse_location(td[-6].text)
                 if not l:
                     continue
 
@@ -48,11 +62,16 @@ class MitJobScraper(JobScraper):
                 jobs.append(job)
 
             # Navigate to the next page
-            try:
-                self.br.select_form('GetNextPage')
-                self.br.submit()
-            except mechanize.FormNotFoundError:
+            p = 'PARAMFILTER:functionName=search|pageIndex=%d|' % pageno
+            i = s.find('input', attrs={'name': p})
+            if not i:
                 break
+
+            self.br.select_form('searchResultForm')
+            self.br.form.set_all_readonly(False)
+            self.br.submit(name=i['name'])
+
+            pageno += 1
 
         return jobs
 
@@ -65,9 +84,10 @@ class MitJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='content')
+            a = {'name': 'jobDetails'}
+            f = s.find('form', attrs=a)
 
-            job.desc = get_all_text(d)    
+            job.desc = get_all_text(f)    
             job.save()
 
 def get_scraper():
