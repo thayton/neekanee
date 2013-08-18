@@ -72,3 +72,7 @@ class MitJobScraper(JobScraper):
 
 def get_scraper():
     return MitJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
