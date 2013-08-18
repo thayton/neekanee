@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Palo Alto, CA',
 
     'home_page_url': 'http://www.palantir.com',
-    'jobs_page_url': 'http://www.palantir.com/careers/positions',
+    'jobs_page_url': 'http://www.palantir.com/careers/OpenPositionLanding',
 
     'empcnt': [201,500]
 }
