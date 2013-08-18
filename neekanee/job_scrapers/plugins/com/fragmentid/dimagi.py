@@ -27,22 +27,27 @@ class DimagiJobScraper(JobScraper):
         self.br.open(self.company.jobs_page_url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', attrs={'class': 'content'})
+        x = {'class': 'content'}
+        d = s.find('div', attrs=x)
+        r = re.compile(r'^#')
         d.extract()
 
         self.company.job_set.all().delete()
 
-        for h2 in d.findAll('h2'):
+        for a in d.findAll('a', href=r):
             job = Job(company=self.company)
-            job.title = h2.text
-            job.url = self.br.geturl()
+            job.title = a.text
+            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
             job.location = self.company.location
             job.desc = ''
 
-            x = h2.next
+            y = {'name': a['href'][1:]}
+            x = d.find('a', attrs=y)
+            x = x.next
+
             while x:
                 name = getattr(x, 'name', None)
-                if name == 'h2':
+                if name == 'a' and x.get('name', False):
                     break
                 elif name is None:
                     job.desc += x
