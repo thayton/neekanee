@@ -9,10 +9,8 @@ COMPANY = {
     'name': 'Silvertech',
     'hq': 'Manchester, NH',
 
-    'benefits': {'vacation': []},
-
     'home_page_url': 'http://www.silvertech.com',
-    'jobs_page_url': 'http://www.silvertech.com/digital-marketing-agency/careers/',
+    'jobs_page_url': 'http://www.silvertech.com/careers',
 
     'empcnt': [11,50]
 }
@@ -20,6 +18,8 @@ COMPANY = {
 class SilverTechJobScraper(JobScraper):
     def __init__(self):
         super(SilverTechJobScraper, self).__init__(COMPANY)
+        self.br.addheaders = [('User-agent', 
+                               'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')]
 
     def scrape_job_links(self, url):
         jobs = []
@@ -27,11 +27,13 @@ class SilverTechJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'/digital-marketing-agency/careers/\S+\.aspx$')
+        d = s.find('div', id='careers')
+        r = re.compile(r'^/careers/\S+\.aspx$')
+        x = {'class': 'position', 'href': r}
 
-        for a in s.findAll('a', href=r):
+        for a in d.findAll('a', attrs=x):
             job = Job(company=self.company)
-            job.title = a.text
+            job.title = a.div.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
             job.location = self.company.location
             jobs.append(job)
@@ -47,11 +49,14 @@ class SilverTechJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            t = s.find('td', attrs={'class': 'content'})
+            d = s.find('div', id='careers')
 
-            job.desc = get_all_text(t)
+            job.desc = get_all_text(d)
             job.save()
 
 def get_scraper():
     return SilverTechJobScraper()
 
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
