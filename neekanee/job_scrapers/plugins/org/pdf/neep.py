@@ -35,7 +35,7 @@ class NeepJobScraper(JobScraper):
 
             job = Job(company=self.company)
             job.title = a.text
-            job.url = urlparse.urljoin(self.company.home_page_url, urllib.quote(a['href']))
+            job.url = urlparse.urljoin(self.company.home_page_url, a['href'])
             job.location = self.company.location
             jobs.append(job)
 
