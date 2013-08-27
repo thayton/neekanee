@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'San Mateo, CA',
 
     'home_page_url': 'http://www.opera.com',
-    'jobs_page_url': 'http://www.opera.com/company/jobs/list/?dept=all&location=all',
+    'jobs_page_url': 'http://business.opera.com/company/jobs/list',
 
     'empcnt': [501,1000]
 }
@@ -18,7 +18,6 @@ COMPANY = {
 class OperaJobScraper(JobScraper):
     def __init__(self):
         super(OperaJobScraper, self).__init__(COMPANY)
-        self.geocoder.return_usa_only = False
 
     def scrape_job_links(self, url):
         jobs = []
@@ -26,13 +25,13 @@ class OperaJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'^/company/jobs/opening/\d+/$')
-        d = s.find('div', attrs={'class': 'joblist'})
-        d.extract()
+        r = re.compile(r'^/company/jobs/list/\d+$')
+        x = {'class': 'joblist'}
+        d = s.find('div', attrs=x)
 
         for a in d.findAll('a', href=r):
             v = a.findNext('dd')
-            l = v.contents[1].split(';')[0]
+            l = v.contents[-1]
             l = self.parse_location(l)
 
             if not l:
@@ -55,9 +54,10 @@ class OperaJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', attrs={'class': 'article'})
+            x = {'role': 'main'}
+            m = s.find('main', attrs=x)
 
-            job.desc = get_all_text(d)
+            job.desc = get_all_text(m)
             job.save()
 
 def get_scraper():
