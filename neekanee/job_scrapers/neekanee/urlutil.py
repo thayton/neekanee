@@ -73,6 +73,12 @@ def url_params_del(url):
     u[3] = None
     return urlparse.urlunparse(u)
 
+def url_set_path(url, path):
+    u = urlparse.urlparse(url)
+    u = list(u)
+    u[2] = path
+    return urlparse.urlunparse(u)
+    
 def url_domain(url):
     """
     Extract domain from url
