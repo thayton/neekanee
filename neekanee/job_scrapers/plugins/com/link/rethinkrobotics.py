@@ -25,9 +25,9 @@ class RethinkRoboticsJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id='content')
-        r = re.compile(r'/index\.php/about/careers/[^/]+/$')
-        x = {'title': True, 'href': r}
+        x = {'class': 'careers'}
+        d = s.find('div', attrs=x)
+        r = re.compile(r'/about/careers/posting/')
 
         for a in d.findAll('a', href=r):
             job = Job(company=self.company)
@@ -47,10 +47,11 @@ class RethinkRoboticsJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='content')
-            d = d.find('div', id='left')
+            x = {'class': 'page-title'}
+            h = s.find('h1', attrs=x)
+            n = h.parent
 
-            job.desc = get_all_text(d)
+            job.desc = get_all_text(n)
             job.save()
 
 def get_scraper():
