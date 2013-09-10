@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Houston, TX',
 
     'home_page_url': 'http://www.omnienergy.com',
-    'jobs_page_url': 'http://www.omnienergy.com/careers/job-openings.html',
+    'jobs_page_url': 'http://www.gibsons.com/Careers/US-Careers.aspx',
 
     'empcnt': [201,500]
 }
@@ -25,15 +25,13 @@ class OmniEnergyJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        x = {'class': 'job-info-table'}
-        t = s.find('table', attrs=x)
-        r = re.compile(r'^/job-listings/[^/]+$')
+        r = re.compile(r'^^/Careers/US-Careers/Career-U-S\.aspx\?ItemID=\d+$')
 
-        for a in t.findAll('a', href=r):
-            tr = a.findParent('tr')
-            td = tr.findAll('td')
+        for a in s.findAll('a', href=r):
+            d = a.findParent('div')
+            p = d.findAll('span')
 
-            l = self.parse_location(td[-2].text)
+            l = self.parse_location(p[1].text)
             if not l:
                 continue
 
@@ -42,6 +40,7 @@ class OmniEnergyJobScraper(JobScraper):
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
             job.location = l
             jobs.append(job)
+            break
 
         return jobs
 
@@ -54,8 +53,7 @@ class OmniEnergyJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            x = {'class': 'job-description editable'}
-            d = s.find('div', attrs=x)
+            d = s.find('div', id='careerIndv')
 
             job.desc = get_all_text(d)
             job.save()
