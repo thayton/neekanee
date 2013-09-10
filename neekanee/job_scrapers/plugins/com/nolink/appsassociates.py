@@ -22,7 +22,7 @@ class AppsAssociatesJobScraper(JobScraper):
     def scrape_jobs(self):
         self.br.open(self.company.jobs_page_url)
 
-        l = {
+        locs = {
             'usa': self.parse_location('Acton, MA'),
             'germany': self.parse_location('Dortmund, Germany'),
             'netherlands': self.parse_location('Eindhoven, Netherlands'),
@@ -36,10 +36,10 @@ class AppsAssociatesJobScraper(JobScraper):
 
         for a in s.findAll('a', href=r):
             m = re.search(r, a['href'])
-            if not l.has_key(m.group(1)):
+            if not locs.has_key(m.group(1)):
                 continue
 
-            l = self.parse_location(l[m.group(1)])
+            l = self.parse_location(locs[m.group(1)])
             if not l:
                 continue
 

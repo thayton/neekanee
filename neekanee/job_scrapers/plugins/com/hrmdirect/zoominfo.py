@@ -18,7 +18,7 @@ COMPANY = {
     },
 
     'home_page_url': 'http://www.zoominfo.com',
-    'jobs_page_url': 'http://zoominfo.hrmdirect.com/employment/openings_sm.php',
+    'jobs_page_url': 'http://zoominfo.hrmdirect.com/employment/job-openings.php?search=true&nohd',
 
     'empcnt': [51,200]
 }
@@ -35,13 +35,15 @@ class ZoomInfoJobScraper(JobScraper):
         s = soupify(self.br.response().read())
         x = {'class': 'reqResultTable'}
         t = s.find('table', attrs=x)
-        r = re.compile(r'^view_sm\.php\?req=\S+')
+        r = re.compile(r'^job-opening\.php\?req=\d+')
 
         for a in t.findAll('a', href=r):
             tr = a.findParent('tr')
             td = tr.findAll('td')
 
-            l = self.parse_location(td[-1].text)
+            l = td[-3].text + ', ' + td[-2].text
+            l = self.parse_location(l)
+
             if not l:
                 continue
 
@@ -62,8 +64,8 @@ class ZoomInfoJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            x = {'class': 'jobDesc reqResult'}
-            d = s.find('td', attrs=x)
+            x = {'class': 'reqResult'}
+            d = s.find('div', attrs=x)
 
             job.desc = get_all_text(d)
             job.save()
