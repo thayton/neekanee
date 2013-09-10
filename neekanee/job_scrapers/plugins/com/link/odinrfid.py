@@ -26,7 +26,7 @@ class OdinRfidJobScraper(JobScraper):
 
         s = soupify(self.br.response().read())
         r = re.compile(r'^/careers/[^/]+/$')
-        f = lambda x: x.name == 'a' and re.search(r, x['href']) and x.parent.name == 'h3'
+        f = lambda x: x.name == 'a' and re.search(r, x.get('href', '')) and x.parent.name == 'h3'
 
         for a in s.findAll(f):
             job = Job(company=self.company)
