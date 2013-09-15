@@ -56,7 +56,10 @@ class RaytheonJobScraper(JobScraper):
 
             m = re.search(z, a['href'])
 
-            self.br.select_form('form1')
+            def select_form(form):
+                return form.attrs.get('id', None) == 'form1'
+
+            self.br.select_form(predicate=select_form)
             self.br.form.set_all_readonly(False)
             self.br.form['ctl03_HiddenField'] = ';;AjaxControlToolkit, Version=3.5.50927.0, Culture=neutral, PublicKeyToken=28f01b0e84b6d53e:en-US:4a126967-c4d4-4d5c-8f94-b4e3e72d7549:5546a2b:475a4ef5:d2e10b12:effe2a26:37e2e5c9:5a682656:12bbc599'
             self.br.form.new_control('hidden', '__EVENTTARGET',   {'value': m.group(1)})
