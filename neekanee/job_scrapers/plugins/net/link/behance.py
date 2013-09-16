@@ -25,10 +25,9 @@ class BehanceJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'^/careers/view\?id=\d+$')
-        ul = s.find('ul', id='open_positions')
+        r = re.compile(r'/careers/view\?id=\d+$')
 
-        for a in ul.findAll('a', href=r):
+        for a in s.findAll('a', href=r):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
