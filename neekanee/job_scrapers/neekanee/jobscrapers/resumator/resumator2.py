@@ -49,13 +49,18 @@ class ResumatorJobScraper(JobScraper):
 
             if not d:
                 d = s.find('div', id='content-area-inner')
-                if not d:
-                    d = s.find('div', id='job_description_wrapper')
-                    if d:
-                        d = d.findParent('div')
-                if not d:
-                    x = {'class': 'frmWrp'}
-                    d = s.find('div', attrs=x)
+
+            if not d:
+                d = s.find('div', id='job_description_wrapper')
+                if d:
+                    d = d.findParent('div')
+
+            if not d:
+                x = {'class': 'frmWrp'}
+                d = s.find('div', attrs=x)
+
+            if not d:
+                d = s.find('div', id='page')
 
             job.desc = get_all_text(d)
             job.save()
