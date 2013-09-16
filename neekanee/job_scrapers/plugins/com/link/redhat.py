@@ -42,6 +42,7 @@ class RedHatJobScraper(JobScraper):
                 job.url = urlparse.urljoin(self.br.geturl(), a['href'])
                 job.location = l
                 jobs.append(job)
+                break
 
             y = re.compile(r"__doPostBack\('([^']+)'")
             z = re.compile(r'^maincontent_\d+_jobsearchresults_\d+_next_page$')
@@ -52,7 +53,10 @@ class RedHatJobScraper(JobScraper):
 
             m = re.search(y, a['href'])
             
-            self.br.select_form('form1')
+            def select_form(form):
+                return form.attrs.get('id', None) == 'form1'
+
+            self.br.select_form(predicate=select_form)
             self.br.form.new_control('hidden', '__EVENTTARGET',   {'value': m.group(1)})
             self.br.form.new_control('hidden', '__EVENTARGUMENT', {'value': ''})
             self.br.form.new_control('hidden', '__LASTFOCUS',     {'value': ''})
