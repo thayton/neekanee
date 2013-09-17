@@ -16,7 +16,10 @@ class ManTechJobScraper(KenexaJobScraper):
         super(ManTechJobScraper, self).__init__(COMPANY)
 
     def get_location_from_td(self, td):
-        return self.parse_location(td[-4].text)
+        if len(td[-4]) == 0:
+            return None
+        else:
+            return self.parse_location(td[-4].text)
 
 def get_scraper():
     return ManTechJobScraper()
