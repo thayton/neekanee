@@ -14,7 +14,7 @@ COMPANY = {
     'ats': 'UltiRecruit',
 
     'home_page_url': 'http://www.jmfamily.com',
-    'jobs_page_url': 'https://www9.ultirecruit.com/JMF1000/JobBoard/listjobs.aspx',
+    'jobs_page_url': 'https://re13.ultipro.com/JMF1000/Jobboard/listjobs.aspx',
 
     'empcnt': [1001,5000]
 }
