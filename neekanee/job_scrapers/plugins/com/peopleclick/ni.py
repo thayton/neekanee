@@ -33,6 +33,19 @@ class NiJobScraper(JobScraper):
 
         self.br.open(url)
         self.br.follow_link(self.br.find_link(url_regex=re.compile(r'search\.do$')))
+
+        #
+        # Some of script contents throw off mechanize
+        # and it gives error 'ParseError: OPTION outside of SELECT'
+        # So we soupify it to remove script contents
+        #
+        s = soupify(self.br.response().read())
+
+        html = s.prettify()
+        resp = mechanize.make_response(html, [("Content-Type", "text/html")],
+                                       self.br.geturl(), 200, "OK")
+
+        self.br.set_response(resp)
         self.br.select_form('searchForm')
         self.br.submit()
 
@@ -87,3 +100,7 @@ class NiJobScraper(JobScraper):
 
 def get_scraper():
     return NiJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
