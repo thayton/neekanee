@@ -10,27 +10,50 @@ COMPANY = {
     'hq': 'Boston, MA',
 
     'home_page_url': 'http://www.flextronics.com',
-    'jobs_page_url': 'https://flextronics.hua.hrsmart.com/custom/flex/jobs/',
+    'jobs_page_url': 'https://flextronics.hua.hrsmart.com/hr/ats/JobSearch/index',
 
     'empcnt': [10001]
 }
 
 class FlextronicsJobScraper(JobScraper):
     def __init__(self):
-        super(FlextronicsJobScraper, self).__init__(COMPANY, return_usa_only=False)
+        super(FlextronicsJobScraper, self).__init__(COMPANY)
 
     def scrape_job_links(self, url):
         jobs = []
 
+        def select_form(form):
+            return form.attrs.get('id', None) == 'jobSearchForm'
+
         self.br.open(url)
+        self.br.select_form(predicate=select_form)
+        self.br.submit('search_jobs')
 
-        s = soupify(self.br.response().read())
-        r = re.compile(r'^\d+\.html$')
+        pageno = 2
 
-        for a in s.findAll('a', href=r):
-            job = Job(company=self.company)
-            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-            jobs.append(job)
+        while True:
+            s = soupify(self.br.response().read())
+            r = re.compile(r'^/hr/ats/Posting/view/\d+$')
+
+            for a in s.findAll('a', href=r):
+                tr = a.findParent('tr')
+                td = tr.findAll('td')
+
+                l = self.parse_location(td[1].text)
+                if not l:
+                    continue
+
+                job = Job(company=self.company)
+                job.title = a.text
+                job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+                job.location = l
+                jobs.append(job)
+
+            try:
+                self.br.follow_link(self.br.find_link(text='%d' % pageno))
+                pageno += 1
+            except mechanize.LinkNotFoundError:
+                break
 
         return jobs
 
@@ -44,18 +67,7 @@ class FlextronicsJobScraper(JobScraper):
 
             s = soupify(self.br.response().read())
             d = s.find('div', id='app_main_id')
-            v = d.find('div', id='job_details_hua_location_id')
 
-            if not v:
-                continue
-
-            l = self.parse_location(v.text)
-
-            if not l:
-                continue
-            
-            job.title = d.h2.text
-            job.location = l
             job.desc = get_all_text(d)
             job.save()
 
