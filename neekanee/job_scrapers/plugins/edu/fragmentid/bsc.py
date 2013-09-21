@@ -17,7 +17,7 @@ COMPANY = {
     },
 
     'home_page_url': 'http://www.bsc.edu',
-    'jobs_page_url': 'http://www.bsc.edu/administration/humanresources/job_opportunities.cfm',
+    'jobs_page_url': 'http://www.bsc.edu/administration/humanresources/job_descriptions.cfm',
 
     'empcnt': [201,500]
 }
@@ -26,37 +26,31 @@ class BscJobScraper(JobScraper):
     def __init__(self):
         super(BscJobScraper, self).__init__(COMPANY)
 
-    def scrape_job_links(self, url):
-        jobs = []
-
-        self.br.open(url)
+    def scrape_jobs(self):
+        self.br.open(self.company.jobs_page_url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'^job_descriptions')
+        x = {'id': True, 'name': True}
 
-        for a in s.findAll('a', href=r):
+        self.company.job_set.all().delete()
+
+        for a in s.findAll('a', attrs=x):
             job = Job(company=self.company)
-            job.title = a.text
-            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.title = a.parent.text
+            job.url = urlparse.urljoin(self.br.geturl(), '#' + a['id'])
             job.location = self.company.location
-            jobs.append(job)
+            job.desc = ''
 
-        return jobs
+            x = a.next
 
-    def scrape_jobs(self):
-        job_list = self.scrape_job_links(self.company.jobs_page_url)
-        self.prune_unlisted_jobs(job_list)
-        new_jobs = self.new_job_listings(job_list)
+            while x:
+                name = getattr(x, 'name', None)
+                if name == 'a' and x.has_key('name'):
+                    break
+                elif name is None:
+                    job.desc += x
+                x = x.next
 
-        for job in new_jobs:
-            link,frag = urlparse.urldefrag(job.url)
-            self.br.open(link)
-
-            s = soupify(self.br.response().read())
-            a = s.find('a', id=frag)
-            d = a.findParent('div')
-
-            job.desc = get_all_text(d)
             job.save()
 
 def get_scraper():
