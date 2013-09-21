@@ -49,14 +49,19 @@ class BscJobScraper(JobScraper):
         new_jobs = self.new_job_listings(job_list)
 
         for job in new_jobs:
-            link = urlparse.urldefrag(job.url)[0]
+            link,frag = urlparse.urldefrag(job.url)
             self.br.open(link)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='mainContent')
+            a = s.find('a', id=frag)
+            d = a.findParent('div')
 
             job.desc = get_all_text(d)
             job.save()
 
 def get_scraper():
     return BscJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
