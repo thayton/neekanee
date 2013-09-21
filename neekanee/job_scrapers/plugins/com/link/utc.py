@@ -67,8 +67,11 @@ class UtcJobScraper(JobScraper):
             resp = mechanize.make_response(html, [("Content-Type", "text/html")],
                                            self.br.geturl(), 200, "OK")
 
+            def select_form(form):
+                return form.attrs.get('id', None) == 'form1'
+
             self.br.set_response(resp)
-            self.br.select_form('form1')
+            self.br.select_form(predicate=select_form)
 
             ctl = self.br.form.find_control('maincontent_0$rightcolcontent_1$findjob')
             self.br.form.controls.remove(ctl)
