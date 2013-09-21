@@ -77,6 +77,10 @@ class NetSuiteJobScraper(JobScraper):
 
             s = soupify(self.br.response().read())
             d = s.find('div', id='contentcontainer')
+
+            if not d:
+                continue
+
             x = {'class': 'content '}
             d = d.find('div', attrs=x)
 
