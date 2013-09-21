@@ -58,6 +58,10 @@ class PilotJobScraper(JobScraper):
 
             s = soupify(self.br.response().read())
             d = s.find('div', id='divAboutJob')
+
+            if not d:
+                continue
+
             t = d.findParent('table')
 
             job.desc = get_all_text(t)
