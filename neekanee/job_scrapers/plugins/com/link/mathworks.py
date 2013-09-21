@@ -25,25 +25,31 @@ class MathWorksJobScraper(JobScraper):
 
         self.br.open(url)
 
-        s = soupify(self.br.response().read())
-        x = {'summary': 'Results from searching'}
-        t = s.find('table', attrs=x)
-        r = re.compile(r'/company/jobs/opportunities/\S+')
+        while True:
+            s = soupify(self.br.response().read())
+            d = s.find('div', id='results_container')
+            r = re.compile(r'/company/jobs/opportunities/\S+')
 
-        for a in t.findAll('a', href=r):
-            tr = a.findParent('tr')
-            td = tr.findAll('td')
+            for a in d.findAll('a', href=r):
+                tr = a.findParent('tr')
+                l = self.parse_location(tr.span.text)
 
-            l = self.parse_location(td[-1].text)
-            if not l:
-                continue
+                if not l:
+                    continue
 
-            job = Job(company=self.company)
-            job.title = a.text
-            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-            job.url = url_query_filter(job.url, [])
-            job.location = l
-            jobs.append(job)
+                job = Job(company=self.company)
+                job.title = a.text
+                job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+                job.location = l
+                jobs.append(job)
+
+            x = {'class': 'next_page pagination '}
+            a = s.find('a', attrs=x)
+            if not a:
+                break
+
+            u = urlparse.urljoin(self.br.geturl(), a['href'])
+            self.br.open(u)
 
         return jobs
 
