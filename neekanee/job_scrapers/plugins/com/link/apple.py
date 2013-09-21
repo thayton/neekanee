@@ -48,10 +48,15 @@ class AppleJobScraper(JobScraper):
                 break
 
             for r in s.findAll('requisition'):
-                j = int(r.jobid.text)
+                j = r.jobid.text
                 job = Job(company=self.company)
-                job.title = r.postingtitle.text
-                job.url = self.company.jobs_page_url + 'job=%d&openJobId=%d' % (j, j)
+
+                if r.postingtitle:
+                    job.title = r.postingtitle.text
+                else:
+                    job.title = r.retailpostingtitle.text
+
+                job.url = self.company.jobs_page_url + 'job=%s&openJobId=%s' % (j, j)
                 jobs.append(job)
 
             # Next page
