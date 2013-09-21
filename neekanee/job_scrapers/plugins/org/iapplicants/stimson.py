@@ -10,7 +10,6 @@ COMPANY = {
     'hq': 'Washington, DC',
 
     'ats': 'iApplicants',
-    'benefits': {'vacation': []},
 
     'home_page_url': 'http://www.stimson.org',
     'jobs_page_url': 'http://stimson.iapplicants.com/searchjobs.php',
@@ -41,7 +40,7 @@ class StimsonJobScraper(JobScraper):
                 continue
 
             job = Job(company=self.company)
-            job.title = a.b.text
+            job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
             job.location = l
             jobs.append(job)
@@ -65,3 +64,7 @@ class StimsonJobScraper(JobScraper):
         
 def get_scraper():
     return StimsonJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
