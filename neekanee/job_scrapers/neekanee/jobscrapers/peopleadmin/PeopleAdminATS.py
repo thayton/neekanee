@@ -121,5 +121,8 @@ class PeopleAdminJobScraper(JobScraper):
 
                         break
 
+            if not d:
+                continue
+
             job.desc = get_all_text(d)
             job.save()
