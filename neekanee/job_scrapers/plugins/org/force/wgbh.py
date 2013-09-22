@@ -25,10 +25,9 @@ class WgbhJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        t = s.find('table', id='j_id0:j_id2:j_id48:j_id63')
         r = re.compile(r'^/positiondetail\?id=\w+$')
 
-        for a in t.findAll('a', href=r):
+        for a in s.findAll('a', href=r):
             tr = a.findParent('tr')
             td = tr.findAll('td')
 
