@@ -1,4 +1,5 @@
 import re, urllib, urlparse
+import HTMLParser
 
 from BeautifulSoup import BeautifulSoup
 from neekanee.jobscrapers.jobscraper import JobScraper
@@ -13,7 +14,7 @@ COMPANY = {
     'ats': 'Jobvite',
 
     'home_page_url': 'http://www.panasas.com',
-    'jobs_page_url': 'http://hire.jobvite.com/CompanyJobs/Careers.aspx?c=qO49VfwG&jvprefix=http%3a%2f%2fwww.panasas.com&jvresize=http%3a%2f%2fpantest.panasas.com%2fsites%2fdefault%2ffiles%2fFrameResize.html&k=JobListing&v=1',
+    'jobs_page_url': 'http://hire.jobvite.com/CompanyJobs/Jobs.aspx?c=qO49VfwG&jvresize=http://pantest.panasas.com/sites/default/files/FrameResize.html',
 
     'empcnt': [51,200]
 }
@@ -32,6 +33,7 @@ class PanasasJobScraper(JobScraper):
         m = re.search(r, s.prettify())
 
         jvurlargs = m.group(1)
+        jvurlargs = HTMLParser.HTMLParser().unescape(jvurlargs)
 
         t = s.find('table', attrs={'class': 'jvcontent'})
         r = re.compile(r"jvGoToPage\('(.*)','','(.*)'\)")
@@ -85,3 +87,7 @@ class PanasasJobScraper(JobScraper):
 
 def get_scraper():
     return PanasasJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
