@@ -262,3 +262,4 @@ if __name__ == '__main__':
     print g.geocode('Dubai, United Arab Emirates')
     print g.geocode('Hampton, New Hampshire')
     print g.geocode('New Hampshire - Hampton')
+    print g.geocode('Dickinson, ND')
