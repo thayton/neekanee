@@ -53,6 +53,7 @@
 # http://hire.jobvite.com/CompanyJobs/Careers.aspx?c=qG19Vfwv&jvprefix=http%3a%2f%2fwww.percussion.com&jvresize=http%3a%2f%2fwww.percussion.com%2fweb_resources%2fwww.percussion.com%2fjobvite%2fFrameResize.html&page=Job%20Description&j=otjDVfw4
 #################################################################
 import re, urllib, urlparse
+import HTMLParser
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
@@ -67,7 +68,7 @@ COMPANY = {
     'ats': 'Jobvite',
 
     'home_page_url': 'http://www.customink.com',
-    'jobs_page_url': 'http://hire.jobvite.com/CompanyJobs/Careers.aspx?k=JobListing&c=qB29Vfwr&v=1&jvresize=/about/jobs/frameresize.htm',
+    'jobs_page_url': 'http://hire.jobvite.com/CompanyJobs/Careers.aspx?k=JobListing&c=qB29Vfwr&v=1&jvresize=http://www.customink.com/about/jobs/frameresize.htm',
 
     'empcnt': [201, 500]
 }
@@ -86,6 +87,7 @@ class CustomInkJobScraper(JobScraper):
         m = re.search(r, s.prettify())
 
         jvurlargs = m.group(1)
+        jvurlargs = HTMLParser.HTMLParser().unescape(jvurlargs)
 
         v = { 'class': 'jobList' }
         d = s.find('div', attrs=v)
@@ -138,3 +140,7 @@ class CustomInkJobScraper(JobScraper):
 
 def get_scraper():
     return CustomInkJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
