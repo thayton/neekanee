@@ -49,11 +49,15 @@ class WorkMarketJobScraper(JobScraper):
             d = s.find('div', attrs=x)
             f = lambda x: x.name == 'b' and x.text == 'Location'
             b = d.find(f)
-            l = b.parent.contents[-1].split(':')[1]
-            l = self.parse_location(l)
 
-            if not l:
-                continue
+            if not b:
+                l = self.company.location
+            else:
+                l = b.parent.contents[-1].split(':')[1]
+                l = self.parse_location(l)
+
+                if not l:
+                    continue
 
             job.location = l
             job.desc = get_all_text(d)
