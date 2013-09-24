@@ -1,4 +1,4 @@
-import re, urlparse
+import re, urlparse, json
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Airdrie, Canada',
 
     'home_page_url': 'http://www.unitedsafety.net',
-    'jobs_page_url': 'http://careers.unitedsafety.net',
+    'jobs_page_url': 'http://recruiter.unitedsafety.net/CareerConnector/Job/Search',
 
     'empcnt': [501,1000]
 }
@@ -25,16 +25,17 @@ class UnitedSafetyJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'\.html#more$')
-        x = {'href': r, 'title': True}
-        y = {'class': 'post-outer'}
+        json_jobs = json.loads(s.prettify())
 
-        for a in s.findAll('a', attrs=x):
-            d = a.findParent('div', attrs=y)
+        for j in json_jobs:
+            l = self.parse_location(j['Location'])
+            if not l:
+                continue
+
             job = Job(company=self.company)
-            job.title = d.h3.text
-            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-            job.location = self.company.location
+            job.title = j['Title']
+            job.url = urlparse.urljoin(self.br.geturl(), '/CareerConnector/Job/Details/%s' % j['Job'])
+            job.location = l
             jobs.append(job)
 
         return jobs
@@ -48,7 +49,7 @@ class UnitedSafetyJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='main')
+            d = s.find('div', id='container')
 
             job.desc = get_all_text(d)
             job.save()
