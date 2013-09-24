@@ -29,6 +29,9 @@ class RegMoviesJobScraper(JobScraper):
         r = re.compile(r'^/About-Regal/Job-Opportunities/\w+')
         
         for a in d.findAll('a', href=r):
+            if len(a.text.strip()) == 0:
+                continue
+
             l = a.text.rsplit('-', 1)[1]
             l = self.parse_location(l)
 
