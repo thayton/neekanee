@@ -82,15 +82,24 @@ class AppleJobScraper(JobScraper):
             # we're creating requests manually
             time.sleep(2)
 
-            u = 'https://jobs.apple.com/us/requisition/detail.json'
+            u1 = 'https://jobs.apple.com/us/requisition/detail.json'
+            u2 = 'https://jobs.apple.com/us/requisition/retaildetail.json'
+
+            u = u1
             m = re.search(r'job=(\d+)', job.url)
+            reqtype = 'REQ'
+
+            if not m:
+                m = re.search(r'job=([^&]+)', job.url)
+                u = u2
+                reqtype = 'PT'
 
             data = { 'requisitionId': m.group(1),
-                     'reqType':       'REQ',
+                     'reqType':       reqtype,
                      'clientOffset':  '-300'
             }
-            data = urllib.urlencode(data)
 
+            data = urllib.urlencode(data)
             resp = mechanize.Request(u, data)
 
             r = mechanize.urlopen(resp)
@@ -98,6 +107,10 @@ class AppleJobScraper(JobScraper):
 
             d = '\n'.join(['%s' % x for x in j['reqTextFields'].values()])
             r = j['requisitionInfo']
+
+            if not r.get('locationName'):
+                continue
+
             l = [r['locationName'], r.get('stateAbbr', ''), r['countryCode']]
             l = ', '.join(['%s' % x for x in l if x])
             l = self.parse_location(l)
