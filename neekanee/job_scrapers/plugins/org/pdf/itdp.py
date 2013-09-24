@@ -26,11 +26,9 @@ class ItdpJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        x = {'class': 'DetailCopyWrapper'}
-        d = s.find('div', attrs=x)
         r = re.compile(r'^/uploads/[^\.]+\.pdf$')
 
-        for a in d.findAll('a', href=r):
+        for a in s.findAll('a', href=r):
             g = a.findPrevious('strong')
             job = Job(company=self.company)
             job.title = g.contents[0]
