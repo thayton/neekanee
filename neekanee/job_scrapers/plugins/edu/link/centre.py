@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Danville, KY',
 
     'home_page_url': 'http://www.centre.edu',
-    'jobs_page_url': 'http://www.centre.edu/human_resources/jobs.html',
+    'jobs_page_url': 'https://www.mycareernetwork.com/clientResumeMgr/?cid=4424&first=true',
 
     'empcnt': [201,500]
 }
@@ -18,6 +18,8 @@ COMPANY = {
 class CentreJobScraper(JobScraper):
     def __init__(self):
         super(CentreJobScraper, self).__init__(COMPANY)
+        self.br.addheaders = [('User-agent', 
+                               'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')]
 
     def scrape_job_links(self, url):
         jobs = []
@@ -25,19 +27,20 @@ class CentreJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'window\.open\(\'(http://www\.mycareernetwork\.com/clientResumeMgr/\?cid=\d+&first=true)\'')
-        a = s.find('a', attrs={'onclick': r})
-        m = re.search(r, a['onclick'])
-
-        self.br.open(m.group(1))
-
-        s = soupify(self.br.response().read())
         r = re.compile(r'JobSearchDetails\.aspx\?JobID=\d+')
 
         for a in s.findAll('a', href=r):
+            tr = a.findParent('tr')
+            td = tr.findAll('td')
+
+            l = self.parse_location(td[1].text)
+            if not l:
+                continue
+
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.location = l
             jobs.append(job)
 
         return jobs
@@ -52,14 +55,7 @@ class CentreJobScraper(JobScraper):
 
             s = soupify(self.br.response().read())
             d = s.find('div', id='content')
-            x = {'class': 'JobDetailsJobTitle'}
-            p = d.findAll('span', attrs=x)
-            l = self.parse_location(p[-2].text)
-            
-            if not l:
-                continue
 
-            job.location = l
             job.desc = get_all_text(d)
             job.save()
 
