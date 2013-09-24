@@ -9,8 +9,6 @@ COMPANY = {
     'name': 'Smule',
     'hq': 'Palo Alto, CA',
 
-    'benefits': {'vacation': []},
-
     'home_page_url': 'http://www.smule.com',
     'jobs_page_url': 'http://www.smule.com/jobs',
 
@@ -26,8 +24,8 @@ class SmuleJobScraper(JobScraper):
 
         s = soupify(self.br.response().read())
         r = re.compile(r'^#')
-        d = s.find('div', id='page-inner')
-        d.extract()
+        x = {'class': 'open-positions-panel'}
+        d = s.find('div', attrs=x)
 
         self.company.job_set.all().delete()
 
@@ -36,17 +34,17 @@ class SmuleJobScraper(JobScraper):
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
             job.location = self.company.location
-            job.desc = ''
 
-            x = d.find(attrs={'name' : a['href'][1:]})
-            
-            while x and (getattr(x, 'name', None) != 'hr' and\
-                         getattr(x, 'name', None) != 'div'):
-                if hasattr(x, 'name') is False: 
-                    job.desc += x
-                x = x.next
+            x = {'name': a['href'][1:]}
+            y = s.find('a', attrs=x)
+            v = y.findParent('div')
 
+            job.desc = get_all_text(v)
             job.save()
 
 def get_scraper():
     return SmuleJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
