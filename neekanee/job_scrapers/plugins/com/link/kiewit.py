@@ -42,6 +42,7 @@ class KiewitJobScraper(JobScraper):
                 job = Job(company=self.company)
                 job.title = a.text
                 job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+                job.url = job.url.encode('utf8')
                 job.location = l
                 jobs.append(job)
 
@@ -60,11 +61,17 @@ class KiewitJobScraper(JobScraper):
         new_jobs = self.new_job_listings(job_list)
 
         for job in new_jobs:
-            self.br.open(job.url)
+            try:
+                self.br.open(job.url)
+            except:
+                continue
 
             s = soupify(self.br.response().read())
             x = {'class': 'box jobDesc'}
             d = s.find('div', id='jobDesc')
+
+            if not d:
+                continue
 
             job.desc = get_all_text(d)
             job.save()
