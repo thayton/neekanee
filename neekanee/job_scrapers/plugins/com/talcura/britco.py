@@ -94,8 +94,6 @@ class BritcoJobScraper(JobScraper):
                 self.br.form.controls.remove(ctl)
             
             for ctl in self.br.form.controls:
-                print ctl.name
-
                 if re.search(r'Button', ctl.name):
                     self.br.form.controls.remove(ctl)                    
 
