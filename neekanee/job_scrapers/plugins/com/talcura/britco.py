@@ -46,7 +46,6 @@ class BritcoJobScraper(JobScraper):
                 job.url = urlparse.urljoin(self.br.geturl(), a['href'])
                 job.location = l
                 jobs.append(job)
-                break
 
             f = lambda x: x.name == 'a' and x.text == '%d' % pageno
             a = s.find(f)
