@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Manchester, NH',
 
     'home_page_url': 'http://www.renesys.com',
-    'jobs_page_url': 'http://www.renesys.com/about/careers.shtml',
+    'jobs_page_url': 'http://www.renesys.com/company/careers/',
 
     'empcnt': [11,50]
 }
@@ -18,6 +18,8 @@ COMPANY = {
 class RenesysJobScraper(JobScraper):
     def __init__(self):
         super(RenesysJobScraper, self).__init__(COMPANY)
+        self.br.addheaders = [('User-agent', 
+                               'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')]
 
     def scrape_job_links(self, url):
         jobs = []
