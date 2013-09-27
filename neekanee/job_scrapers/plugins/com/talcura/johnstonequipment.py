@@ -115,8 +115,9 @@ class JohnstonEquipmentJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            x = {'class': 'c-j-desc'}
+            x = {'class': 'job-info'}
             d = s.find('div', attrs=x)
+            d = d.findParent('div')
 
             job.desc = get_all_text(d)
             job.save()
