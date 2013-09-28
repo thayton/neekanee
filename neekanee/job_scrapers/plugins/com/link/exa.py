@@ -25,7 +25,7 @@ class ExaJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id='u11684-166')
+        d = s.find('div', id='u11684-135')
         r = re.compile(r'\.html$')
         f = lambda x: x.name == 'a' and x.parent.name == 'p' and re.search(r, x['href'])
         
@@ -46,7 +46,7 @@ class ExaJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='u118421-81')
+            d = s.find('h1').parent
             f = lambda x: x.name == 'h2' and x.text == 'LOCATION:'
             l = s.find(f)
 
@@ -55,7 +55,6 @@ class ExaJobScraper(JobScraper):
 
             p = l.findNext('p')
             l = self.parse_location(p.text)
-            d = p.findParent('div')
 
             if not l:
                 continue
