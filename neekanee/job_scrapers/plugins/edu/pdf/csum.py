@@ -57,9 +57,9 @@ class CsumJobScraper(JobScraper):
             self.br.open(job.url)
 
             d = self.br.response().read()
-            s = soupify(pdftohtml(data))
+            s = soupify(pdftohtml(d))
 
-            job.desc = get_all_text(d)
+            job.desc = get_all_text(s.html.body)
             job.save()
 
 def get_scraper():
