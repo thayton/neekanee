@@ -46,7 +46,6 @@ class BritcoJobScraper(JobScraper):
                 job.url = urlparse.urljoin(self.br.geturl(), a['href'])
                 job.location = l
                 jobs.append(job)
-                break
 
             f = lambda x: x.name == 'a' and x.text == '%d' % pageno
             a = s.find(f)
@@ -116,10 +115,9 @@ class BritcoJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            x = {'class': 'c-j-desc'}
-            d = s.find('div', attrs=x)
+            p = s.find('span', id='BeginSignForPost')
 
-            job.desc = get_all_text(d)
+            job.desc = get_all_text(p)
             job.save()
 
 def get_scraper():
