@@ -14,8 +14,9 @@ class SoleraNetworksJobScraper(IcimsJobScraper):
     def __init__(self):
         super(SoleraNetworksJobScraper, self).__init__(COMPANY)
 
-    def get_location_from_td(self, td):
-        return self.parse_location(td[-2].text)
+    def scrape_jobs(self):
+        # Acquired by Blue Coat
+        self.company.job_set.all().delete()
 
 def get_scraper():
     return SoleraNetworksJobScraper()
