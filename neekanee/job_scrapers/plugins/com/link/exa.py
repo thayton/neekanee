@@ -25,7 +25,7 @@ class ExaJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id='u11684-135')
+        d = s.h1.parent
         r = re.compile(r'\.html$')
         f = lambda x: x.name == 'a' and x.parent.name == 'p' and re.search(r, x['href'])
         
