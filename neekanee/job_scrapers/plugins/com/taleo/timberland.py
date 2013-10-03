@@ -10,12 +10,12 @@ COMPANY = {
     'empcnt': [1001,5000]
 }
 
-class TimerlandNetJobScraper(TaleoJobScraper):
+class TimberlandNetJobScraper(TaleoJobScraper):
     def __init__(self):
-        super(TimerlandNetJobScraper, self).__init__(COMPANY)
+        super(TimberlandNetJobScraper, self).__init__(COMPANY)
 
 def get_scraper():
-    return TimerlandNetJobScraper()
+    return TimberlandNetJobScraper()
 
 if __name__ == '__main__':
     job_scraper = get_scraper()
