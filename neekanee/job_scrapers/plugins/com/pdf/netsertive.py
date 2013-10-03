@@ -28,18 +28,16 @@ class NetsertiveJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        x = {'class': 'entry-content article'}
-        d = s.find('div', attrs=x)
-        r = re.compile(r'/wp-content/uploads/\d{4}/\d{2}/\S+\.pdf$')
-        d.extract()
+        x = {'class': 'career-list'}
+        n = s.find('section', attrs=x)
+        r = re.compile(r'/about/careers/\S+\.pdf$')
+        n.extract()
 
-        for a in d.findAll('a', href=r):
-            if a.img:
-                continue
+        for a in n.findAll('a', href=r):
+            d = a.findParent('div')
 
-            g = a.findPrevious('strong')
             job = Job(company=self.company)
-            job.title = g.text
+            job.title = d.h4.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
             job.location = self.company.location
             jobs.append(job)
