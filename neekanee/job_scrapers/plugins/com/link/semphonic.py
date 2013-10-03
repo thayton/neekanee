@@ -19,7 +19,7 @@ class SemphonicJobScraper(JobScraper):
     def __init__(self):
         super(SemphonicJobScraper, self).__init__(COMPANY)
 
-    def scrape_job_links(self, url):
+    def scrape_jobs(self):
         # Semphonic acquired by Ernst & Young
         self.company.job_set.all().delete()
 
