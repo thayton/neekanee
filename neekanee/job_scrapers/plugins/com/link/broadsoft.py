@@ -47,7 +47,7 @@ class BroadSoftJobScraper(JobScraper):
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
             job.location = l
             jobs.append(job)
-        
+
         return jobs
 
     def scrape_jobs(self):
@@ -59,21 +59,12 @@ class BroadSoftJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
+            s.footer.extract()
 
-            #
-            # Strip out script elements, comments, styles
-            #
-            x = s.find('div', attrs={'class': 'main-bg'}).parent
-            x.extract()
- 
-            x = s.find('div', attrs={'class': 'footer'})
-            x.extract()
-
-            x = s.find('div', attrs={'class': 'footer-legal'})
-            x.extract()
+            [ b.extract() for b in s.findAll('body') ]
 
             job.desc = get_all_text(s.html)
-            job.save()
+`            job.save()
 
 def get_scraper():
     return BroadSoftJobScraper()
