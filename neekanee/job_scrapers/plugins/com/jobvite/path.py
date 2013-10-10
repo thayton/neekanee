@@ -9,8 +9,6 @@ COMPANY = {
     'name': 'Path',
     'hq': 'San Francisco, CA',
 
-    'benefits': {'vacation': []},
-
     'home_page_url': 'http://www.path.com',
     'jobs_page_url': 'https://www.path.com/jobs',
 
@@ -27,10 +25,11 @@ class PathJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', attrs={'class': 'jobs_listing'})
-        r = re.compile(r'/CompanyJobs/Careers\.aspx')
+        x = {'class': 'positions cols'}
+        n = s.find('nav', attrs=x)
+        r = re.compile(r'/jobs/join/[^/]+$')
 
-        for a in d.ul.findAll('a', href=r):
+        for a in n.findAll('a', href=r):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
@@ -48,11 +47,14 @@ class PathJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            a = {'class': 'jvcontent'}
-            d = s.find('div', attrs=a)
+            d = s.find('div', id='content')
 
             job.desc = get_all_text(d)
             job.save()
 
 def get_scraper():
     return PathJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
