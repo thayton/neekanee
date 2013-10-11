@@ -64,7 +64,7 @@ class BroadSoftJobScraper(JobScraper):
             [ b.extract() for b in s.findAll('body') ]
 
             job.desc = get_all_text(s.html)
-`            job.save()
+            job.save()
 
 def get_scraper():
     return BroadSoftJobScraper()
