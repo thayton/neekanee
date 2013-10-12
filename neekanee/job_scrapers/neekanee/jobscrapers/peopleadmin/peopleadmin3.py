@@ -48,12 +48,22 @@ class PeopleAdminJobScraper(JobScraper):
         while True:
             s = soupify(self.br.response().read())
             d = s.find('div', id='search_results')
+            x = {'class': 'job-title'}
 
-            for t in d.findAll('td', attrs={'class': 'job-title'}):
+            for td in d.findAll('td', attrs=x):
+                tr = td.findParent('tr')
+
                 job = Job(company=self.company)
-                job.title = t.a.text
-                job.url = urlparse.urljoin(self.br.geturl(), t.a['href'])
-                job.location = self.company.location
+                job.title = td.a.text
+                job.url = urlparse.urljoin(self.br.geturl(), td.a['href'])
+
+                if hasattr(self, 'get_location_from_td'):
+                    l = self.get_location_from_td(tr.findAll('td'))
+                    if not l:
+                        continue
+                else:
+                    job.location = self.company.location
+
                 jobs.append(job)
 
             # Navigate to the next page
