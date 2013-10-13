@@ -56,13 +56,14 @@ class PeopleAdminJobScraper(JobScraper):
                 job = Job(company=self.company)
                 job.title = td.a.text
                 job.url = urlparse.urljoin(self.br.geturl(), td.a['href'])
+                job.location = self.company.location
 
                 if hasattr(self, 'get_location_from_td'):
                     l = self.get_location_from_td(tr.findAll('td'))
                     if not l:
                         continue
-                else:
-                    job.location = self.company.location
+
+                    job.location = l
 
                 jobs.append(job)
 
