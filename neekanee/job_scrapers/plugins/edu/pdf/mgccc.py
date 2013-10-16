@@ -16,9 +16,7 @@ COMPANY = {
     },
 
     'home_page_url': 'http://www.mgccc.edu',
-    'jobs_page_url': 'http://www.mgccc.edu/employees/employment_opportunities.php',
-
-    'gctw_chronicle': True,
+    'jobs_page_url': 'https://www.mgccc.edu/employees/employment-opportunities/',
 
     'empcnt': [501,1000]
 }
@@ -33,19 +31,13 @@ class MgccJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'/Documents/HR/\d+/.*\.pdf')
+        r = re.compile(r'/wp-content/uploads/\d{4}/\d{2}/\S+\.pdf$')
+        x = {'title': True, 'href': r}
 
-        for a in s.findAll('a', href=r):
-            tr = a.findParent('tr')
-
-            if not tr:
-                continue
-
-            td = tr.findAll('td')
-
+        for a in s.findAll('a', attrs=x):
             job = Job(company=self.company)
-            job.title = td[1].a.text
-            job.url = urlparse.urljoin(self.br.geturl(), td[1].a['href'])
+            job.title = a.text
+            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
             job.location = self.company.location
             jobs.append(job)
         
@@ -67,3 +59,7 @@ class MgccJobScraper(JobScraper):
 
 def get_scraper():
     return MgccJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
