@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'San Francisco, CA',
 
     'home_page_url': 'http://www.loggly.com',
-    'jobs_page_url': 'http://www.loggly.com/company/careers/',
+    'jobs_page_url': 'http://www.loggly.com/about-loggly/careers/',
 
     'empcnt': [11,50]
 }
@@ -18,37 +18,24 @@ COMPANY = {
 class LogglyJobScraper(JobScraper):
     def __init__(self):
         super(LogglyJobScraper, self).__init__(COMPANY)
+        self.br.addheaders = [('User-agent', 
+                               'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')]
 
     def scrape_jobs(self):
         self.br.open(self.company.jobs_page_url)
 
         s = soupify(self.br.response().read())
-        x = {'class': 'main focus'}
-        d = s.find('div', attrs=x)
-        d.extract()
+        r = re.compile(r'lgg_job_vacancy')
+        x = {'class': r}
 
         self.company.job_set.all().delete()
 
-        for h3 in d.findAll('h3'):
-            title = h3.text.replace('&nbsp;', '')
-            if len(title.strip()) == 0:
-                continue
-
+        for d in s.findAll('div', attrs=x):
             job = Job(company=self.company)
-            job.title = title
-            job.url = self.br.geturl()
+            job.title = d.a.text
+            job.url = urlparse.urljoin(self.br.geturl(), d.a['href'])
             job.location = self.company.location
-            job.desc = ''
-
-            x = h3.next
-            while x:
-                name = getattr(x, 'name', None)
-                if name == 'h3':
-                    break
-                elif name is None:
-                    job.desc += x
-                x = x.next
-            
+            job.desc = get_all_text(d)
             job.save()
 
 def get_scraper():
