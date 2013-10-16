@@ -2,6 +2,7 @@ import re, urlparse, mechanize
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
+from neekanee.urlutil import url_query_get, url_query_add
 
 from neekanee_solr.models import *
 
@@ -10,7 +11,7 @@ COMPANY = {
     'hq': 'Everett, WA',
 
     'home_page_url': 'http://www.flukenetworks.com',
-    'jobs_page_url': 'http://jobs.danaher.com/go/fluke-network-jobs/333684/',
+    'jobs_page_url': 'http://flukenetworks.jobs/joblisting/?num_items=50&offset=0',
 
     'empcnt': [501,1000]
 }
@@ -22,35 +23,36 @@ class FlukeJobScraper(JobScraper):
     def scrape_job_links(self, url):
         jobs = []
 
-        self.br.open(url)
+        d = url_query_get(url, ['num_items', 'offset'])
+        num_items = int(d['num_items'])
+        offset = int(d['offset'])
 
-        pageno = 2
+        self.br.addheaders = [('X-Requested-With', 'XMLHttpRequest')]
+        self.br.open(url)
 
         while True:
             s = soupify(self.br.response().read())
-            t = s.find('table', id='searchresults')
-            x = {'class': 'jobTitle'}
-            r = re.compile(r'/jobs/\S+')
+            x = {'class': 'direct_joblisting '}
+            y = {'class': 'direct_joblocation'}
 
-            for p in t.tbody.findAll('span', attrs=x):
-                tr = p.findParent('tr')
-                td = tr.find('td', attrs={'class': 'colLocation'})
+            if len(s.findAll('li', attrs=x)) == 0:
+                break # Done
 
-                l = self.parse_location(td.text)
+            for li in s.findAll('li', attrs=x):
+                d = li.find('div', attrs=y)
+                l = self.parse_location(d.text)
                 if not l:
                     continue
 
                 job = Job(company=self.company)
-                job.title = p.text
-                job.url = urlparse.urljoin(self.br.geturl(), p.a['href'])
+                job.title = li.a.text
+                job.url = urlparse.urljoin(self.br.geturl(), li.a['href'])
                 job.location = l
                 jobs.append(job)
 
-            try:
-                self.br.follow_link(self.br.find_link(text='Page %d' % pageno))
-                pageno += 1
-            except mechanize.LinkNotFoundError:
-                break
+            offset += num_items
+            u = url_query_add(self.br.geturl(), {'offset': '%d' % offset}.items())
+            self.br.open(u)
 
         return jobs
 
@@ -63,7 +65,7 @@ class FlukeJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            x = {'class': 'jobDisplay'}
+            x = {'itemtype': 'http://schema.org/JobPosting'}
             d = s.find('div', attrs=x)
 
             job.desc = get_all_text(d)
