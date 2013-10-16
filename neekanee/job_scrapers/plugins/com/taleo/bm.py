@@ -18,11 +18,6 @@ class BursonMarstellerJobScraper(TaleoJobScraper):
     def get_location_from_td(self, td):
         return self.parse_location(td[-1].text)
 
-    def get_desc_from_s(self, s):
-        x = {'class': 'mainContent'}
-        d = s.find('div', attrs=x)
-        return get_all_text(d)
-
 def get_scraper():
     return BursonMarstellerJobScraper()
 
