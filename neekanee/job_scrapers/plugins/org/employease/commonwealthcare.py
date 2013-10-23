@@ -10,11 +10,8 @@ COMPANY = {
     'name': 'Commonwealth Care Alliance',
     'hq': 'Washington, DC',
 
-    'ats': 'Employease',
-    'benefits': {'vacation': []},
-
     'home_page_url': 'http://www.commonwealthcare.org',
-    'jobs_page_url': 'http://www.commonwealthcare.org/about-us/careers.html',
+    'jobs_page_url': 'http://www.commonwealthcarealliance.org/careers/opportunities',
 
     'empcnt': [51,200]
 }
@@ -29,29 +26,25 @@ class CommonwealthCareJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id='content')
+        t = s.find('table', id='jobs')
         r = re.compile(r'/recruit/\?id=\d+$')
-        done = []
 
-        for a in d.findAll('a', href=r):
-            if a['href'] in done:
-                continue
-
+        for a in t.findAll('a', href=r):
             tr = a.findParent('tr')
             td = tr.findAll('td')
 
-            l = self.parse_location(td[-1].text)
+            if a != td[0].a:
+                continue
 
+            l = self.parse_location(td[-2].text)
             if not l:
                 continue
 
             job = Job(company=self.company)
-            job.title = td[0].text
+            job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
             job.location = l
-
             jobs.append(job)
-            done.append(job.url)
 
         return jobs
 
@@ -71,3 +64,7 @@ class CommonwealthCareJobScraper(JobScraper):
 
 def get_scraper():
     return CommonwealthCareJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
