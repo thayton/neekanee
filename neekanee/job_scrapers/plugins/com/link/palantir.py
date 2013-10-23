@@ -43,7 +43,7 @@ class PalantirJobScraper(JobScraper):
                 job.url = urlparse.urljoin(self.br.geturl(), a['href'])
                 job.location = l
                 jobs.append(job)
-                
+
             try:
                 self.br.follow_link(self.br.find_link(text='%d' % pageno))
                 pageno += 1
@@ -61,7 +61,7 @@ class PalantirJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='container')
+            d = s.find('div', id='wrapper')
 
             job.desc = get_all_text(d)
             job.save()
