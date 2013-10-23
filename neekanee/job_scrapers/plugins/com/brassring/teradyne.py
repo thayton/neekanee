@@ -19,12 +19,11 @@ class TeradyneJobScraper(BrassringJobScraper):
         self.soupify_search_form = True
 
     def get_url_from_formtext(self, x):
-        s = soupify(x['FORMTEXT3'])
+        s = soupify(x['AutoReq'])
         return s.a
 
     def get_title_from_formtext(self, x):
-        a = soupify(x['FORMTEXT3']).a
-        return a.text
+        return x['FORMTEXT3']
 
     def get_location_from_formtext(self, x):
         l = re.sub('HR-\S+', '', x['FORMTEXT1'])
