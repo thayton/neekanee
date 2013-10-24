@@ -2,23 +2,22 @@ import re, urlparse
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
-from doctohtml import doctohtml
 
 from neekanee_solr.models import *
 
 COMPANY = {
-    'name': 'Avuba GmbH',
+    'name': 'Acid21',
     'hq': 'Berlin, Germany',
 
-    'home_page_url': 'http://www.avuba.de',
-    'jobs_page_url': 'https://www.avuba.de/team-jobs',
+    'home_page_url': 'http://www.acid21.com',
+    'jobs_page_url': 'http://www.acid21.com/en/Jobs/',
 
-    'empcnt': [1,10]
+    'empcnt': [11,50]
 }
 
-class AvubaJobScraper(JobScraper):
+class Acid21JobScraper(JobScraper):
     def __init__(self):
-        super(AvubaJobScraper, self).__init__(COMPANY)
+        super(Acid21JobScraper, self).__init__(COMPANY)
 
     def scrape_job_links(self, url):
         jobs = []
@@ -26,18 +25,16 @@ class AvubaJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'/document/d/')
-        
-        for a in s.findAll('a', href=r):
-            d = a.findParent('div')
+        d = s.find('div', id='innerContentWrapper')
+        f = lambda x: x.name == 'h1' and x.text == 'Jobs'
+        h = s.find(f)
+        u = h.findNext('ul')
+        x = {'target': '_self'}
+
+        for a in u.findAll('a', attrs=x):
             job = Job(company=self.company)
-            job.title = d.h4.text
-
-            # URL is to a Google .doc - we update the URL so that it exports a .txt file
-            # to us when we download it below
+            job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-            job.url = urlparse.urljoin(job.url, 'export?format=txt')
-
             job.location = self.company.location
             jobs.append(job)
 
@@ -50,11 +47,15 @@ class AvubaJobScraper(JobScraper):
 
         for job in new_jobs:
             self.br.open(job.url)
-            job.desc = self.br.response().read()
+
+            s = soupify(self.br.response().read())
+            d = s.find('div', id='innerContentWrapper')
+
+            job.desc = get_all_text(d)
             job.save()
 
 def get_scraper():
-    return AvubaJobScraper()
+    return Acid21JobScraper()
 
 if __name__ == '__main__':
     job_scraper = get_scraper()

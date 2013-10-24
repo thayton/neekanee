@@ -2,23 +2,22 @@ import re, urlparse
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
-from doctohtml import doctohtml
 
 from neekanee_solr.models import *
 
 COMPANY = {
-    'name': 'Avuba GmbH',
+    'name': 'MobileSuite GmbH',
     'hq': 'Berlin, Germany',
 
-    'home_page_url': 'http://www.avuba.de',
-    'jobs_page_url': 'https://www.avuba.de/team-jobs',
+    'home_page_url': 'http://www2.mobilesuite.de',
+    'jobs_page_url': 'http://www2.mobilesuite.de/en/jobs',
 
-    'empcnt': [1,10]
+    'empcnt': [11,50]
 }
 
-class AvubaJobScraper(JobScraper):
+class MobileSuiteJobScraper(JobScraper):
     def __init__(self):
-        super(AvubaJobScraper, self).__init__(COMPANY)
+        super(MobileSuiteJobScraper, self).__init__(COMPANY)
 
     def scrape_job_links(self, url):
         jobs = []
@@ -26,18 +25,16 @@ class AvubaJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'/document/d/')
-        
-        for a in s.findAll('a', href=r):
-            d = a.findParent('div')
+        d = s.find('div', id='main')
+        r = re.compile(r'^en/jobs#skipNavigation')
+        a = d.find('a', href=r)
+        u = a.findNext('ul')
+        x = {'title': True}
+
+        for a in u.findAll('a', attrs=x):
             job = Job(company=self.company)
-            job.title = d.h4.text
-
-            # URL is to a Google .doc - we update the URL so that it exports a .txt file
-            # to us when we download it below
-            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-            job.url = urlparse.urljoin(job.url, 'export?format=txt')
-
+            job.title = a.text
+            job.url = urlparse.urljoin(self.br.geturl(), '/' + a['href'])
             job.location = self.company.location
             jobs.append(job)
 
@@ -50,11 +47,15 @@ class AvubaJobScraper(JobScraper):
 
         for job in new_jobs:
             self.br.open(job.url)
-            job.desc = self.br.response().read()
+
+            s = soupify(self.br.response().read())
+            d = s.find('div', id='main')
+
+            job.desc = get_all_text(d)
             job.save()
 
 def get_scraper():
-    return AvubaJobScraper()
+    return MobileSuiteJobScraper()
 
 if __name__ == '__main__':
     job_scraper = get_scraper()
