@@ -53,7 +53,6 @@ class ActionLinkJobScraper(JobScraper):
                 job.url = urlutil.url_params_del(job.url)
                 job.location = l
                 jobs.append(job)
-                break
 
             y = {'title': 'Next Page'}
             i = s.find('input', attrs=y)

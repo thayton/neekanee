@@ -68,7 +68,6 @@ class FoulgerPrattJobScraper(JobScraper):
                 job.url = urlparse.urljoin(self.br.geturl(), a['href'])
                 job.location = l
                 jobs.append(job)
-                break
 
             # Navigate to the next page
             d = {'type': 'submit', 'name': '__Next', 'disabled': True}

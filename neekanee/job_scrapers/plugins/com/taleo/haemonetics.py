@@ -45,7 +45,6 @@ class HaemoneticsJobScraper(JobScraper):
             job.url = urlutil.url_params_del(job.url)
             job.location = l
             jobs.append(job)
-            break
 
         return jobs
 
