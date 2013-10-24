@@ -42,7 +42,6 @@ class RedHatJobScraper(JobScraper):
                 job.url = urlparse.urljoin(self.br.geturl(), a['href'])
                 job.location = l
                 jobs.append(job)
-                break
 
             y = re.compile(r"__doPostBack\('([^']+)'")
             z = re.compile(r'^maincontent_\d+_jobsearchresults_\d+_next_page$')
