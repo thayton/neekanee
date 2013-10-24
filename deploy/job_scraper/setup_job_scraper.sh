@@ -37,7 +37,7 @@ mysql_create_database 'n33kanee' 'neekanee_solr'
 apt-get -y install poppler-utils
 
 # Install Java for Tika to run
-# XXX
+apt-get -y install default-jre
 
 # Apache Tika for plugins that pull down MSWord job descriptions
 # XXX
