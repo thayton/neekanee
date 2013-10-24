@@ -36,6 +36,12 @@ mysql_create_database 'n33kanee' 'neekanee_solr'
 # pdftotext for plugins that that pull down PDF job descriptions
 apt-get -y install poppler-utils
 
+# Install Java for Tika to run
+apt-get -y install default-jre
+
+# Apache Tika for plugins that pull down MSWord job descriptions
+# XXX
+
 # Misc dependencies
 apt-get -y install libxml2-dev libxslt-dev
 
