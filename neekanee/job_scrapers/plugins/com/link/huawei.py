@@ -50,7 +50,6 @@ class HuaweiJobScraper(JobScraper):
                 job.url = urlparse.urljoin(self.br.geturl(), a['href'])
                 job.location = self.company.location
                 jobs.append(job)
-                break
 
             try:
                 self.br.follow_link(self.br.find_link(text='Next'))

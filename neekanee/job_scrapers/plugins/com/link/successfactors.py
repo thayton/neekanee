@@ -45,7 +45,6 @@ class SuccessFactorsJobScraper(JobScraper):
                 job.url = urlparse.urljoin(self.br.geturl(), a['href'])
                 job.location = l
                 jobs.append(job)
-                break
 
             try:
                 self.br.follow_link(self.br.find_link(text='Page %d' % pageno))

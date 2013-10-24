@@ -52,7 +52,6 @@ class GeneJobScraper(JobScraper):
                 job.url = urlparse.urljoin(self.br.geturl(), a['href'])
                 job.location = l
                 jobs.append(job)
-                break
 
             # Navigate to the next page
             try:
