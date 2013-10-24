@@ -41,7 +41,6 @@ class SfnJobScraper(JobScraper):
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
             job.location = l
             jobs.append(job)
-            break
 
         return jobs
 

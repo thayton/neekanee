@@ -54,7 +54,6 @@ class LaheyJobScraper(JobScraper):
                 job.url = u
                 job.location = l
                 jobs.append(job)
-                break
 
             a = s.find('a', id='HRS_APPL_WRK_HRS_LST_NEXT')
             if not a:
