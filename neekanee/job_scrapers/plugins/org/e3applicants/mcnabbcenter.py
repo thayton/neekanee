@@ -41,10 +41,28 @@ class McnabbCenterJobScraper(JobScraper):
                 job.url = u
                 job.location = self.company.location
                 jobs.append(job)
+
+            y = re.compile(r"__doPostBack\('([^']+)'")
+            f = lambda z: z.name == 'a' and z.text == '%d' % pageno and re.search(y, z.get('href', ''))
+            a = s.find(f)
+
+            if not a:
                 break
-                
+
+            m = re.search(y, a['href'])
+            
             self.br.select_form('aspnetForm')
-            self.br.subit()
+            self.br.form.new_control('hidden', '__EVENTTARGET',   {'value': m.group(1)})
+            self.br.form.new_control('hidden', '__EVENTARGUMENT', {'value': ''})
+#            self.br.form.new_control('hidden', '__LASTFOCUS',     {'value': ''})
+            self.br.form.fixup()
+
+            # Next page doesn't seem to work unless we remove these controls
+            for control in self.br.form.controls[:]:
+                if control.type in ['image', 'checkbox', 'submit']:
+                    self.br.form.controls.remove(control)
+
+            self.br.submit()
 
         return jobs
 
