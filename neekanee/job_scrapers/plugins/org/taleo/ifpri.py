@@ -44,7 +44,6 @@ class IfpriJobScraper(JobScraper):
             job.url = url_params_del(job.url)
             job.location = l
             jobs.append(job)
-            break
 
         return jobs
 
