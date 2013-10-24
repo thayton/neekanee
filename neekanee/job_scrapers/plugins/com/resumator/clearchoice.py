@@ -41,7 +41,6 @@ class ClearChoiceJobScraper(JobScraper):
             job.url = urlparse.urljoin(self.br.geturl(), d.a['href'])
             job.location = l
             jobs.append(job)
-            break
 
         return jobs
 
