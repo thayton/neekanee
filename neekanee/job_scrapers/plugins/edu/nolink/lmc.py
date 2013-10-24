@@ -32,6 +32,9 @@ class LmcJobScraper(JobScraper):
             t = a.findNext('table')
 
             for tr in t.findAll('tr'):
+                if not tr.h4:
+                    continue
+
                 job = Job(company=self.company)
                 job.title = tr.h4.text
                 job.url = self.br.geturl()
