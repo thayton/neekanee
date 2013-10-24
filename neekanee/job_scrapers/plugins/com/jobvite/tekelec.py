@@ -62,7 +62,6 @@ class TekelecJobScraper(JobScraper):
             job.url = self.new_url(self.br.geturl(), jobid)
             job.location = l
             jobs.append(job)
-            break
 
         return jobs
 
