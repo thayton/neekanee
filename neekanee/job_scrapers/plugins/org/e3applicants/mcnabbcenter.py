@@ -54,7 +54,6 @@ class McnabbCenterJobScraper(JobScraper):
             self.br.select_form('aspnetForm')
             self.br.form.new_control('hidden', '__EVENTTARGET',   {'value': m.group(1)})
             self.br.form.new_control('hidden', '__EVENTARGUMENT', {'value': ''})
-#            self.br.form.new_control('hidden', '__LASTFOCUS',     {'value': ''})
             self.br.form.fixup()
 
             # Next page doesn't seem to work unless we remove these controls
