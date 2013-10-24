@@ -8,6 +8,12 @@ be done with the following command::
 
 Then use python manage.py loaddata <file> to import the data.
 
+Unicode Characters in Job URLs
+==============================
+Handle unicode characters in URLs as follows:
+
+job.url = job.url.encode('utf8')
+
 Scraping Jobs
 =============
 links = scrape job links
