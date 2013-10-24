@@ -32,7 +32,12 @@ class AvubaJobScraper(JobScraper):
             d = a.findParent('div')
             job = Job(company=self.company)
             job.title = d.h4.text
+
+            # URL is to a Google .doc - we update the URL so that it exports a .txt file
+            # to us when we download it below
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.url = urlparse.urljoin(job.url, 'export?format=txt')
+
             job.location = self.company.location
             jobs.append(job)
 
@@ -45,11 +50,7 @@ class AvubaJobScraper(JobScraper):
 
         for job in new_jobs:
             self.br.open(job.url)
-
-            d = self.br.response().read()
-            s = soupify(doctohtml(d))
-
-            job.desc = get_all_text(d)
+            job.desc = self.br.response().read()
             job.save()
 
 def get_scraper():
