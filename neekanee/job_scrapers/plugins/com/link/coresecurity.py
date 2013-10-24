@@ -47,7 +47,6 @@ class CoreSecurityJobScraper(JobScraper):
             job.url = urlparse.urljoin(self.br.geturl(), td.a['href'])
             job.location = l
             jobs.append(job)
-            break
 
         return jobs
 
