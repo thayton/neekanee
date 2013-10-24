@@ -34,7 +34,6 @@ class PsiJobScraper(JobScraper):
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
             job.location = self.company.location
             jobs.append(job)
-            break
 
         return jobs
 
