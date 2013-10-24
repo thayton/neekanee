@@ -49,7 +49,7 @@ class AvubaJobScraper(JobScraper):
             d = self.br.response().read()
             s = soupify(doctohtml(d))
 
-            job.desc = get_all_text(d)
+            job.desc = get_all_text(s.html.body)
             job.save()
 
 def get_scraper():
