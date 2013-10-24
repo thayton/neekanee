@@ -22,8 +22,8 @@ def doctohtml(data):
             os.dup2(w, 1)
             os.close(r)
             os.close(w)
-            # java -jar /usr/local/bin/tika-app-1.1.jar -h /tmp/data.doc
-            os.execlp('java', 'java', '-jar', '/usr/local/bin/tika-app-1.1.jar',  '-h', '/tmp/data.doc')
+            # java -jar /usr/local/bin/tika-app.jar -h /tmp/data.doc
+            os.execlp('java', 'java', '-jar', '/usr/local/bin/tika-app.jar',  '-h', '/tmp/data.doc')
         else: # parent 
             os.close(w)
 
