@@ -1,24 +1,24 @@
 import re, urlparse
 
 from neekanee.jobscrapers.jobscraper import JobScraper
-from neekanee.htmlparse.soupify import soupify, get_all_text
-from doctohtml import doctohtml
+from neekanee.htmlparse.soupify import soupify, get_all_text, get_mailto
+from neekanee.txtextract.pdftohtml import pdftohtml
 
 from neekanee_solr.models import *
 
 COMPANY = {
-    'name': 'Avuba GmbH',
-    'hq': 'Berlin, Germany',
+    'name': '16Tags',
+    'hq': 'Munich, Germany',
 
-    'home_page_url': 'http://www.avuba.de',
-    'jobs_page_url': 'https://www.avuba.de/team-jobs',
+    'home_page_url': 'http://www.16tags.com',
+    'jobs_page_url': 'http://www.16tags.com/Jobs',
 
-    'empcnt': [1,10]
+    'empcnt': [11,50],
 }
 
-class AvubaJobScraper(JobScraper):
+class TagsJobScraper(JobScraper):
     def __init__(self):
-        super(AvubaJobScraper, self).__init__(COMPANY)
+        super(TagsJobScraper, self).__init__(COMPANY)
 
     def scrape_job_links(self, url):
         jobs = []
@@ -26,18 +26,12 @@ class AvubaJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'/document/d/')
-        
+        r = re.compile(r'\.pdf$')
+    
         for a in s.findAll('a', href=r):
-            d = a.findParent('div')
             job = Job(company=self.company)
-            job.title = d.h4.text
-
-            # URL is to a Google .doc - we update the URL so that it exports a .txt file
-            # to us when we download it below
+            job.title =  a.parent.contents[0]
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-            job.url = urlparse.urljoin(job.url, 'export?format=txt')
-
             job.location = self.company.location
             jobs.append(job)
 
@@ -50,11 +44,15 @@ class AvubaJobScraper(JobScraper):
 
         for job in new_jobs:
             self.br.open(job.url)
-            job.desc = self.br.response().read()
+
+            d = self.br.response().read()
+            s = soupify(pdftohtml(d))
+
+            job.desc = get_all_text(s.html.body)
             job.save()
 
 def get_scraper():
-    return AvubaJobScraper()
+    return TagsJobScraper()
 
 if __name__ == '__main__':
     job_scraper = get_scraper()
