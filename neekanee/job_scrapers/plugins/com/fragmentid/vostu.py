@@ -37,7 +37,6 @@ class VostuJobScraper(JobScraper):
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
             jobs.append(job)
-            break
 
         return jobs
 
