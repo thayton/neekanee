@@ -35,6 +35,7 @@ class IcimsJobScraper(JobScraper):
                 job = Job(company=self.company)
                 job.title = d.a.text
                 job.url = urlparse.urljoin(self.br.geturl(), d.a['href'])
+                job.location = l
                 jobs.append(job)
 
             # Navigate to the next page
