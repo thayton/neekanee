@@ -60,7 +60,7 @@ class RedBullUsaJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            x = {'class': 'job'}
+            x = {'class': re.compile(r'job'), 'itemtype': True}
             n = s.find('section', attrs=x)
 
             job.desc = get_all_text(n)
