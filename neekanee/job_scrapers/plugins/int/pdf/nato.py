@@ -11,14 +11,16 @@ COMPANY = {
     'hq': 'Geneva, Switzerland',
 
     'home_page_url': 'http://www.nato.int',
-    'jobs_page_url': 'http://www.nato.int/wcm-asp/recruit-wide.asp',
+    'jobs_page_url': 'http://www.nato.int/cps/en/natolive/recruit-wide.htm',
 
     'empcnt': [1001,5000]
 }
 
 class NatoJobScraper(JobScraper):
     def __init__(self):
-        super(NatoJobScraper, self).__init__(COMPANY, return_usa_only=False)
+        super(NatoJobScraper, self).__init__(COMPANY)
+        # Server is determined to return gzip no matter the accept-encoding we send
+        self.br.set_handle_gzip(True) 
 
     def scrape_job_links(self, url):
         jobs = []
@@ -34,7 +36,6 @@ class NatoJobScraper(JobScraper):
             td = tr.findAll('td')
             
             l = self.parse_location(td[0].text)
-
             if not l:
                 continue
 
