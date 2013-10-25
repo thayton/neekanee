@@ -73,8 +73,11 @@ class InditexJobScraper(JobScraper):
             id = url_query_get(job.url, 'id')['id']
             r = re.compile(r'/vacancies/view/%d' % int(id))
 
-            self.br.open(job.url)
-            self.br.follow_link(self.br.find_link(url_regex=r))
+            try:
+                self.br.open(job.url)
+                self.br.follow_link(self.br.find_link(url_regex=r))
+            except:
+                continue
 
             s = soupify(self.br.response().read())
             d = s.find('div', id='main')
