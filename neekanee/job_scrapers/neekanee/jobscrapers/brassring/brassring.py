@@ -101,7 +101,11 @@ class BrassringJobScraper(JobScraper):
 
             self.br.form.set_all_readonly(False)
             self.br.form['recordstart'] = '%d' % (numResults + 1)
-            self.br.submit()
+
+            try:
+                self.br.submit()
+            except:
+                break
 
         return jobs
 
