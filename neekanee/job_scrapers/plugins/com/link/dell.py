@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Round Rock, TX',
 
     'home_page_url': 'http://www.dell.com',
-    'jobs_page_url': 'http://jobs.dell.com/careers/',
+    'jobs_page_url': 'http://jobs.dell.com/searches.aspx?keyword=advanced+search&ISAdvanceSearch=True&ASCategory=-1&ASPostedDate=-1&ASCountry=-1&ASState=-1&ASCity=-1&ASLocation=-1&ASCompanyName=-1&ASCustom1=-1&ASCustom2=-1&ASCustom3=-1&ASCustom4=-1&ASCustom5=-1&ASIsRadius=False&ASCityStateZipcode=-1&ASDistance=-1&ASLatitude=-1&ASLongitude=-1&ASDistanceType=-1&jobtitlekeyword=filter%20by%20job%20title&locationkeyword=filter%20by%20job%20location&dateKeyword=&categoryKeyword=&issearchpaging=True&isdate=True&pagenumber=',
 
     'empcnt': [10001]
 }
@@ -22,14 +22,17 @@ class DellJobScraper(JobScraper):
     def scrape_job_links(self, url):
         jobs = []
 
-        self.br.open(url)
+        pageno = 1
+        u = url + '%d' % pageno
+        pageno += 1
 
+        self.br.open(u)
+        
         while True:
             s = soupify(self.br.response().read())
-            d = s.find('div', id='conteinerForSearchResults')
-            r = re.compile(r'^jobs_list_link_\d+$')
+            r = re.compile(r'^search_result_link_\d+$')
 
-            for a in d.findAll('a', id=r):
+            for a in s.findAll('a', id=r):
                 tr = a.findParent('tr')
                 td = tr.findAll('td')
 
@@ -45,13 +48,15 @@ class DellJobScraper(JobScraper):
                 job.url = urlparse.urljoin(self.br.geturl(), a['href'])
                 job.location = l
                 jobs.append(job)
+                
+            f = lambda x: x.name == 'a' and x.text == '%d' % pageno
+            a = s.find(f)
 
-            n = s.find('a', id='jobs_next_page_link')
-
-            if not n:
+            if not a:
                 break
 
-            u = urlparse.urljoin(self.br.geturl(), n['href'])
+            u = url + '%d' % pageno
+            pageno += 1
 
             self.br.open(u)
 
