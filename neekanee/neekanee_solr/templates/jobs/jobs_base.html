@@ -176,6 +176,8 @@
 
     {% if page.paginator.count > 0 %}
     <link rel="canonical" href="/{% if query.q %}{{ query.q|slugify }}-{% elif query.title %}{{ query.title|slugify }}-{% endif %}jobs{% if query.company %}-at-{{ query.company|slugify }}{% endif %}{% if query.city or query.state or query.country %}-in{% endif %}{% if query.city %}-{{query.city|slugify}}{% endif %}{% if query.state %}-{{query.state}}{% endif %}{% if not query.state %}{% if query.city and facet_counts.country|length = 1 and facet_counts.country.0.0 == 'us' %}-{{ facet_counts.state.0.0 }}{% endif %}{% endif %}{% if query.country %}-{{query.country}}{% endif %}{% if not query.country %}{% if query.city or query.state %}-{{ facet_counts.country.0.0 }}{% endif %}{% endif %}">
+    {% else %}
+    <meta name="robots" content="noindex,nofollow">
     {% endif %}
 {% endblock %}
 
