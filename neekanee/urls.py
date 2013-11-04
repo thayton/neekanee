@@ -85,6 +85,7 @@ urlpatterns += patterns('neekanee.neekanee_solr.views',
     (r'^jobs-at-(?P<cslug>partners-in-health)-in-(?P<state>[a-z]{2})-(?P<country>us)$',                      'seosearch'),
     (r'^jobs-at-(?P<cslug>partners-in-health)-in-(?P<city>[a-z0-9-]+)-(?P<country>[a-z]{2})$',               'seosearch'),
     (r'^jobs-at-(?P<cslug>partners-in-health)-in-(?P<country>[a-z]{2})$',                                    'seosearch'),
+    #--------------------------------------------------
 
     (r'^jobs-at-(?P<cslug>[a-z0-9-]+)-in-(?P<city>[a-z0-9-]+)-(?P<state>[a-z]{2})-(?P<country>us)$', 'seosearch'),
     (r'^jobs-at-(?P<cslug>[a-z0-9-]+)-in-(?P<state>[a-z]{2})-(?P<country>us)$',                      'seosearch'),
@@ -96,6 +97,13 @@ urlpatterns += patterns('neekanee.neekanee_solr.views',
     (r'(?P<q>[^/]+)-jobs-in-(?P<state>[a-z]{2})-(?P<country>us)$',                      'seosearch'),
     (r'(?P<q>[^/]+)-jobs-in-(?P<city>[a-z0-9-]+)-(?P<country>[a-z]{2})$',               'seosearch'),
     (r'(?P<q>[^/]+)-jobs-in-(?P<country>[a-z]{2})$',                                    'seosearch'),
+
+    # Fix for Partners in Health
+    (r'(?P<q>[^/]+)-jobs-at-(?P<cslug>partners-in-health)-in-(?P<city>[a-z0-9-]+)-(?P<state>[a-z]{2})-(?P<country>us)$', 'seosearch'),
+    (r'(?P<q>[^/]+)-jobs-at-(?P<cslug>partners-in-health)-in-(?P<state>[a-z]{2})-(?P<country>us)$',                      'seosearch'),
+    (r'(?P<q>[^/]+)-jobs-at-(?P<cslug>partners-in-health)-in-(?P<city>[a-z0-9-]+)-(?P<country>[a-z]{2})$',               'seosearch'),
+    (r'(?P<q>[^/]+)-jobs-at-(?P<cslug>partners-in-health)-in-(?P<country>[a-z]{2})$',                                    'seosearch'),    
+    #--------------------------------------------------
 
     (r'(?P<q>[^/]+)-jobs$',                                                                                      'seosearch'),
     (r'(?P<q>[^/]+)-jobs-at-(?P<cslug>[a-z0-9-]+)-in-(?P<city>[a-z0-9-]+)-(?P<state>[a-z]{2})-(?P<country>us)$', 'seosearch'),
