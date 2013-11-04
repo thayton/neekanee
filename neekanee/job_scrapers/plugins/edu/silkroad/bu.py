@@ -2,6 +2,7 @@ import re, urlparse
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
+from neekanee.urlutil import url_query_filter
 
 from neekanee_solr.models import *
 
@@ -10,7 +11,7 @@ COMPANY = {
     'hq': 'Boston, MA',
 
     'home_page_url': 'http://www.bu.edu',
-    'jobs_page_url': 'http://www.bu.edu/hr/jobs/open-job-opportunities/',
+    'jobs_page_url': 'https://bu.silkroad.com/epostings/index.cfm?company_id=15509&version=1',
 
     'empcnt': [5001,10000]
 }
@@ -23,23 +24,24 @@ class BuJobScraper(JobScraper):
         jobs = []
 
         self.br.open(url)
-        self.br.select_form(nr=1)
+        self.br.select_form('frmsearch')
         self.br.submit()
-        self.br.follow_link(self.br.find_link(text='All Posted Jobs'))
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'/epostings/submit.cfm\?fuseaction=app\.jobinfo')
+        r = re.compile(r'index\.cfm\?fuseaction=app.jobinfo&jobid=\d+')
 
         for a in s.findAll('a', href=r):
-            l = a.parent.contents[3]
-            l = self.parse_location(l)
-            
+            tr = a.findParent('tr')
+            td = tr.findAll('td')
+
+            l = self.parse_location(td[2].text)
             if not l:
                 continue
 
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.url = url_query_filter(job.url, ['fuseaction', 'jobid', 'company_id'])
             job.location = l
             jobs.append(job)
 
@@ -54,9 +56,9 @@ class BuJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='text')
+            f = s.find('form', id='applyJob')
 
-            job.desc = get_all_text(d)
+            job.desc = get_all_text(f)
             job.save()
 
 def get_scraper():
