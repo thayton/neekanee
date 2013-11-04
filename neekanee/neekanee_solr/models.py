@@ -143,7 +143,7 @@ class Company(models.Model):
     """
     objects = CompanyManager()
     name = models.CharField(max_length=64)
-    name_slug = models.SlugField(blank=True, unique=True)
+    name_slug = models.SlugField(blank=True, unique=True, max_length=64)
 
     home_page_url = models.CharField(max_length=255, unique=True)
     jobs_page_url = models.CharField(max_length=512)
