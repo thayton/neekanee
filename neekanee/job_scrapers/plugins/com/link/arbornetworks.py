@@ -11,7 +11,7 @@ COMPANY = {
     'hq': 'Chelmsford, MA',
 
     'home_page_url': 'http://www.arbornetworks.com',
-    'jobs_page_url': 'http://arbornetworks.jobs/joblisting/?num_items=50&offset=0',
+    'jobs_page_url': 'http://arbornetworks.jobs/ajax/joblisting/?num_items=50&offset=0',
 
 
     'empcnt': [201,500]
