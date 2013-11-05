@@ -30,22 +30,30 @@ class LonestarJobScraper(JobScraper):
         self.br.submit()
         self.br.follow_link(self.br.find_link(text='TAM'))
 
-        s = soupify(self.br.response().read())
-        r = re.compile(r'^POSTINGTITLE\$\d+$')
-        x = {'id': r, 'name': r}
+        while True:
+            s = soupify(self.br.response().read())
+            r = re.compile(r'^POSTINGTITLE\$\d+$')
+            x = {'id': r, 'name': r}
 
-#        self.company.job_set.all().delete()
+            for a in s.findAll('a', attrs=x):
+                f = s.find('form', attrs={'name': 'win0'})
+                f['ICAction'] = a['id']
 
-        for a in s.findAll('a', attrs=x):
-            f = s.find('form', attrs={'name': 'win0'})
-            f['ICAction'] = a['id']
+                job = Job(company=self.company)
+                job.title = a.text
+                job.location = self.company.location
+                job.url = urlparse.urljoin(self.br.geturl(), f['action'])
+                job.url_data = urllib.urlencode({'ICAction': a['id']})
+                jobs.append(job)
 
-            job = Job(company=self.company)
-            job.title = a.text
-            job.location = self.company.location
-            job.url = urlparse.urljoin(self.br.geturl(), f['action'])
-            job.url_data = urllib.urlencode({'ICAction': a['id']})
-            jobs.append(job)
+            a = s.find('a', id='HRS_APPL_WRK_HRS_LST_NEXT')
+            if not a:
+                break
+
+            self.br.select_form('win0')
+            self.br.set_all_readonly(False)
+            self.br.form['ICAction'] = 'HRS_APPL_WRK_HRS_LST_NEXT'
+            self.br.submit()
 
         return jobs
 
