@@ -25,10 +25,12 @@ class MultiplicaJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
+        x = {'class': 'columns six first'}
+        d = s.find('div', attrs=x)
         r = re.compile(r'/cast/[^/]+/$')
         x = {'class': 'adv'}
 
-        for p in s.findAll('p', attrs=x):
+        for p in d.findAll('p', attrs=x):
             h6 = p.findPrevious('h6')
             job = Job(company=self.company)
             job.title = h6.text
