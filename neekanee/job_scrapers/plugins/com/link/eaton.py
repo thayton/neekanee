@@ -11,7 +11,7 @@ COMPANY = {
     'hq': 'Cleveland, OH',
 
     'home_page_url': 'http://www.eaton.com',
-    'jobs_page_url': 'http://find.eaton.jobs/joblisting/?num_items=50&offset=0',
+    'jobs_page_url': 'http://find.eaton.jobs/ajax/joblisting/?num_items=50&offset=0',
 
     'empcnt': [10001]
 }
@@ -49,6 +49,7 @@ class EatonJobScraper(JobScraper):
                 job = Job(company=self.company)
                 job.title = li.a.text
                 job.url = urlparse.urljoin(self.br.geturl(), li.a['href'])
+                job.url = job.url.encode('utf8')
                 job.location = l
                 jobs.append(job)
 
