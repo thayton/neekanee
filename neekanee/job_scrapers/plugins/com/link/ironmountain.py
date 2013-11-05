@@ -47,6 +47,7 @@ class IronMountainJobScraper(JobScraper):
                 job = Job(company=self.company)
                 job.title = li.a.text
                 job.url = urlparse.urljoin(self.br.geturl(), li.a['href'])
+                job.url = job.url.encode('utf8')
                 job.location = l
                 jobs.append(job)
 
@@ -62,10 +63,7 @@ class IronMountainJobScraper(JobScraper):
         new_jobs = self.new_job_listings(job_list)
 
         for job in new_jobs:
-            try:
-                self.br.open(job.url)
-            except:
-                continue
+            self.br.open(job.url)
 
             s = soupify(self.br.response().read())
             d = s.find('div', id='direct_innerContainer')
