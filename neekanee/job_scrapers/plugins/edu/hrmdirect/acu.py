@@ -31,8 +31,7 @@ class AcuJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', attrs={'class': 'body'})
-        r = re.compile(r'view\.php\?req=\d+&$')
+        r = re.compile(r'^job-opening\.php\?req=\d+')
 
         for a in s.findAll('a', href=r):
             job = Job(company=self.company)
@@ -65,3 +64,7 @@ class AcuJobScraper(JobScraper):
 
 def get_scraper():
     return AcuJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
