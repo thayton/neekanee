@@ -12,12 +12,8 @@ COMPANY = {
 
     'ats': 'Oracle',
 
-    'benefits': {'vacation': []},
-
     'home_page_url': 'http://www.lonestar.edu',
     'jobs_page_url': 'https://hcm.lonestar.edu/tsdwzs32.html',
-
-    'gctw_chronicle': True,
 
     'empcnt': [1001,5000]
 }
@@ -69,7 +65,7 @@ class LonestarJobScraper(JobScraper):
             self.br.submit()
 
             z = soupify(self.br.response().read())
-            d = z.find('div', id='PAGECONTAINER')
+            d = z.find('div', id='win0divPSPAGECONTAINER')
 
             job.desc = get_all_text(d)
             job.save()
