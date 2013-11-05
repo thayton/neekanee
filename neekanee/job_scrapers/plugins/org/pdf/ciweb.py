@@ -11,7 +11,7 @@ COMPANY = {
     'hq': 'Chautauqua, NY',
 
     'home_page_url': 'http://www.ciweb.org',
-    'jobs_page_url': 'http://www.ciweb.org/employment/',
+    'jobs_page_url': 'http://www.ciweb.org/about-us/about-chautauqua/employment',
 
     'empcnt': [51,200]
 }
