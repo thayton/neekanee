@@ -93,7 +93,7 @@
 <div class="row">
   <div class="span9">
     <p>
-      {{ company.description }}
+      {{ company.description|safe }}
     </p>
   </div>
 
@@ -173,46 +173,6 @@
 
 <div class="row">
   <div class="span12">
-    <h2 id="locations">Locations</h1>
-    <hr />
-  </div>
-</div>
-{% comment %} Company headquarters should always be 1st location {% endcomment %}
-{% for company_location in company.companylocation_set.all|slice:":4" %}
-<div class="row">
-  <div class="span9">
-    {% if company.location.country == 'us' %}
-      <h3>{{ company_location.location.city|title}}, {{ company_location.location.state|upper }} {% if company_location.location == company.location %} (HQ){% endif %}</h3>
-    {% else %}
-      <h3>{{ company_location.location.city|title }}, {{ company_location.location.country|upper }} {% if company_location.location == company.location %} (HQ){% endif %}</h3>
-    {% endif %}
-    <div style="height: 180px; margin-bottom: 40px;" id="map_canvas"></div>
-  </div>
-  <div class="span3">
-    <h3>Location Tags</h3>
-    {% for tag in company_location.companylocationtag_set.all %}
-      <p>{{ tag }}</p>
-    {% endfor %}
-    </h3>
-  </div>
-</div>
-<div class="row">
-  <div class="span12">
-    <ul class="thumbnails">
-    {% for location_photo in company_location.companylocationphoto_set.all %}
-      <li class="span3">
-        <a href="#" class="thumbnail">
-          <img src="{{ location_photo.photo.url }}" />
-        </a>
-      </li>
-    {% endfor %}
-    </ul>
-  </div>
-</div>
-{% endfor %}
-
-<div class="row">
-  <div class="span12">
     <h2 id="worklife">WorkLife at {{ company.name }}</h1>
     <hr />
   </div>
@@ -257,6 +217,46 @@
     </table>
   </div>
 </div>
+
+<div class="row">
+  <div class="span12">
+    <h2 id="locations">Locations</h1>
+    <hr />
+  </div>
+</div>
+{% comment %} Company headquarters should always be 1st location {% endcomment %}
+{% for company_location in company.companylocation_set.all|slice:":4" %}
+<div class="row">
+  <div class="span9">
+    {% if company.location.country == 'us' %}
+      <h3>{{ company_location.location.city|title}}, {{ company_location.location.state|upper }} {% if company_location.location == company.location %} (HQ){% endif %}</h3>
+    {% else %}
+      <h3>{{ company_location.location.city|title }}, {{ company_location.location.country|upper }} {% if company_location.location == company.location %} (HQ){% endif %}</h3>
+    {% endif %}
+    <div style="height: 180px; margin-bottom: 40px;" id="map_canvas"></div>
+  </div>
+  <div class="span3">
+    <h3>Location Tags</h3>
+    {% for tag in company_location.companylocationtag_set.all %}
+      <p>{{ tag }}</p>
+    {% endfor %}
+    </h3>
+  </div>
+</div>
+<div class="row">
+  <div class="span12">
+    <ul class="thumbnails">
+    {% for location_photo in company_location.companylocationphoto_set.all %}
+      <li class="span3">
+        <a href="#" class="thumbnail">
+          <img src="{{ location_photo.photo.url }}" />
+        </a>
+      </li>
+    {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endfor %}
 
 <div class="row">
   <div class="span12">
