@@ -150,6 +150,7 @@ class Company(models.Model):
     benefits_page_url = models.CharField(max_length=512, blank=True)
 
     description = models.TextField(blank=True)
+    worklife = models.TextField(blank=True)
 
     last_scrape_time = models.DateField(null=True, blank=True)
 
