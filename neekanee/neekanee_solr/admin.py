@@ -1,5 +1,7 @@
 from neekanee_solr.models import *
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
 
 class VacationAccrualInline(admin.TabularInline):
     model = VacationAccrual
@@ -52,6 +54,8 @@ class CompanyLocationAdmin(admin.ModelAdmin):
     search_fields = ['company__name']
     inlines = [ CompanyLocationTagInline, CompanyLocationPhotoInline ]
 
+UserAdmin.list_display = ('email', 'first_name', 'last_name', 'is_active', 'date_joined', 'last_login', 'is_staff')
+
 admin.site.register(Company, CompanyAdmin)
 admin.site.register(CompanyLocation, CompanyLocationAdmin)
 admin.site.register(CompanySize)
@@ -64,3 +68,6 @@ admin.site.register(JobAlert)
 admin.site.register(Location)
 admin.site.register(LocationAlias)
 admin.site.register(NullLocation)
+
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
