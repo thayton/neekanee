@@ -329,7 +329,7 @@ class Job(models.Model):
 
         m = hashlib.md5()
         m.update(self.title)
-        m.update(self.url)
+        m.update(self.url.encode('utf8'))
         m.update(self.url_data)
         m.update(smart_str(self.desc))
 
