@@ -1,14 +1,14 @@
 {% load neek_extras %}
 
   <div id="jobs-sidebar-left">
-    <div class="accordion" id="tag-accordion">
+    <div class="panel-group" id="tag-accordion">
       {% if query %}
-      <div class="accordion-group">
-        <div class="accordion-heading" style="background-color: whiteSmoke">
-          <a class="accordion-toggle" data-toggle="collapse" href="#current-filters"><i class="icon-chevron-down"></i>Current Filters</a>
+      <div class="panel panel-default">
+        <div class="panel-heading" style="background-color: whiteSmoke">
+          <a class="panel-title" data-toggle="collapse" href="#current-filters"><i class="glyphicon glyphicon-chevron-down"></i>Current Filters</a>
         </div>
-        <div id="current-filters" class="accordion-body collapse in">
-          <div class="accordion-inner">
+        <div id="current-filters" class="panel-collapse collapse in">
+          <div class="panel-body">
             <ul class="nav nav-list">
               {% if query.vacation %}
               <li>
@@ -131,17 +131,17 @@
               </li>
               {% endif %}
             </ul>
-          </div> <!-- accordion-inner -->
+          </div> <!-- panel-body -->
         </div> <!-- current-filters -->
       </div> <!-- accordion-group -->                                 
       {% endif %}
 
-      <div class="accordion-group">
-        <div class="accordion-heading" style="background-color: whiteSmoke">
-          <a class="accordion-toggle" data-toggle="collapse" href="#top-level-domain"><i class="icon-chevron-right"></i>Top Level Domain</a>
+      <div class="panel panel-default">
+        <div class="panel-heading" style="background-color: whiteSmoke">
+          <a class="panel-title" data-toggle="collapse" href="#top-level-domain"><i class="glyphicon glyphicon-chevron-right"></i>Top Level Domain</a>
         </div>
-        <div id="top-level-domain" class="accordion-body collapse">
-          <div class="accordion-inner">
+        <div id="top-level-domain" class="panel-collapse collapse">
+          <div class="panel-body">
             <ul class="nav nav-list">
               {% for tld,cnt in facet_counts.tld %}
               <li>
@@ -151,16 +151,16 @@
               </li>          
               {% endfor %}
             </ul>
-          </div> <!-- accordion-inner -->
+          </div> <!-- panel-body -->
         </div> <!-- current-filters -->
       </div> <!-- accordion-group -->                                 
 
-      <div class="accordion-group">
-        <div class="accordion-heading" style="background-color: whiteSmoke">
-          <a class="accordion-toggle" data-toggle="collapse" href="#company-size"><i class="icon-chevron-right"></i>Company Size</a>
+      <div class="panel panel-default">
+        <div class="panel-heading" style="background-color: whiteSmoke">
+          <a class="panel-title" data-toggle="collapse" href="#company-size"><i class="glyphicon glyphicon-chevron-right"></i>Company Size</a>
         </div>
-        <div id="company-size" class="accordion-body collapse">
-          <div class="accordion-inner">
+        <div id="company-size" class="panel-collapse collapse">
+          <div class="panel-body">
             <ul class="nav nav-list">
               {% for company_size,cnt in facet_counts.company_size %}
               <li>
@@ -171,17 +171,17 @@
               </li>    
               {% endfor %}
             </ul>
-          </div> <!-- accordion-inner -->
+          </div> <!-- panel-body -->
         </div> <!-- current-filters -->
       </div> <!-- accordion-group -->                                 
 
       {% ifnotequal request.path "/jobs_by_location/" %} 
-      <div class="accordion-group">
-        <div class="accordion-heading" style="background-color: whiteSmoke">
-          <a class="accordion-toggle" data-toggle="collapse" href="#location"><i class="icon-chevron-right"></i>Location</a>
+      <div class="panel panel-default">
+        <div class="panel-heading" style="background-color: whiteSmoke">
+          <a class="panel-title" data-toggle="collapse" href="#location"><i class="glyphicon glyphicon-chevron-right"></i>Location</a>
         </div>
-        <div id="location" class="accordion-body collapse">
-          <div class="accordion-inner">
+        <div id="location" class="panel-collapse collapse">
+          <div class="panel-body">
             <ul class="nav nav-list">
               {% comment %}
               The location part of the sidebar is allows a user to drill-down by location. The logic is:
@@ -251,18 +251,18 @@
               {% endif %}
 
             </ul>
-          </div> <!-- accordion-inner -->
+          </div> <!-- panel-body -->
         </div> <!-- current-filters -->
       </div> <!-- accordion-group -->                                 
       {% endifnotequal %}
 
       {% ifnotequal request.path "/jobs_by_company/" %} 
-      <div class="accordion-group">
-        <div class="accordion-heading" style="background-color: whiteSmoke">
-          <a class="accordion-toggle" data-toggle="collapse" href="#company"><i class="icon-chevron-right"></i>Company</a>
+      <div class="panel panel-default">
+        <div class="panel-heading" style="background-color: whiteSmoke">
+          <a class="panel-title" data-toggle="collapse" href="#company"><i class="glyphicon glyphicon-chevron-right"></i>Company</a>
         </div>
-        <div id="company" class="accordion-body collapse">
-          <div class="accordion-inner">
+        <div id="company" class="panel-collapse collapse">
+          <div class="panel-body">
             <ul class="nav nav-list">
                 {% for company,cnt in facet_counts.company_name|slice:":6" %}
                   <li>
@@ -283,17 +283,17 @@
                 {% endif %}
 
             </ul>
-          </div> <!-- accordion-inner -->
+          </div> <!-- panel-body -->
         </div> <!-- current-filters -->
       </div> <!-- accordion-group -->                                 
       {% endifnotequal %}
 
-      <div class="accordion-group">
-        <div class="accordion-heading" style="background-color: whiteSmoke">
-          <a class="accordion-toggle" data-toggle="collapse" href="#vacation"><i class="icon-chevron-right"></i>Vacation</a>
+      <div class="panel panel-default">
+        <div class="panel-heading" style="background-color: whiteSmoke">
+          <a class="panel-title" data-toggle="collapse" href="#vacation"><i class="glyphicon glyphicon-chevron-right"></i>Vacation</a>
         </div>
-        <div id="vacation" class="accordion-body collapse">
-          <div class="accordion-inner">
+        <div id="vacation" class="panel-collapse collapse">
+          <div class="panel-body">
             <ul class="nav nav-list">
               {% for numdays,cnt in facet_counts.vacation_year_1|slice:":8" %}
                 <li>
@@ -304,16 +304,16 @@
                 </li>
               {% endfor %}
             </ul>
-          </div> <!-- accordion-inner -->
+          </div> <!-- panel-body -->
         </div> <!-- current-filters -->
       </div> <!-- accordion-group -->                                 
 
-      <div class="accordion-group">
-        <div class="accordion-heading" style="background-color: whiteSmoke">
-          <a class="accordion-toggle" data-toggle="collapse" href="#awards"><i class="icon-chevron-right"></i>Awards</a>
+      <div class="panel panel-default">
+        <div class="panel-heading" style="background-color: whiteSmoke">
+          <a class="panel-title" data-toggle="collapse" href="#awards"><i class="glyphicon glyphicon-chevron-right"></i>Awards</a>
         </div>
-        <div id="awards" class="accordion-body collapse">
-          <div class="accordion-inner">
+        <div id="awards" class="panel-collapse collapse">
+          <div class="panel-body">
             <ul class="nav nav-list">
               {% for award,cnt in facet_counts.company_awards|slice:":6" %}
                 <li>
@@ -328,7 +328,7 @@
                 </li>
               {% endfor %}
             </ul>
-          </div> <!-- accordion-inner -->
+          </div> <!-- panel-body -->
         </div> <!-- current-filters -->
       </div> <!-- accordion-group -->                                 
     </div> <!-- accordion -->

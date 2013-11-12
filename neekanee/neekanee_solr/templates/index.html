@@ -58,31 +58,25 @@
 {% block body_id %}landing-page{% endblock %}
 
 {% block body_content %}
-        <div id="landing-page-search" class="row">
-          <div class="span7">
-            <h1>Search thousands of jobs in over 50 countries.</h1>
-          </div>
-          <div class="span5">
-            <center>
-              <form id="landing-page-search-form" method="get" action="/search" class="form-inline well" onsubmit="return getcoord(this);">
-                <div class="control-group">
-                  <div class="controls">
-                    <input class="span4" name="q" type="text" placeholder="Job Title, Keywords, or Company">
-                  </div>
-                </div>
-                <div class="controls-group">
-                  <div class="controls">
-                    <input name="loc" class="span3" type="text" placeholder="Location">
-                    <input type="hidden" name="lat" />
-                    <input type="hidden" name="lng" />
-                    <input type="hidden" name="radius" />
-                    <input type="hidden" name="state" />
-                    <input type="hidden" name="country" />
-                    <button type="submit" class="btn btn-primary">Search</button>
-                  </div>
-                </div>
-              </form>
-            </center>
-          </div>
+        <div class="row">
+          <h1 class="text-center">Search thousands of jobs in over 50 countries.</h1>
         </div>
+	<div class="row">
+	  <div class="col-md-10 col-md-offset-2">
+          <form id="landing-page-search-form" class="pull-left form-inline well well-sm" method="get" action="/search" role="form" onsubmit="return getcoord(this);">
+	    <div class="form-group">
+              <input class="form-control" name="q" type="text" placeholder="Job Title, Keywords, or Company">
+	    </div>
+            <div class="form-group">
+              <input name="loc" class="form-control" type="text" placeholder="Location">
+              <input type="hidden" name="lat" />
+              <input type="hidden" name="lng" />
+              <input type="hidden" name="radius" />
+              <input type="hidden" name="state" />
+              <input type="hidden" name="country" />
+            </div>
+	    <button type="submit" class="btn btn-primary">Search</button>
+          </form>
+	  </div>
+	</div>
 {% endblock %}
