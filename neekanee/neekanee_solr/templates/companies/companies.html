@@ -8,7 +8,7 @@
 {% block body_content %}
 
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     {% include "companies/company_search_bar.html" %}
   </div>
 </div>
@@ -16,10 +16,10 @@
 <hr />
 
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <ul class="breadcrumb">
       <li>
-        <a href="/">Home</a> <span class="divider">/</span>
+        <a href="/">Home</a>
       </li>
       <li class="active">
         Companies
@@ -29,13 +29,13 @@
 </div>
 
 <div class="row">
-  <div class="span3">
+  <div class="col-md-3 visible-md visible-lg">
     <div class="sidebar-nav">
       {% include "companies/sidebar.html" %}
     </div>
   </div>
 
-  <div class="span6">
+  <div class="col-md-6">
     <p><small>Companies {{ page.start_index }} to {{ page.end_index }} of {{ page.paginator.count }}</small></p>
     <table class="table table-striped table-hover">
       <tbody>
@@ -44,7 +44,7 @@
           <td>
             <a href="/companies/{{ c.name_slug }}/"><b>{{ c.name }}</b></a>
             <p>
-              {{ c.description|truncatestr:210 }}
+              {{ c.description|truncatestr:210|safe }}
             </p>
             {% for tag in c.companytag_set.all %}
               {% if query.tags %}
@@ -66,25 +66,33 @@
     </div>
   </div>
 
-  <div class="span3">
-    <div class="well">
-      <h6 style="margin-bottom: 10px;" align="center">Company Tags</h6>
-      <ul style="list-style: none none; margin: 0;">
-        {% for tag,cnt in facet_counts.company_tags|slice:":32" %}
-        <li>
-          {% if query.tags %}
-            <a href="?{{ query.tags|split_and_remove:tag|append:tag|join:'+'|prepend:'tags='|qstring_set:query.urlencode }}">
-          {% else %}
-            <a href="?{{ 'tags='|add:tag|qstring_set:query.urlencode }}">
-          {% endif %}
-          #{{ tag }}
-              <span class="facet-count">{{ cnt }}</span>
-            </a>
-        </li>
-        {% endfor %}
-      </ul>
+  <div class="col-md-3 visible-md visible-lg">
+    <div id="companies-sidebar-right">
+      <div class="panel-group" id="tag-accordion">
+        <div class="panel panel-default">
+	  <div class="panel-heading" style="background-color: whiteSmoke">
+            <a class="panel-title" data-toggle="collapse" href="#company-tags"><i class="glyphicon glyphicon-chevron-right"></i>Company Tags</a>
+	  </div>
+	  <div id="company-tags" class="panel-collapse collapse">
+            <div class="panel-body">
+	      <ul style="list-style: none none; margin: 0;">
+	      {% for tag,cnt in facet_counts.company_tags|slice:":32" %}
+                <li>
+		  {% if query.tags %}
+		  <a href="?{{ query.tags|split_and_remove:tag|append:tag|join:'+'|prepend:'tags='|qstring_set:query.urlencode }}">
+		  {% else %}
+		  <a href="?{{ 'tags='|add:tag|qstring_set:query.urlencode }}">
+		  {% endif %}
+		  #{{ tag }}
+		  <span class="facet-count">{{ cnt }}</span>
+		  </a>
+		</li>
+              {% endfor %}
+	      </ul>
+	    </div>
+	  </div>
+	</div>
+      </div>
     </div>
   </div>
-</div>
-
 {% endblock %}
