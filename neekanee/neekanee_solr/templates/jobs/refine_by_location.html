@@ -14,7 +14,7 @@ name are hidden and all of the locations are listed and not just the first few.
 
 {% block jobs_content %}
           <p><small>Locations {{ page.start_index }} to {{ page.end_index }} of {{ page.paginator.count }}</small></p>
-          <table class="table table-striped">
+          <table class="table table-striped table-hover">
             <tbody>       
               {% if locations|length > 0 %}
                 {% for location,count in locations %}

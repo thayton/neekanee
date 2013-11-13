@@ -1,8 +1,14 @@
 {% load neek_extras %}
-
-          <div class="sidebar-nav">
+  <div id="companies-sidebar-left">
+    <div class="panel-group" id="tag-accordion">
+      {% if query %}
+      <div class="panel panel-default">
+        <div class="panel-heading" style="background-color: whiteSmoke">
+          <a class="panel-title" data-toggle="collapse" href="#current-filters"><i class="glyphicon glyphicon-chevron-down"></i>Current Filters</a>
+        </div>
+        <div id="current-filters" class="panel-collapse collapse in">
+          <div class="panel-body">
             <ul class="nav nav-list">
-              <li class="nav-header">Current Filters</li>
               {% if query.vacation %}
               <li>
                 <a rel="nofollow" href="?{{ query.urlencode|qstring_del:'vacation' }}">
@@ -57,8 +63,19 @@
                 </a>
               </li>
               {% endif %}
+	    </ul>
+          </div> <!-- panel-body -->
+        </div> <!-- current-filters -->
+      </div> <!-- accordion-group -->                                 
+      {% endif %}
 
-              <li class="nav-header">Top Level Domain</li>
+      <div class="panel panel-default">
+        <div class="panel-heading" style="background-color: whiteSmoke">
+          <a class="panel-title" data-toggle="collapse" href="#top-level-domain"><i class="glyphicon glyphicon-chevron-right"></i>Top Level Domain</a>
+	</div>
+        <div id="top-level-domain" class="panel-collapse collapse">
+          <div class="panel-body">
+            <ul class="nav nav-list">
               {% for tld,cnt in facet_counts.tld %}
               <li>
                 <a rel="nofollow" href="?{{ 'tld='|add:tld|qstring_set:query.urlencode }}">{{ tld }}
@@ -66,8 +83,18 @@
                 </a> 
               </li>          
               {% endfor %}
+            </ul>
+          </div> <!-- panel-body -->
+        </div> <!-- current-filters -->
+      </div> <!-- accordion-group -->                                 
 
-              <li class="nav-header">Company Size</li>
+      <div class="panel panel-default">
+        <div class="panel-heading" style="background-color: whiteSmoke">
+          <a class="panel-title" data-toggle="collapse" href="#company-size"><i class="glyphicon glyphicon-chevron-right"></i>Company Size</a>
+        </div>
+        <div id="company-size" class="panel-collapse collapse">
+          <div class="panel-body">
+            <ul class="nav nav-list">
               {% for company_size,cnt in facet_counts.company_size %}
               <li>
                 <a rel="nofollow" href="?{{ 'size='|add:company_size|qstring_set:query.urlencode }}">
@@ -76,8 +103,18 @@
                 </a> 
               </li>    
               {% endfor %}
+            </ul>
+          </div> <!-- panel-body -->
+        </div> <!-- current-filters -->
+      </div> <!-- accordion-group -->                                 
 
-              <li class="nav-header">Vacation *</li>
+      <div class="panel panel-default">
+        <div class="panel-heading" style="background-color: whiteSmoke">
+          <a class="panel-title" data-toggle="collapse" href="#vacation"><i class="glyphicon glyphicon-chevron-right"></i>Vacation</a>
+        </div>
+        <div id="vacation" class="panel-collapse collapse">
+          <div class="panel-body">
+            <ul class="nav nav-list">
               {% for numdays,cnt in facet_counts.vacation_year_1|slice:":8" %}
                 {% if cnt > 0 %}
                   <li>
@@ -88,7 +125,18 @@
                   </li>
                 {% endif %}
               {% endfor %}
+            </ul>
+          </div> <!-- panel-body -->
+        </div> <!-- current-filters -->
+      </div> <!-- accordion-group -->                                 
 
+      <div class="panel panel-default">
+        <div class="panel-heading" style="background-color: whiteSmoke">
+          <a class="panel-title" data-toggle="collapse" href="#awards"><i class="glyphicon glyphicon-chevron-right"></i>Awards</a>
+        </div>
+        <div id="awards" class="panel-collapse collapse">
+          <div class="panel-body">
+            <ul class="nav nav-list">
               <li class="nav-header">Company Awards</li>
               {% for award,cnt in facet_counts.company_awards|slice:":6" %}
                 <li>
@@ -104,3 +152,7 @@
               {% endfor %}
             </ul>
           </div>
+        </div> <!-- current-filters -->
+      </div> <!-- accordion-group -->                                 
+    </div> <!-- accordion -->
+  </div>

@@ -29,13 +29,13 @@ $(document).ready( function() {
 });
 
 // Change the right-chevron to down-chevron when people click to show filters
-$('.collapse').on('show', function () {
-  var i = $(this).parent('.accordion-group').find('i');
-  i.attr('class', 'icon-chevron-down');    
+$('.collapse').on('show.bs.collapse', function () {
+  var i = $(this).parent('.panel').find('i');
+  i.attr('class', 'glyphicon glyphicon-chevron-down');    
 });
 
 // Change the down-chevron to right-chevron when people click to hide filters
-$('.collapse').on('hide', function () {
-  var i = $(this).parent('.accordion-group').find('i');
-  i.attr('class', 'icon-chevron-right');    
+$('.collapse').on('hide.bs.collapse', function () {
+  var i = $(this).parent('.panel').find('i');
+  i.attr('class', 'glyphicon glyphicon-chevron-right');    
 });
