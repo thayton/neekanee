@@ -6,20 +6,20 @@
 
 {% block user_content %}
     <div class="row">
-      <div class="span1">
+      <div class="col-md-1">
         <p><strong>User</strong></p>
       </div>
-      <div class="span11">
+      <div class="col-md-11">
 	{% user_display user as user_display %}
         {{ user_display }}
       </div>
     </div>
 
     <div class="row">
-      <div class="span1">
+      <div class="col-md-1">
         <p><strong>Email</strong></p>
       </div>
-      <div class="span11">
+      <div class="col-md-11">
         {% if user.emailaddress_set.all %}
           {% for emailaddress in user.emailaddress_set.all %}
             {% if emailaddress.primary %}
@@ -42,10 +42,10 @@
 
     {% if user.has_usable_password %}
     <div class="row">
-      <div class="span1">
+      <div class="col-md-1">
         <p><strong>Password</strong></p>
       </div>
-      <div class="span11">
+      <div class="col-md-11">
         <div><a href="{% url 'account_change_password' %}">Change Password</a></div>
         <a href="{% url 'account_reset_password' %}">Reset Password</a>
       </div>
