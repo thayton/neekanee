@@ -1,5 +1,5 @@
 <center>
-  <form method="get" action="/search" class="form-inline text-center well" style="background-color: #eeeeee;" onsubmit="return getcoord(this);" >
+  <form id="job-search-bar-form" method="get" action="/search" class="form-inline text-center well" style="background-color: #eeeeee;" onsubmit="return getcoord(this);" >
     <div class="form-group">
       <input name="q" class="form-control" type="text" {% if query.q %} value="{{ query.q }}" {% else %} placeholder="Keywords: Ruby, Rails, Django" {% endif %} >
     </div>
