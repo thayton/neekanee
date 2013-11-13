@@ -138,3 +138,7 @@ a.tag-link:hover > span.label {
 .container {
   max-width: 1100px;
 }
+
+#job-search-bar-form div.form-group {
+  min-width: 300px;  
+}
