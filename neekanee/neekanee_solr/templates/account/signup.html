@@ -54,22 +54,68 @@
                   <div class="col-xs-12 col-sm-12 col-md-12 login-box">
 		  <form id="signup_form" method="post" action="{% url 'account_signup' %}">
 		    {% csrf_token %}
-                    <div class="input-group">
-                      <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-		      <input id="id_username" type="text" class="form-control" name="username" placeholder="Username" maxlength="30">
+
+		    {% if form.non_field_errors %}
+		    <div class="alert alert-danger">
+		      <a class="close" data-dismiss="alert">&times;</a>
+		      {% for non_field_error in form.non_field_errors %}
+		        {{ non_field_error }}
+		      {% endfor %}
 		    </div>
-                    <div class="input-group">
-                      <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
-		      <input type="password" name="password1" id="id_password1" class="form-control" placeholder="Password">
+		    {% endif %}
+
+		    <div class="form-group {% if form.username.errors %}has-error{% endif %}">
+		      {% for error in form.username.errors %}
+		      <span class="help-block">{{ error }}</span>
+		      {% endfor %}
+
+                      <div class="input-group">
+			<span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+			{% if form.username.value %} 
+			<input id="id_username" type="text" class="form-control" name="username" value={{ form.username.value}} maxlength="30">
+			{% else %}
+			<input id="id_username" type="text" class="form-control" name="username" placeholder="Username" maxlength="30">
+			{% endif %}
+		      </div>
 		    </div>
-                    <div class="input-group">
-                      <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
-		      <input type="password" name="password2" id="id_password2" class="form-control" placeholder="Password (again)">
+
+		    <div class="form-group {% if form.password1.errors %}has-error{% endif %}">
+		      {% for error in form.password1.errors %}
+		      <span class="help-block">{{ error }}</span>
+		      {% endfor %}
+
+                      <div class="input-group">
+			<span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+			<input type="password" name="password1" id="id_password1" class="form-control" placeholder="Password">
+		      </div>
 		    </div>
-                    <div class="input-group">
-                      <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
-		      <input type="text" name="email" id="id_email" class="form-control" placeholder="Email (optional)">
+
+		    <div class="form-group {% if form.password2.errors %}has-error{% endif %}">
+		      {% for error in form.password2.errors %}
+		      <span class="help-block">{{ error }}</span>
+		      {% endfor %}
+
+                      <div class="input-group">
+			<span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+			<input type="password" name="password2" id="id_password2" class="form-control" placeholder="Password (again)">
+		      </div>
 		    </div>
+
+		    <div class="form-group {% if form.email.errors %}has-error{% endif %}">
+		      {% for error in form.email.errors %}
+		      <span class="help-block">{{ error }}</span>
+		      {% endfor %}
+
+                      <div class="input-group">
+			<span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+			{% if form.email.value %} 
+			<input type="text" name="email" id="id_email" class="form-control" value={{ form.email.value}}>
+			{% else %}
+			<input type="text" name="email" id="id_email" class="form-control" placeholder="Email (optional)">
+			{% endif %}
+		      </div>
+		    </div>
+
 		    {% if redirect_field_value %}
   		    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
 		    {% endif %}
