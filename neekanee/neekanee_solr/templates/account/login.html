@@ -94,14 +94,42 @@
                         </div>
                         <div class="col-xs-6 col-sm-6 col-md-6 login-box">
 			  <form role="form" method="post" action="{% url 'account_login' %}">{% csrf_token %}
-                            <div class="input-group">
+
+			    {% if form.non_field_errors %}
+			    <div class="alert alert-danger">
+			      <a class="close" data-dismiss="alert">&times;</a>
+			      {% for non_field_error in form.non_field_errors %}
+		                {{ non_field_error }}
+			      {% endfor %}
+			    </div>
+			    {% endif %}
+
+			    <div class="form-group {% if form.username.errors %}has-error{% endif %}">
+			      {% for error in form.login.errors %}
+			      <span class="help-block">{{ error }}</span>
+			      {% endfor %}
+
+                              <div class="input-group">
                                 <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+				{% if form.login.value %} 
+                                <input id="id_login" name="login" type="text" class="form-control" value={{ form.login.value }} required autofocus />
+				{% else %}
                                 <input id="id_login" name="login" type="text" class="form-control" placeholder="Username" required autofocus />
-                            </div>
-                            <div class="input-group">
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+				{% endif %}
+                              </div>
+			    </div>
+
+			    <div class="form-group {% if form.password1.errors %}has-error{% endif %}">
+			      {% for error in form.password.errors %}
+			      <span class="help-block">{{ error }}</span>
+			      {% endfor %}
+
+                              <div class="input-group">
+				<span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
                                 <input id="id_password" name="password" type="password" class="form-control" placeholder="Password" required />
-                            </div>
+                              </div>
+			    </div>
+
 			    {% if redirect_field_value %}
 			    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
 			    {% endif %}
