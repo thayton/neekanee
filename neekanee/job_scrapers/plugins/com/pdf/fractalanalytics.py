@@ -11,7 +11,7 @@ COMPANY = {
     'hq': 'San Mateo, CA',
 
     'home_page_url': 'http://www.fractalanalytics.com',
-    'jobs_page_url': 'http://www.fractalanalytics.com/fractal-analytics-careers/current-job-openings.html',
+    'jobs_page_url': 'http://www.fractalanalytics.com/content/current-openings',
 
     'empcnt': [501,1000],
 }
