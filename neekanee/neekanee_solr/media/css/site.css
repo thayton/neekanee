@@ -85,11 +85,17 @@ form.form_as_link input[type="submit"]:hover, input.input_as_link:hover {
   text-decoration: underline;
 }
 
-#landing-page-search-form {
-  border:none; 
+#landing-page-search-form.well {
+  border:1px solid rgba(0,0,0,0.8); 
   background-color: #222; 
   background: rgba(0, 0, 0, .75); 
-  border-radius: 0;
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  padding: 3px;
+}
+
+#landing-page-search-form div.form-group {
+  min-width: 300px;  
 }
 
 a.tag-link > span.label {
@@ -104,10 +110,6 @@ a.tag-link:hover > span.label {
   background-color: #34789a;
 }
 
-.site-background {
-  background: url(/media/images/Neekanee-white-line.png) repeat-y center center fixed; background-color: #eee;
-}
-
 #landing-page.site-background {
   background: url(/media/images/desk.jpg) no-repeat center center fixed; background-size: cover;
 }
@@ -116,12 +118,38 @@ a.tag-link:hover > span.label {
   display: none;
 }
 
-#jobs-sidebar-left i.icon-chevron-right, i.icon-chevron-down {
+#companies-sidebar-left i.glyphicon-chevron-right, i.glyphicon-chevron-down,
+#jobs-sidebar-left i.glyphicon-chevron-right, i.glyphicon-chevron-down {
   float: right;
   opacity: 0.25;
 }
 
-#jobs-sidebar-right i.icon-chevron-right, i.icon-chevron-down {
+#companies-sidebar-right i.glyphicon-chevron-right, i.glyphicon-chevron-down,
+#jobs-sidebar-right i.glyphicon-chevron-right, i.glyphicon-chevron-down {
   float: right;
   opacity: 0.25;
 }
+
+/* So that job/company/locations count text is bunched up against the nav tabs */
+.nav.nav-tabs {
+  margin-bottom: 20px;
+}
+
+.container {
+  max-width: 1100px;
+}
+
+#job-search-bar-form div.form-group {
+  min-width: 300px;  
+}
+
+/* Login form */
+div#login-panel .btn-label {position: relative;left: -12px;display: inline-block;padding: 6px 12px;background: rgba(0,0,0,0.15);border-radius: 3px 0 0 3px;}
+div#login-panel .btn-labeled {padding-top: 0;padding-bottom: 0;}
+div#login-panel .input-group { margin-bottom:10px; }
+div#login-panel .separator { border-right: 1px solid #dfdfe0; }
+div#login-panel .linkedin, { min-width:170px; }
+div#login-panel .facebook { background-color:#354E84;color:#fff; }
+div#login-panel .twitter { background-color:#00A5E3;color:#fff; }
+div#login-panel .linkedin { background-color:#00A5E3;color:#fff; }
+div#login-panel .facebook:hover,.twitter:hover { color:#fff; }

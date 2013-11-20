@@ -5,7 +5,7 @@
 
 {% block body_content %}
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     {% include "jobs/jobs_search_bar.html" %}
   </div>
 </div>
@@ -13,10 +13,10 @@
 <hr />
 
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <ul class="breadcrumb">
       <li>
-	<a href="/">Home</a> <span class="divider">/</span>
+	<a href="/">Home</a>
       </li>
       <li class="active">
 	Browse Jobs
@@ -26,10 +26,10 @@
 </div>
 
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <h3 id="by_company">Browse Jobs by Company</h3>
     <br />
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped table-hover">
       <tbody>
       {% for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"|make_list %}
 	{% if forloop.counter0|modulus:13 == 0 %}
@@ -44,7 +44,7 @@
     </table>
     <h3 id="by_job_title">Browse Jobs by Job Title</h3>
     <br />
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped table-hover">
       <tbody>
       {% for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"|make_list %}
 	{% if forloop.counter0|modulus:13 == 0 %}
@@ -59,7 +59,7 @@
     </table>
     <h3 id="by_category">Browse Jobs by Category</h3>
     <br />
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped table-hover">
       <tbody>
 	{% for category in job_categories %}
 	{% if forloop.counter0|modulus:3 == 0 %}
@@ -74,7 +74,7 @@
     </table>
     <h3 id="by_tld">Browse Jobs by Top-Level-Domain</h3>
     <br />
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped table-hover">
       <tbody>
 	{% for tld in company_tlds %}
 	{% if forloop.counter0|modulus:3 == 0 %}
@@ -89,7 +89,7 @@
     </table>
     <h3 ="by_company_size">Browse Jobs by Company Size</h3>
     <br />
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped table-hover">
       <tbody>
 	{% for size in company_sizes %}
 	{% if forloop.counter0|modulus:4 == 0 %}
@@ -104,7 +104,7 @@
     </table>
     <h3 id="by_company_tag">Browse Jobs by Company Tags</h3>
     <br />
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped table-hover">
       <tbody>
 	{% for tag in company_tags %}
 	{% if forloop.counter0|modulus:3 == 0 %}

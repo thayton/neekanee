@@ -11,16 +11,16 @@
 {% block body_content %}
     
       <div class="row">
-        <div class="span12">
+        <div class="col-md-12">
           {% include "jobs/jobs_search_bar.html" %}
         </div>
       </div>
       <hr>
       <div class="row">
-        <div class="span12">
+        <div class="col-md-12">
           <ul class="breadcrumb">
             <li>
-              <a href="/">Home</a> <span class="divider">/</span>
+              <a href="/">Home</a>
             </li>
             <li class="active">
               Login
@@ -30,7 +30,8 @@
       </div>
 
       <div class="row">
-        <div class="span12">
+        <div class="col-md-12">
+<!-- -->
           {% if not user.is_authenticated %}
             {% if socialaccount.providers  %}
               <p>Sign in with <a title="LinkedIn" class="socialaccount_provider linkedin" href="{% provider_login_url "linkedin" %}">LinkedIn</a> or 
@@ -44,6 +45,30 @@
           {% endif %}
 
           <form class="well" method="post" action="{% url 'account_login' %}">{% csrf_token %}
+	    <div class="control-group required">
+              <label class="control-label" for="id_login">Username</label>
+              <div class="controls">
+		<input id="id_login" type="text" placeholder="Username" name="login" maxlength="30">
+              </div>
+	    </div>
+	    <div class="control-group required">
+              <label class="control-label" for="id_password">Password</label>
+              <div class="controls">
+		<input type="password" name="password" id="id_password">
+              </div>
+	    </div>
+	    <div class="control-group">
+              <div class="controls">
+                <label class="checkbox">
+                  <input type="checkbox" name="remember" id="id_remember"> <span>Remember Me</span>
+                </label>
+              </div>
+	    </div>
+            <button class="btn btn-primary" type="submit">Sign In</button>
+            <a class="btn" href="/account/password/reset/">Forgot Password?</a>
+         </form>
+
+<!--
           {{ form|bootstrap }}
           {% if redirect_field_value %}
             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
@@ -51,7 +76,89 @@
             <button class="btn btn-primary" type="submit">{% trans "Sign In" %}</button>
             <a class="btn" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
          </form>
+-->
 	</div>
       </div>
+
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12">
+            <div id="login-panel" class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Log in</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-6 separator social-login-box"> <br />
+                            <a href="{% provider_login_url "linkedin" %}" class="btn linkedin btn-block" role="button">Log in using <strong>LinkedIn</strong></a>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6 login-box">
+			  <form role="form" method="post" action="{% url 'account_login' %}">{% csrf_token %}
+
+			    {% if form.non_field_errors %}
+			    <div class="alert alert-danger">
+			      <a class="close" data-dismiss="alert">&times;</a>
+			      {% for non_field_error in form.non_field_errors %}
+		                {{ non_field_error }}
+			      {% endfor %}
+			    </div>
+			    {% endif %}
+
+			    <div class="form-group {% if form.username.errors %}has-error{% endif %}">
+			      {% for error in form.login.errors %}
+			      <span class="help-block">{{ error }}</span>
+			      {% endfor %}
+
+                              <div class="input-group">
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+				{% if form.login.value %} 
+                                <input id="id_login" name="login" type="text" class="form-control" value={{ form.login.value }} required autofocus />
+				{% else %}
+                                <input id="id_login" name="login" type="text" class="form-control" placeholder="Username" required autofocus />
+				{% endif %}
+                              </div>
+			    </div>
+
+			    <div class="form-group {% if form.password1.errors %}has-error{% endif %}">
+			      {% for error in form.password.errors %}
+			      <span class="help-block">{{ error }}</span>
+			      {% endfor %}
+
+                              <div class="input-group">
+				<span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                                <input id="id_password" name="password" type="password" class="form-control" placeholder="Password" required />
+                              </div>
+			    </div>
+
+			    {% if redirect_field_value %}
+			    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+			    {% endif %}
+                            <p>
+                                <a href="/account/password/reset/">Forgot your password?</a></p>
+                            Don't have an account? <a href="{{ signup_url }}">Sign up here</a>
+                        </div> <!-- login-box -->
+                    </div> <!-- row -->
+                </div> <!-- panel-body -->
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="remember" id="id_remember" value="Remember">
+                                    Remember me
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6">
+                          <button type="submit" class="btn btn-labeled btn-success">
+                            <span class="btn-label"><i class="glyphicon glyphicon-ok"></i></span>Sign In</button>
+                        </div>
+			</form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
 
