@@ -52,8 +52,7 @@
               <div class="panel-body">
                 <div class="row">
                   <div class="col-xs-12 col-sm-12 col-md-12 login-box">
-		  <form id="signup_form" method="post" action="{% url 'account_signup' %}">
-		    {% csrf_token %}
+		  <form id="signup_form" method="post" action="{% url 'account_signup' %}">{% csrf_token %}
 
 		    {% if form.non_field_errors %}
 		    <div class="alert alert-danger">
