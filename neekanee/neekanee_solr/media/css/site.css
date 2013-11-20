@@ -138,3 +138,18 @@ a.tag-link:hover > span.label {
 .container {
   max-width: 1100px;
 }
+
+#job-search-bar-form div.form-group {
+  min-width: 300px;  
+}
+
+/* Login form */
+div#login-panel .btn-label {position: relative;left: -12px;display: inline-block;padding: 6px 12px;background: rgba(0,0,0,0.15);border-radius: 3px 0 0 3px;}
+div#login-panel .btn-labeled {padding-top: 0;padding-bottom: 0;}
+div#login-panel .input-group { margin-bottom:10px; }
+div#login-panel .separator { border-right: 1px solid #dfdfe0; }
+div#login-panel .linkedin, { min-width:170px; }
+div#login-panel .facebook { background-color:#354E84;color:#fff; }
+div#login-panel .twitter { background-color:#00A5E3;color:#fff; }
+div#login-panel .linkedin { background-color:#00A5E3;color:#fff; }
+div#login-panel .facebook:hover,.twitter:hover { color:#fff; }
