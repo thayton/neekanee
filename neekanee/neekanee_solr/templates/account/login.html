@@ -29,57 +29,6 @@
         </div>
       </div>
 
-      <div class="row">
-        <div class="col-md-12">
-<!-- -->
-          {% if not user.is_authenticated %}
-            {% if socialaccount.providers  %}
-              <p>Sign in with <a title="LinkedIn" class="socialaccount_provider linkedin" href="{% provider_login_url "linkedin" %}">LinkedIn</a> or 
-                <a href="{{ signup_url }}">sign up</a> for a Neekanee account and sign in below:
-              </p>
-            {% endif %}
-          {% endif %}
-
-          {% if user.is_authenticated %}
-            {% include "account/snippets/already_logged_in.html" %}
-          {% endif %}
-
-          <form class="well" method="post" action="{% url 'account_login' %}">{% csrf_token %}
-	    <div class="control-group required">
-              <label class="control-label" for="id_login">Username</label>
-              <div class="controls">
-		<input id="id_login" type="text" placeholder="Username" name="login" maxlength="30">
-              </div>
-	    </div>
-	    <div class="control-group required">
-              <label class="control-label" for="id_password">Password</label>
-              <div class="controls">
-		<input type="password" name="password" id="id_password">
-              </div>
-	    </div>
-	    <div class="control-group">
-              <div class="controls">
-                <label class="checkbox">
-                  <input type="checkbox" name="remember" id="id_remember"> <span>Remember Me</span>
-                </label>
-              </div>
-	    </div>
-            <button class="btn btn-primary" type="submit">Sign In</button>
-            <a class="btn" href="/account/password/reset/">Forgot Password?</a>
-         </form>
-
-<!--
-          {{ form|bootstrap }}
-          {% if redirect_field_value %}
-            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-          {% endif %}
-            <button class="btn btn-primary" type="submit">{% trans "Sign In" %}</button>
-            <a class="btn" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
-         </form>
--->
-	</div>
-      </div>
-
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12">
             <div id="login-panel" class="panel panel-primary">
