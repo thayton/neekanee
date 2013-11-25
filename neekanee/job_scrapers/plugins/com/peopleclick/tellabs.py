@@ -40,7 +40,7 @@ class TellabsJobScraper(JobScraper):
         self.br.select_form('searchForm')
         self.br.form.set_all_readonly(False)
         self.br.form['com.peopleclick.cp.formdata.hitsPerPage'] = [ '50' ]
-        self.br.submit()
+        self.br.submit('input')
 
         r = re.compile(r'^jobDetails\.do\?functionName=getJobDetail&jobPostId=\d+')
         pageno = 2
@@ -93,3 +93,7 @@ class TellabsJobScraper(JobScraper):
 
 def get_scraper():
     return TellabsJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
