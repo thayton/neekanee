@@ -47,7 +47,7 @@ class NiJobScraper(JobScraper):
 
         self.br.set_response(resp)
         self.br.select_form('searchForm')
-        self.br.submit()
+        self.br.submit('input')
 
         r = re.compile(r'^jobDetails\.do\?functionName=getJobDetail&jobPostId=\d+')
         pageno = 2
@@ -56,28 +56,28 @@ class NiJobScraper(JobScraper):
             s = soupify(self.br.response().read())
 
             for a in s.findAll('a', href=r):
-                tr = a.findAll('tr')
-
-                l = tr[1].findAll('td')[1].text
-                l = self.parse_location(l)
-                
+                tr = a.findParent('tr')
+                td = tr.findAll('td')
+            
+                l = self.parse_location(td[-4].text)
                 if not l:
                     continue
 
                 job = Job(company=self.company)
-                job.title = tr[0].findAll('td')[1].text
+                job.title = a.text
                 job.url = urlparse.urljoin(self.br.geturl(), a['href'])
                 job.location = l
                 jobs.append(job)
 
             # Navigate to the next page
-            i = s.find('img', attrs={'alt': 'Next'})
-            if not i or i.parent.name != 'button':
+            p = 'PARAMFILTER:functionName=search|pageIndex=%d|' % pageno
+            i = s.find('input', attrs={'name': p})
+            if not i:
                 break
 
             self.br.select_form('searchResultForm')
             self.br.form.set_all_readonly(False)
-            self.br.submit(name=i.parent['name'])
+            self.br.submit(name=i['name'])
 
             pageno += 1
 
