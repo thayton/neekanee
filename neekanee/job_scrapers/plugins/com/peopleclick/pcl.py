@@ -18,7 +18,6 @@ COMPANY = {
 class PclJobScraper(JobScraper):
     def __init__(self):
         super(PclJobScraper, self).__init__(COMPANY)
-        self.geocoder.return_usa_only = False
 
     def scrape_job_links(self, url):
         jobs = []
