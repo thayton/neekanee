@@ -50,6 +50,9 @@ class TcdJobScraper(JobScraper):
                 y = re.compile(r'view_erecruit_document\?p_key_\d+=')
                 a = z.find('a', href=y)
 
+                if not a:
+                    continue
+
                 job.url = urlparse.urljoin(self.br.geturl(), a['href'])
                 jobs.append(job)
 
