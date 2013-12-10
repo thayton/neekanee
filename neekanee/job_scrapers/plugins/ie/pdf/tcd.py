@@ -1,4 +1,4 @@
-import re, urlparse
+import re, urlparse, mechanize
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
@@ -41,7 +41,11 @@ class TcdJobScraper(JobScraper):
                 job.title = a.text
                 job.location = self.company.location
 
-                self.br.select_form('callTheJobSpecFromSearch')
+                try:
+                    self.br.select_form('callTheJobSpecFromSearch')
+                except mechanize.FormNotFoundError:
+                    continue
+
                 self.br.form.set_all_readonly(False)
                 self.br.form['p_recruitment_id'] = m.group(1)
                 self.br.submit()
@@ -64,7 +68,11 @@ class TcdJobScraper(JobScraper):
             if not a:
                 break
 
-            self.br.select_form('searchv4navigateresultsforward')
+            try:
+                self.br.select_form('searchv4navigateresultsforward')
+            except mechanize.FormNotFoundError:
+                break
+
             self.br.submit()
 
         return jobs
