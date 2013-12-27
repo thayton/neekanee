@@ -3,6 +3,7 @@ import re, urlparse, urllib
 from BeautifulSoup import BeautifulSoup
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
+from neekanee.urlutil import url_query_add
 
 from neekanee_solr.models import *
 
@@ -15,7 +16,8 @@ COMPANY = {
     'contact': 'resumes@xoom.com',
 
     'home_page_url': 'https://www.xoom.com',
-    'jobs_page_url': 'https://hire.jobvite.com/CompanyJobs/Careers.aspx?c=qB49Vfwt&jvprefix=https%3a%2f%2fwww.xoom.com&cs=9Tv9Vfwc&jvresize=https%3a%2f%2fwww.xoom.com%2fabout%2fjobvite-iframe-resizer',
+    'jobs_page_url': 'https://hire.jobvite.com/CompanyJobs/Careers.aspx?c=qB49Vfwt&cs=9uoaVfwH&jvresize=https://www.xoom.com/about/iframe-resizer',
+#    'jobs_page_url': 'https://hire.jobvite.com/CompanyJobs/Careers.aspx?c=qB49Vfwt&jvprefix=https%3a%2f%2fwww.xoom.com&cs=9Tv9Vfwc&jvresize=https%3a%2f%2fwww.xoom.com%2fabout%2fjobvite-iframe-resizer',
 
     'empcnt': [51,200]
 }
@@ -34,26 +36,20 @@ class XoomJobScraper(JobScraper):
         m = re.search(r, s.prettify())
 
         jvurlargs = m.group(1)
+        jvurlargs = url_query_add(jvurlargs, {'jvprefix': 'https://www.xoom.com'}.items())
 
         d = s.find('div', attrs={'class': 'jobList'})
         r = re.compile(r"jvGoToPage\('(.*)','','(.*)'\)")
 
         for a in d.findAll('a', href=r):
-            tr = a.findParent('tr')
-            td = tr.findAll('td')
-
             m = re.search(r, a['href'])
             page  = m.group(1)
             jobid = m.group(2)
         
-            l = self.parse_location(td[1].text)
-            if l is None:
-                continue
-
             job = Job(company=self.company)
             job.title = a.text
             job.url = self.mkurl(self.br.geturl(), jvurlargs, page, jobid)
-            job.location = l
+            job.location = self.company.location
             jobs.append(job)
 
         return jobs
@@ -84,3 +80,7 @@ class XoomJobScraper(JobScraper):
 
 def get_scraper():
     return XoomJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
