@@ -53,3 +53,7 @@ class TriggitJobScraper(JobScraper):
 
 def get_scraper():
     return TriggitJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
