@@ -7,7 +7,8 @@ COMPANY = {
     'ats': 'icims',
 
     'home_page_url': 'http://www.tibco.com',
-    'jobs_page_url': 'https://usa-tibcosoftware.icims.com/jobs/intro?in_iframe=1',
+    'jobs_page_url': ['https://usa-tibcosoftware.icims.com/jobs/intro?in_iframe=1',
+                      'https://intl-tibcosoftware.icims.com/jobs/intro?in_iframe=1'],
 
     'empcnt': [1001,5000]
 }
