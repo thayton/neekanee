@@ -9,42 +9,46 @@ class IcimsJobScraper(JobScraper):
     def __init__(self, company_dict):
         super(IcimsJobScraper, self).__init__(company_dict)
 
-    def scrape_job_links(self, url):
+    def scrape_job_links(self, urls):
         jobs = []
 
-        self.br.open(url)
-        self.br.select_form('searchForm')
-        self.br.submit()
+        if not isinstance(urls, list):
+            urls = [ urls ]
 
-        pageno = 1 # page numbers start at 0
+        for url in urls:
+            self.br.open(url)
+            self.br.select_form('searchForm')
+            self.br.submit()
 
-        z = re.compile(r'iCIMS_JobListingRow')
-        x = {'class': z}
-        y = {'itemprop': 'address'}
+            pageno = 1 # page numbers start at 0
 
-        while True:
-            s = soupify(self.br.response().read())
+            z = re.compile(r'iCIMS_JobListingRow')
+            x = {'class': z}
+            y = {'itemprop': 'address'}
 
-            for d in s.findAll('div', attrs=x):
-                p = d.find('span', attrs=y)
-                l = self.parse_location(p.text)
+            while True:
+                s = soupify(self.br.response().read())
 
-                if not l:
-                    continue
+                for d in s.findAll('div', attrs=x):
+                    p = d.find('span', attrs=y)
+                    l = self.parse_location(p.text)
+                    
+                    if not l:
+                        continue
 
-                job = Job(company=self.company)
-                job.title = d.a.text
-                job.url = urlparse.urljoin(self.br.geturl(), d.a['href'])
-                job.location = l
-                jobs.append(job)
+                    job = Job(company=self.company)
+                    job.title = d.a.text
+                    job.url = urlparse.urljoin(self.br.geturl(), d.a['href'])
+                    job.location = l
+                    jobs.append(job)
 
-            # Navigate to the next page
-            try:
-                r = re.compile(r'/jobs/search\?pr=' + str(pageno))
-                pageno += 1
-                self.br.follow_link(self.br.find_link(url_regex=r))
-            except mechanize.LinkNotFoundError:
-                break
+                # Navigate to the next page
+                try:
+                    r = re.compile(r'/jobs/search\?pr=' + str(pageno))
+                    pageno += 1
+                    self.br.follow_link(self.br.find_link(url_regex=r))
+                except mechanize.LinkNotFoundError:
+                    break
 
         return jobs
 
