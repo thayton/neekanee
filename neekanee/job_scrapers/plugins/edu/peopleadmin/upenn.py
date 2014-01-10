@@ -1,11 +1,11 @@
-from neekanee.jobscrapers.peopleadmin.peopleadmin2 import PeopleAdminJobScraper
+from neekanee.jobscrapers.peopleadmin.peopleadmin3 import PeopleAdminJobScraper
 
 COMPANY = {
     'name': 'University of Pennsylvania',
     'hq': 'Philadelphia, PA',
 
     'home_page_url': 'http://www.upenn.edu/',
-    'jobs_page_url': 'https://jobs.hr.upenn.edu/applicants/jsp/shared/index.jsp',
+    'jobs_page_url': 'https://jobs.hr.upenn.edu',
 
     'empcnt': [10001]
 }
