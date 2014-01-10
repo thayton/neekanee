@@ -1,4 +1,4 @@
-from neekanee.jobscrapers.icims.icims import IcimsJobScraper
+from neekanee.jobscrapers.icims.icims2 import IcimsJobScraper
 
 COMPANY = {
     'name': 'Fishnet Security',
@@ -7,7 +7,7 @@ COMPANY = {
     'ats': 'icims',
 
     'home_page_url': 'http://www.fishnetsecurity.com',
-    'jobs_page_url': 'https://careers-fishnetsecurity.icims.com/jobs/intro',
+    'jobs_page_url': 'https://careers-fishnetsecurity.icims.com/jobs/intro?in_iframe=1',
 
     'empcnt': [201,500]
 }
@@ -15,9 +15,6 @@ COMPANY = {
 class FishnetJobScraper(IcimsJobScraper):
     def __init__(self):
         super(FishnetJobScraper, self).__init__(COMPANY)
-
-    def get_location_from_td(self, td):
-        return self.parse_location(td[-2].text)
 
 def get_scraper():
     return FishnetJobScraper()
