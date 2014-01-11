@@ -31,7 +31,10 @@ class IcimsJobScraper(JobScraper):
 
                 for d in s.findAll('div', attrs=x):
                     p = d.find('span', attrs=y)
-                    if len(p.text.strip()) == 0:
+
+                    if hasattr(self, 'get_location_from_div'):
+                        l = self.get_location_from_div(d)
+                    elif len(p.text.strip()) == 0:
                         p = p.meta['content']
                         l = self.parse_location(p)
                     else:
