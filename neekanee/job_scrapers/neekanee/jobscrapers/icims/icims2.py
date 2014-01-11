@@ -31,22 +31,26 @@ class IcimsJobScraper(JobScraper):
 
                 for d in s.findAll('div', attrs=x):
                     p = d.find('span', attrs=y)
+                    l = None
 
                     if hasattr(self, 'get_location_from_div'):
                         l = self.get_location_from_div(d)
-                    elif len(p.text.strip()) == 0:
+                    elif p and len(p.text.strip()) == 0:
                         p = p.meta['content']
                         l = self.parse_location(p)
-                    else:
+                    elif p:
                         l = self.parse_location(p.text)
                     
-                    if not l:
+                    if not l and not hasattr(self, 'get_location_from_desc'):
                         continue
 
                     job = Job(company=self.company)
                     job.title = d.a.text
                     job.url = urlparse.urljoin(self.br.geturl(), d.a['href'])
-                    job.location = l
+
+                    if l:
+                        job.location = l
+
                     jobs.append(job)
 
                 # Navigate to the next page
@@ -71,6 +75,12 @@ class IcimsJobScraper(JobScraper):
             r = re.compile(r'iCIMS_JobPage')
             x = {'class': r}
             d = s.find('div', attrs=x)
+
+            if hasattr(self, 'get_location_from_desc'):
+                l = self.get_location_from_desc(d)
+                if not l:
+                    continue
+                job.location = l
 
             job.desc = get_all_text(d)
             job.save()
