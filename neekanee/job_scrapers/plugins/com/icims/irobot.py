@@ -1,4 +1,4 @@
-from neekanee.jobscrapers.icims.icims import IcimsJobScraper
+from neekanee.jobscrapers.icims.icims2 import IcimsJobScraper
 
 COMPANY = {
     'name': 'iRobot',
@@ -7,17 +7,17 @@ COMPANY = {
     'ats': 'icims',
 
     'home_page_url': 'http://www.irobot.com',
-    'jobs_page_url': 'https://careers-irobot.icims.com/jobs/intro',
+    'jobs_page_url': 'https://careers-irobot.icims.com/jobs/intro?in_iframe=1',
 
     'empcnt': [201,500],
 }
 
 locations = (
-    ('US-MA-', lambda x: x + 'Bedford'),
-    ('US-NC-', lambda x: x + 'Durham'),
-    ('US-CA-', lambda x: x + 'San Luis Obispo'),
-    ('US-FL-', lambda x: x + 'Miami'),
-    ('US-VA-', lambda x: x + 'Arlington'),
+    ('US-MA', lambda x: x + 'Bedford'),
+    ('US-NC', lambda x: x + 'Durham'),
+    ('US-CA', lambda x: x + 'San Luis Obispo'),
+    ('US-FL', lambda x: x + 'Miami'),
+    ('US-VA', lambda x: x + 'Arlington'),
 )
 
 # Locations in table only specify coutry state (US-MA-)
@@ -34,9 +34,10 @@ class IRobotJobScraper(IcimsJobScraper):
     def __init__(self):
         super(IRobotJobScraper, self).__init__(COMPANY)
 
-    def get_location_from_td(self, td):
-        l = td[-2].text
-        l = full_location(l)
+    def get_location_from_div(self, div):
+        y = {'itemprop': 'address'}
+        p = div.find('span', attrs=y)
+        l = full_location(p.text)
 
         if l is None:
             return None
