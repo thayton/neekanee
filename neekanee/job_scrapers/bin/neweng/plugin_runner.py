@@ -114,6 +114,9 @@ class PluginRunner(object):
 
     def get_plugin_jobs_page_domain(self):
         netloc = urlparse(self.plugin.COMPANY['jobs_page_url']).netloc
+        if isinstance(netloc, list):
+            netloc = netloc[0]
+
         domain = '.'.join(netloc.split('.')[-2:])
         return domain
 
