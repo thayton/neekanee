@@ -9,7 +9,7 @@ COMPANY = {
     'name': 'Skillshare',
     'hq': 'New York City, NY',
 
-    'home_page_url': 'http://www.skillshare.com.',
+    'home_page_url': 'http://www.skillshare.com',
     'jobs_page_url': 'https://skillshare.recruiterbox.com',
 
     'empcnt': [11,50]
