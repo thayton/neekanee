@@ -113,11 +113,13 @@ class PluginRunner(object):
         return filename
 
     def get_plugin_jobs_page_domain(self):
-        netloc = urlparse(self.plugin.COMPANY['jobs_page_url']).netloc
-        if isinstance(netloc, list):
-            netloc = netloc[0]
+        jobs_page_url = self.plugin.COMPANY['jobs_page_url']
+        if isinstance(jobs_page_url, list):
+            jobs_page_url = jobs_page_url[0]
 
+        netloc = urlparse(jobs_page_url).netloc
         domain = '.'.join(netloc.split('.')[-2:])
+
         return domain
 
 if __name__ == '__main__':
