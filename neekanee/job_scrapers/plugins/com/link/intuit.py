@@ -12,7 +12,7 @@ COMPANY = {
     'hq': 'Mountain View, CA',
 
     'home_page_url': 'http://www.intuit.com',
-    'jobs_page_url': 'http://jobs.intuit.com/careers/',
+    'jobs_page_url': 'http://jobs.intuit.com/searches.aspx?keyword=advanced+search&jobtitlekeyword=filter%20by%20job%20title&locationkeyword=filter%20by%20job%20location&dateKeyword=&categoryKeyword=&issearchpaging=True&isdate=True&pagenumber=',
 
     'empcnt': [5001, 10000]
 }
@@ -24,18 +24,22 @@ class IntuitJobScraper(JobScraper):
     def scrape_job_links(self, url):
         jobs = []
 
-        self.br.open(url)
+        pageno = 1
+        u = url + '%d' % pageno
+        pageno += 1
 
+        self.br.open(u)
+        
         while True:
             s = soupify(self.br.response().read())
-            d = s.find('div', id='contents')
-            x = {'class': 'tableSearchResults'}
-            t = d.find('table', attrs=x)
-            r = re.compile(r'/jobid\d+-\S+-jobs$')
-        
-            for a in s.findAll('a', href=r):
+            r = re.compile(r'^search_result_link_\d+$')
+
+            for a in s.findAll('a', id=r):
                 tr = a.findParent('tr')
                 td = tr.findAll('td')
+
+                if len(td[1].text.strip()) == 0:
+                    continue
 
                 l = self.parse_location(td[1].text)
                 if not l:
@@ -46,11 +50,17 @@ class IntuitJobScraper(JobScraper):
                 job.url = urlparse.urljoin(self.br.geturl(), a['href'])
                 job.location = l
                 jobs.append(job)
+                
+            f = lambda x: x.name == 'a' and x.text == '%d' % pageno
+            a = s.find(f)
 
-            try:
-                self.br.follow_link(self.br.find_link(text='Next page'))
-            except mechanize.LinkNotFoundError:
+            if not a:
                 break
+
+            u = url + '%d' % pageno
+            pageno += 1
+
+            self.br.open(u)
 
         return jobs
 
@@ -60,15 +70,12 @@ class IntuitJobScraper(JobScraper):
         new_jobs = self.new_job_listings(job_list)
 
         for job in new_jobs:
-            try:
-                self.br.open(job.url)
-            except:
-                continue
+            self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            x = {'class': 'jobDesc'}
+            x = {'class': 'box jobDesc'}
             d = s.find('div', attrs=x)
-
+            
             job.desc = get_all_text(d)
             job.save()
 
