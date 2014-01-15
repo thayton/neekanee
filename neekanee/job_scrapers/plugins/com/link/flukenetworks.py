@@ -11,7 +11,7 @@ COMPANY = {
     'hq': 'Everett, WA',
 
     'home_page_url': 'http://www.flukenetworks.com',
-    'jobs_page_url': 'http://flukenetworks.jobs/joblisting/?num_items=50&offset=0',
+    'jobs_page_url': 'http://flukenetworks.jobs/jobs/ajax/joblisting/?num_items=50&offset=0',
 
     'empcnt': [501,1000]
 }
