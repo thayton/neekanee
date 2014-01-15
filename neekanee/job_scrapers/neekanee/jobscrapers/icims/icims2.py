@@ -8,6 +8,7 @@ from neekanee_solr.models import *
 class IcimsJobScraper(JobScraper):
     def __init__(self, company_dict):
         super(IcimsJobScraper, self).__init__(company_dict)
+        self.use_company_location = False
 
     def scrape_job_links(self, urls):
         jobs = []
@@ -33,7 +34,9 @@ class IcimsJobScraper(JobScraper):
                     p = d.find('span', attrs=y)
                     l = None
 
-                    if hasattr(self, 'get_location_from_div'):
+                    if self.use_company_location:
+                        l = self.company.location
+                    elif hasattr(self, 'get_location_from_div'):
                         l = self.get_location_from_div(d)
                     elif p and len(p.text.strip()) == 0:
                         p = p.meta['content']
