@@ -24,10 +24,6 @@ class CareJobScraper(TaleoJobScraper):
         else:
             return None
 
-    def get_desc_from_s(self, s):
-        t = s.find('table', id='care-contentarea-table')
-        return get_all_text(t)
-
 def get_scraper():
     return CareJobScraper()
 
