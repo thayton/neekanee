@@ -31,14 +31,27 @@ class UsfJobScraper(JobScraper):
             x = {'id': r, 'name': r}
 
             for a in s.findAll('a', attrs=x):
-                f = s.find('form', attrs={'name': 'win0'})
-                f['ICAction'] = a['id']
+                tr = a.findParent('tr')
+                td = tr.findAll('td')
 
+                jobid = td[-4].text
+
+                parms = '?Page=HRS_CE_JOB_DTL&Action=A&JobOpeningId=%s&SiteId=1&PostingSeq=1'
+                parms = parms % jobid
+
+                url = urlparse.urljoin(self.br.geturl(), parms)
+
+                #
+                # If you click on "Email to Friend" you'll see that
+                # this is the link that is used to refer to a specific
+                # posting:
+                #
+                # https://gems.fastmail.usf.edu:4440/psp/gemspro-tam/EMPLOYEE/HRMS/c/HRS_HRAM.HRS_CE.GBL?Page=HRS_CE_JOB_DTL&Action=A&JobOpeningId=3314&SiteId=1&PostingSeq=1
+                #
                 job = Job(company=self.company)
                 job.title = a.text
                 job.location = self.company.location
-                job.url = urlparse.urljoin(self.br.geturl(), f['action'])
-                job.url_data = urllib.urlencode({'ICAction': a['id']})
+                job.url = url
                 jobs.append(job)
 
             a = s.find('a', id='HRS_APPL_WRK_HRS_LST_NEXT')
@@ -58,14 +71,7 @@ class UsfJobScraper(JobScraper):
         new_jobs = self.new_job_listings(job_list)
 
         for job in new_jobs:
-            html = self.urlencoded_form_to_html_form(job.url, job.url_data)
-            html = str(html) # Required!
-            resp = mechanize.make_response(html, [("Content-Type", "text/html")],
-                                           job.url, 200, "OK")
-
-            self.br.set_response(resp)
-            self.br.select_form(nr=0)
-            self.br.submit()
+            self.br.open(job.url)
 
             z = soupify(self.br.response().read())
             d = z.find('div', id='win0divPSPAGECONTAINER')
