@@ -28,6 +28,10 @@ class TaleoJobScraper(JobScraper):
 
                 x = {'class': 'morelocation'}
                 l = td.find('div', attrs=x)
+
+                if not l:
+                    continue
+
                 l = self.parse_location(l.text)
 
                 if not l:
