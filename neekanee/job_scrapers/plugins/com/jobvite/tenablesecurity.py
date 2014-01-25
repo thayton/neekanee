@@ -27,24 +27,24 @@ class TenableSecurityJobScraper(JobScraper):
 
         s = soupify(self.br.response().read())
         x = {'class': 'joblist'}
-        u = s.find('ul', attrs=x)
         r = re.compile(r'jvi=(.*)$')
         
-        for a in u.findAll('a', href=r):
-            l = a.parent.span
-            l = self.parse_location(l.text)
+        for u in s.findAll('ul', attrs=x):
+            for a in u.findAll('a', href=r):
+                l = a.parent.span
+                l = self.parse_location(l.text)
 
-            if not l:
-                continue
+                if not l:
+                    continue
 
-            m = re.search(r, a['href'])
-            jobid = m.group(1)
+                m = re.search(r, a['href'])
+                jobid = m.group(1)
 
-            job = Job(company=self.company)
-            job.title = a.text
-            job.url = url_query_add(self.br.geturl(), {'j': m.group(1)}.items())
-            job.location = l
-            jobs.append(job)
+                job = Job(company=self.company)
+                job.title = a.text
+                job.url = url_query_add(self.br.geturl(), {'j': m.group(1)}.items())
+                job.location = l
+                jobs.append(job)
 
         return jobs
 
