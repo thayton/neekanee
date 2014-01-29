@@ -2,6 +2,7 @@ import re, urlparse
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
+from neekanee.urlutil import url_query_get
 
 from neekanee_solr.models import *
 
@@ -10,7 +11,7 @@ COMPANY = {
     'hq': 'Omaha, NE',
 
     'home_page_url': 'http://www.kiewit.com',
-    'jobs_page_url': 'http://kiewitjobs.com/careers/',
+    'jobs_page_url': 'http://jobs.kiewit.com/ajax/joblisting/?num_items=50&offset=0',
 
     'empcnt': [10001]
 }
@@ -22,35 +23,35 @@ class KiewitJobScraper(JobScraper):
     def scrape_job_links(self, url):
         jobs = []
 
-        self.br.open(url)
+        d = url_query_get(url, ['num_items', 'offset'])
+        num_items = int(d['num_items'])
+        offset = int(d['offset'])
 
-        x = re.compile(r'^jobs_list_link_\d+$')
-        y = {'class': 'location'}
+        self.br.addheaders = [('X-Requested-With', 'XMLHttpRequest')]
+        self.br.open(url)
 
         while True:
             s = soupify(self.br.response().read())
-            d = s.find('div', id='SearchResultsConteiner')
+            x = {'class': 'direct_joblisting '}
+            y = {'class': 'direct_joblocation'}
 
-            for a in d.findAll('a', id=x):
-                tr = a.findParent('tr')
-                td = tr.find('td', attrs=y)
+            if len(s.findAll('li', attrs=x)) == 0:
+                break # Done
 
-                l = self.parse_location(td.text)
+            for li in s.findAll('li', attrs=x):
+                d = li.find('div', attrs=y)
+                l = self.parse_location(d.text)
                 if not l:
                     continue
 
                 job = Job(company=self.company)
-                job.title = a.text
-                job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-                job.url = job.url.encode('utf8')
+                job.title = li.a.text
+                job.url = urlparse.urljoin(self.br.geturl(), li.a['href'])
                 job.location = l
                 jobs.append(job)
 
-            a = s.find('a', id='jobs_next_page_link')
-            if not a:
-                break
-
-            u = urlparse.urljoin(self.br.geturl(), a['href'])
+            offset += num_items
+            u = url_query_add(self.br.geturl(), {'offset': '%d' % offset}.items())
             self.br.open(u)
 
         return jobs
@@ -61,17 +62,11 @@ class KiewitJobScraper(JobScraper):
         new_jobs = self.new_job_listings(job_list)
 
         for job in new_jobs:
-            try:
-                self.br.open(job.url)
-            except:
-                continue
+            self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            x = {'class': 'box jobDesc'}
-            d = s.find('div', id='jobDesc')
-
-            if not d:
-                continue
+            x = {'itemtype': 'http://schema.org/JobPosting'}
+            d = s.find('div', attrs=x)
 
             job.desc = get_all_text(d)
             job.save()
