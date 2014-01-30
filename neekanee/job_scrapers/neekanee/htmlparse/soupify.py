@@ -5,6 +5,19 @@ from django.utils.encoding import smart_str, smart_unicode
 from unescape import unescape
 from BeautifulSoup import BeautifulSoup, Comment, Tag
 
+#
+# http://stackoverflow.com/questions/15198426/fixing-invalid-json-escape
+#
+invalid_escape = re.compile(r'\\[0-7]{1,3}')  # up to 3 digits for byte values up to FF
+
+def replace_with_byte(match):
+    return chr(int(match.group(0)[1:], 8))
+
+def repair(brokenjson):
+    return invalid_escape.sub(replace_with_byte, brokenjson)
+
+##############################
+
 def soupify(page):
     s = BeautifulSoup(page)
 
