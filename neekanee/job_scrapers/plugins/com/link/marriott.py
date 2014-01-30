@@ -1,7 +1,7 @@
 import re, urlparse, json, mechanize, urllib
 
 from neekanee.jobscrapers.jobscraper import JobScraper
-from neekanee.htmlparse.soupify import soupify, get_all_text
+from neekanee.htmlparse.soupify import soupify, get_all_text, repair
 
 from neekanee_solr.models import *
 
@@ -33,7 +33,7 @@ class MarriottJobScraper(JobScraper):
             resp = mechanize.Request(url, data)
             
             r = mechanize.urlopen(resp)
-            d = json.loads(r.read())
+            d = json.loads(repair(r.read()))
             v = d['jobs'].values()
 
             if len(v) == 0:
