@@ -46,6 +46,7 @@ class DellJobScraper(JobScraper):
                 job = Job(company=self.company)
                 job.title = a.text
                 job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+                job.url = job.url.encode('utf8')
                 job.location = l
                 jobs.append(job)
                 
