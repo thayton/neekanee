@@ -11,7 +11,7 @@ COMPANY = {
     'hq': 'Redwood City, CA',
 
     'home_page_url': 'https://www.isc.org/',
-    'jobs_page_url': 'https://www.isc.org/wordpress/about/jobs/',
+    'jobs_page_url': 'https://www.isc.org/mission/jobs/',
 
     'empcnt': [51,200]
 }
@@ -26,12 +26,9 @@ class IscJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        f = lambda x: x.name == 'h3' and x.text == 'Open Positions'
-        h = s.find(f)
-        u = h.findNext('ul')
-        r = re.compile(r'/jobs/[^/]+/$')
+        r = re.compile(r'\?jobs=')
 
-        for a in u.findAll('a', href=r):
+        for a in s.findAll('a', href=r):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
@@ -49,9 +46,7 @@ class IscJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='main')
-            x = {'class': re.compile(r'template-page\s+content')}
-            d = d.find('div', attrs=x)
+            d = s.find('div', id='page-wrap')
 
             job.desc = get_all_text(d)
             job.save()
