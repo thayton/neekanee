@@ -9,7 +9,7 @@ COMPANY = {
     'name': 'Lever',
     'hq': 'San Francisco, CA',
 
-    'home_page_url': 'http://www.lever.com',
+    'home_page_url': 'https://lever.co',
     'jobs_page_url': 'https://jobs.lever.co/lever',
 
     'empcnt': [1,10]
