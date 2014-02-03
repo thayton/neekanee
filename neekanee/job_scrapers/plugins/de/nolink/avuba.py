@@ -1,4 +1,4 @@
-import re, urlparse
+import re, urlparse, json
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
@@ -11,7 +11,7 @@ COMPANY = {
     'hq': 'Berlin, Germany',
 
     'home_page_url': 'http://www.avuba.de',
-    'jobs_page_url': 'https://www.avuba.de/#/jobs',
+    'jobs_page_url': 'https://cdn.contentful.com/spaces/90xvvflgedhc/entries?access_token=73e6f5b084822947bcbb5e281e989644fb2c321768eb82b93015d4a34360b233&content_type=58J6Ld4U7eC0owYUwkY4u2&locale=en',
 
     'empcnt': [1,10]
 }
@@ -20,37 +20,23 @@ class AvubaJobScraper(JobScraper):
     def __init__(self):
         super(AvubaJobScraper, self).__init__(COMPANY)
 
-    def scrape_job_links(self, url):
-        jobs = []
-
-        self.br.open(url)
-
-        s = soupify(self.br.response().read())
-        r = re.compile(r'/document/d/')
-        
-        for a in s.findAll('a', href=r):
-            d = a.findParent('div')
-            job = Job(company=self.company)
-            job.title = d.h4.text
-
-            # URL is to a Google .doc - we update the URL so that it exports a .txt file
-            # to us when we download it below
-            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-            job.url = urlparse.urljoin(job.url, 'export?format=txt')
-
-            job.location = self.company.location
-            jobs.append(job)
-
-        return jobs
-
     def scrape_jobs(self):
-        job_list = self.scrape_job_links(self.company.jobs_page_url)
-        self.prune_unlisted_jobs(job_list)
-        new_jobs = self.new_job_listings(job_list)
+        self.br.open(self.company.jobs_page_url)
+        
+        r = self.br.response()
+        j = json.loads(r.read())
 
-        for job in new_jobs:
-            self.br.open(job.url)
-            job.desc = self.br.response().read()
+        self.company.job_set.all().delete()
+
+        for i in j['items']:
+            f = i['fields']
+            s = soupify(f['body'])
+
+            job = Job(company=self.company)
+            job.title = f['title']
+            job.url = self.br.geturl()
+            job.location = self.company.location
+            job.desc = get_all_text(s)
             job.save()
 
 def get_scraper():
