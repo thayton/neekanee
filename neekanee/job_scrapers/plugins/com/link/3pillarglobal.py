@@ -2,6 +2,7 @@ import re, urllib, urlparse
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
+from neekanee.urlutil import url_query_del
 
 from neekanee_solr.models import *
 
@@ -10,7 +11,7 @@ COMPANY = {
     'hq': 'Fairfax, VA',
 
     'home_page_url': 'http://www.3pillarglobal.com',
-    'jobs_page_url': 'http://www.3pillarglobal.com/who-we-are/careers',
+    'jobs_page_url': 'http://cats.3pillarglobal.com/jobs/',
 
     'empcnt': [501,1000]
 }
@@ -25,16 +26,11 @@ class ThreePillarJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id='open-positions')
-        r = re.compile(r'/jobs/details\.php\?jid=[a-z0-9]+$')
-        x = re.compile(r'(tab-\d+-content)')
+        r = re.compile(r'^details\.php\?jid=')
 
-        for a in d.findAll('a', href=r):
-            v = a.findParent('div', attrs={'class': x})
-            m = re.search(x, v['class'])
-
-            p = d.find('li', attrs={'rel': m.group(1)})
-            l = self.parse_location(p.text)
+        for a in s.findAll('a', href=r):
+            p = a.findParent('li')
+            l = self.parse_location(p.span.text)
 
             if not l:
                 continue
@@ -42,6 +38,7 @@ class ThreePillarJobScraper(JobScraper):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.url = url_query_del(job.url, 'PHPSESSID')
             job.location = l
             jobs.append(job)
 
@@ -56,7 +53,8 @@ class ThreePillarJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            t = s.find('table', id='maintable')
+            t = s.h1.findParent('table')
+            t = t.findParent('table')
             
             job.desc = get_all_text(t)
             job.save()
