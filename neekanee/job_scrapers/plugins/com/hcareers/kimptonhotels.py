@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'San Francisco, CA',
 
     'home_page_url': 'http://www.kimptonhotels.com',
-    'jobs_page_url': 'http://www.kimptonhotels.com/careers/jobsearch.aspx',
+    'jobs_page_url': 'http://www.hcareers.com/seeker/employer-profiles/kimpton-hotel-restaurant-group/jobs?all=true',
 
     'empcnt': [5001,10000]
 }
@@ -23,14 +23,6 @@ class KimptonHotelsJobScraper(JobScraper):
         jobs = []
 
         self.br.open(url)
-        self.br.follow_link(self.br.find_link(tag='iframe'))
-
-        def select_form(form):
-            return form.method == 'GET' and form.attrs.has_key('action') and \
-                form.attrs['action'].endswith('search-results')
-
-        self.br.select_form(predicate=select_form)
-        self.br.submit(name='form.commit')
 
         s = soupify(self.br.response().read())
         r = re.compile(r'view\?jobAdId=\d+$')
@@ -66,3 +58,7 @@ class KimptonHotelsJobScraper(JobScraper):
 
 def get_scraper():
     return KimptonHotelsJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
