@@ -4,7 +4,7 @@ COMPANY = {
     'name': 'Echoing Green',
     'hq': 'New York, NY',
 
-    'home_page_url': 'http://www.echoinggreen.com',
+    'home_page_url': 'http://www.echoinggreen.org',
     'jobs_page_url': 'http://echoing-green.workable.com',
 
     'empcnt': [11,50]
