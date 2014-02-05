@@ -1,7 +1,7 @@
 from neekanee.jobscrapers.workable.workable import WorkableJobScraper
 
 COMPANY = {
-    'name': 'Interweave',
+    'name': 'Interweave Agency',
     'hq': 'Athens, Greece',
 
     'home_page_url': 'http://www.interweaveagency.gr',
