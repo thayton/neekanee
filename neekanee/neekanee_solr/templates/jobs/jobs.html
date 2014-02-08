@@ -53,7 +53,7 @@
                         <input class="input_as_link" type="submit" value="{{ j.title }}"/>
                       </form>
                     {% else %}
-                      <a onclick="_gaq.push(['_trackEvent', 'Jobs', 'Organic Click', '{{j.title}}',1,true])" rel="nofollow" href="{{ j.url }}" target="_blank">
+                      <a onclick="_gaq.push(['_trackEvent', 'Jobs', 'Organic Click', '{{j.title}}',1,true])" rel="nofollow" href="/job/{{ j.md5 }}" target="_blank">
                         <b>{{ j.title }}</b>
                       </a>
                     {% endif %}
