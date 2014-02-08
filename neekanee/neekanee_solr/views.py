@@ -190,6 +190,7 @@ class SearchResults(Results):
         self.sort_facet_fields()
         self.highlight_desc()
         self.set_companies()
+        self.set_md5()
 
     def facet_ranges_to_facet_fields(self):
         """
@@ -209,6 +210,14 @@ class SearchResults(Results):
         if self.highlighting:
             for doc in self.docs:
                 doc['highlight'] = ''.join(self.highlighting[doc['id']]['desc']) + '...'
+
+    def set_md5(self):
+        """
+        Should set md5 when putting jobs into Solr instead of for each query 
+        """
+        for doc in self.docs:
+            job = Job.objects.get(pk=doc['id'])
+            doc['md5'] = job.md5
 
     def set_companies(self):
         """ 
@@ -436,6 +445,13 @@ def browse_jobs_by_job_title(request, title):
     vars.update({'title_startswith': title})
     vars.update({'job_titles': job_titles[title]})
     return render_to_response('jobs/browse_jobs_by_job_title.html', vars)
+
+def view_job(request, md5):
+    job = get_object_or_404(Job, md5=md5)    
+    vars = RequestContext(request)
+    vars.update({'job': job})
+    # XXX Handle POST forms
+    return HttpResponseRedirect(job.url)
 
 def filter_companies(request):
     """
