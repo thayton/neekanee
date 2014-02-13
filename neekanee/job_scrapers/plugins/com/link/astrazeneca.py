@@ -1,4 +1,4 @@
-import re, urlparse, mechanize
+import re, urlparse, mechanize, urllib2
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
@@ -52,6 +52,7 @@ class AstraZenecaJobScraper(JobScraper):
                 job = Job(company=self.company)
                 job.title = a.text
                 job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+                job.url = urllib2.quote(job.url, '/:?&=,')
                 job.location = self.company.location
                 jobs.append(job)
 
