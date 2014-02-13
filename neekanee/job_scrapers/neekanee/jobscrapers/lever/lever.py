@@ -20,8 +20,10 @@ class LeverJobScraper(JobScraper):
 
         for a in s.findAll('a', attrs=x):
             p = a.parent.find('span', attrs=y)
-            l = self.parse_location(p.text)
+            if not p:
+                continue
 
+            l = self.parse_location(p.text)
             if not l:
                 continue
 
