@@ -36,6 +36,8 @@ urlpatterns += patterns('neekanee.neekanee_solr.views',
     (r'^jobs_by_company/',  'refine_by_company'),
     (r'^jobs_by_location/', 'refine_by_location'),
 
+    (r'^job/(?P<md5>[a-z0-9]+)$', 'view_job'),
+                        
     (r'^browse_jobs/$',                                 'browse_jobs'),
     (r'^browse_jobs/by_category/(?P<category>[^/]+)/$', 'browse_jobs_by_category'),                        
     (r'^browse_jobs/by_company/(?P<name>\w)/$',         'browse_jobs_by_company'),
