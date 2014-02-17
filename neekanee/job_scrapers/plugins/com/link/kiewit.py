@@ -2,7 +2,7 @@ import re, urlparse
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
-from neekanee.urlutil import url_query_get
+from neekanee.urlutil import url_query_get, url_query_add
 
 from neekanee_solr.models import *
 
