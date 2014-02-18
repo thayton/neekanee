@@ -66,6 +66,12 @@ class RaytheonJobScraper(JobScraper):
             self.br.form.new_control('hidden', '__EVENTARGUMENT', {'value': ''})
             self.br.form.new_control('hidden', '__LASTFOCUS',     {'value': ''})
             self.br.form.fixup()
+
+            # Next page doesn't seem to work unless we remove these controls
+            for control in self.br.form.controls[:]:
+                if control.type in ['submit', 'image', 'checkbox']:
+                    self.br.form.controls.remove(control)
+
             self.br.submit()
 
         return jobs
