@@ -33,6 +33,9 @@ class ShopifyJobScraper(JobScraper):
 
         for u in s.findAll('ul', attrs=x):
             for a in u.findAll('a', href=r):
+                if not a.em:
+                    continue
+
                 l = self.parse_location(a.em.text)
                 if not l:
                     continue
