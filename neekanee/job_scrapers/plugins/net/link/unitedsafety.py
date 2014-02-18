@@ -25,9 +25,14 @@ class UnitedSafetyJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
+        r = re.compile(r'\d{4}-\d{4}')
+
         json_jobs = json.loads(s.prettify())
 
         for j in json_jobs:
+            if not re.search(r, j['Job']):
+                continue
+
             l = self.parse_location(j['Location'])
             if not l:
                 continue
