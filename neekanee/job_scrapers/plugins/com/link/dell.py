@@ -69,14 +69,26 @@ class DellJobScraper(JobScraper):
         new_jobs = self.new_job_listings(job_list)
 
         for job in new_jobs:
-            self.br.open(job.url)
+            try:
+                self.br.open(job.url)
+            except:
+                print 'Exception on open - skipped'
+                continue
 
             s = soupify(self.br.response().read())
             x = {'class': 'box jobDesc'}
             d = s.find('div', attrs=x)
             
+            if not d:
+                continue
+
             job.desc = get_all_text(d)
-            job.save()
+
+            try:
+                job.save()
+            except:
+                print 'Exception on save - skipped'
+                continue
 
 def get_scraper():
     return DellJobScraper()
