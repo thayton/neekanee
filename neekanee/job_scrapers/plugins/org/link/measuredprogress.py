@@ -12,7 +12,7 @@ COMPANY = {
     'hq': 'Dover, NH',
 
     'home_page_url': 'http://www.measuredprogress.org',
-    'jobs_page_url': 'https://employment.measuredprogress.org/careers/?',
+    'jobs_page_url': 'https://employment.measuredprogress.org/careers/Careers.aspx',
 
     'empcnt': [201,500]
 }
@@ -25,12 +25,7 @@ class MeasuredProgressJobScraper(JobScraper):
         jobs = []
 
         self.br.open(url)
-        self.br.select_form('frmCRSS')
-
-        ctl = self.br.form.find_control(type='select')
-        ctl.set_value_by_label(['All'])
-
-        self.br.submit()
+        self.br.follow_link(self.br.find_link(url_regex=re.compile(r'Careers\.aspx\?adata=')))
 
         s = soupify(self.br.response().read())
         f = s.find('form', id='frmCRSS')
