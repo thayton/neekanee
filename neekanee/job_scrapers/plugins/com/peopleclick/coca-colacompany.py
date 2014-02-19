@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Atlanta, GA',
 
     'home_page_url': 'http://www.coca-colacompany.com',
-    'jobs_page_url': 'http://careers.peopleclick.com/careerscp/Client_CocaCola/external/search.do',
+    'jobs_page_url': 'http://careers.peopleclick.com/careerscp/client_cocacola/external/search.do',
 
     'empcnt': [10001]
 }
@@ -85,7 +85,10 @@ class CocaColaCompanyJobScraper(JobScraper):
         new_jobs = self.new_job_listings(job_list)
 
         for job in new_jobs:
-            self.br.open(job.url)
+            try:
+                self.br.open(job.url)
+            except:
+                continue
 
             s = soupify(self.br.response().read())
             a = {'name': 'jobDetails'}
