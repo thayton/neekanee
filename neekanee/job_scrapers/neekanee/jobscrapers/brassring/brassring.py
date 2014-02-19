@@ -10,6 +10,7 @@ class BrassringJobScraper(JobScraper):
     def __init__(self, company_dict, location_handler=None):
         super(BrassringJobScraper, self).__init__(company_dict)
         self.soupify_search_form = False
+        self.use_company_location = False # Default to company location for jobs
 
     def mkurl(self, job_link):
         """
@@ -76,6 +77,9 @@ class BrassringJobScraper(JobScraper):
                     job.title = self.get_title_from_formtext(x)
                 else:
                     job.title = a.text
+
+                if self.use_company_location:
+                    job.location = self.company.location
 
                 if hasattr(self, 'get_location_from_formtext'):
                     y = self.get_location_from_formtext(x)
