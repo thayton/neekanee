@@ -26,7 +26,7 @@ class MediaMattersJobScraper(JobScraper):
 
         s = soupify(self.br.response().read())
         x = {'class': 'issues job-index'}
-        r = re.compile(r'/jobs/\d{4}/\d{2}/\d{2}/\S+/\d+$')
+        r = re.compile(r'/jobs/\d{4}/\d{2}/\d{2}/[^/]+/\d+$')
         ul = s.find('ul', attrs=x)
 
         for a in ul.findAll('a'):
