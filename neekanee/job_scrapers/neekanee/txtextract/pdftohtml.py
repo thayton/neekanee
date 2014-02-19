@@ -39,9 +39,9 @@ def pdftohtml(data):
             os.dup2(w, 1)
             os.close(r)
             os.close(w)
-            os.execlp('pdftotext', 'pdftotext', '-htmlmeta', '/tmp/data.pdf', '-')
+            #os.execlp('pdftotext', 'pdftotext', '-htmlmeta', '/tmp/data.pdf', '-')
             # java -jar /usr/local/bin/tika-app-1.1.jar -h /tmp/data.pdf
-#            os.execlp('java', 'java', '-jar', '/usr/local/bin/tika-app-1.1.jar',  '-h', '/tmp/data.pdf')
+            os.execlp('java', 'java', '-jar', '/usr/local/bin/tika-app-1.1.jar',  '-h', '/tmp/data.pdf')
         else: # parent 
             os.close(w)
 
