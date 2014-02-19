@@ -23,21 +23,25 @@ class CuaJobScraper(JobScraper):
         self.br.open(self.company.jobs_page_url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'^#')
+        y = {'name': True}
         d = s.find('div', id='col1num2')
         d.extract()
 
         self.company.job_set.all().delete()
 
-        for a in d.findAll('a', href=r):
+        #
+        # Look directly for the anchors ('a') with the name attrib set
+        # since the actual links have fragment IDs that are often set
+        # to the wrong link
+        #
+        for a in d.findAll('a', attrs=y):
             job = Job(company=self.company)
-            job.title = a.parent.text
-            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.title = a.text
+            job.url = urlparse.urljoin(self.br.geturl(), '#' + a['name'])
             job.location = self.company.location
             job.desc = ''
 
-            y = {'name': a['href'][1:]}
-            x = d.find('a', attrs=y)
+            x = a
             x = x.next
 
             while x:
