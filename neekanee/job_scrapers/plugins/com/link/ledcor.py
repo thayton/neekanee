@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Vancouver, Canada',
 
     'home_page_url': 'http://www.ledcor.com',
-    'jobs_page_url': 'http://www.ledcor.com/careers/search-careers',
+    'jobs_page_url': 'http://jobs.ledcor.com/findjob.aspx',
 
     'empcnt': [10001]
 }
@@ -24,19 +24,20 @@ class LedcorJobScraper(JobScraper):
 
         self.br.open(url)
 
-        r = re.compile(r'^/job\?id=\d+$')
+        r = re.compile(r'^jobs/\d+-')
+        x = {'class': 'content_list-jobs'}
+        y = {'class': 'list-state-city'}
 
         pageno = 2
 
         while True:
             s = soupify(self.br.response().read())
-            t = s.find('table', id='job-search-list')
 
-            for a in t.findAll('a', href=r):
-                tr = a.findParent('tr')
-                td = tr.findAll('td')
+            for a in s.findAll('a', href=r):
+                d = a.findParent('div', attrs=x)
+                d = d.find('div', attrs=y)
 
-                l = self.parse_location(td[1].text)
+                l = self.parse_location(d.text)
                 if not l:
                     continue
 
@@ -46,11 +47,30 @@ class LedcorJobScraper(JobScraper):
                 job.location = l
                 jobs.append(job)
 
-            try:
-                self.br.follow_link(self.br.find_link(text='%d' % pageno))
-                pageno += 1
-            except mechanize.LinkNotFoundError:
+            def select_form(form):
+                return form.attrs.get('id', None) == 'aspnetForm'
+
+            f = lambda x: x.name == 'a' and x.text == '%d' % pageno
+            a = s.find(f)
+
+            if not a:
                 break
+
+            pageno += 1
+
+            z = re.compile(r"__doPostBack\('([^']+)','([^']+)'")
+            m = re.search(z, a['href'])
+
+            self.br.select_form(predicate=select_form)
+
+            ctl = self.br.form.find_control('ctl00$_refineSearch1$ButtonRefine')
+            self.br.form.controls.remove(ctl)
+
+            self.br.form.new_control('hidden', '__EVENTTARGET',   {'value': m.group(1)})
+            self.br.form.new_control('hidden', '__EVENTARGUMENT', {'value': m.group(2)})
+            self.br.form.new_control('hidden', '__LASTFOCUS',     {'value': ''})
+            self.br.form.fixup()
+            self.br.submit()
 
         return jobs
 
@@ -63,9 +83,9 @@ class LedcorJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            a = s.find('article', id='content-body')
+            d = s.find('div', id='detail-page')
 
-            job.desc = get_all_text(a)
+            job.desc = get_all_text(d)
             job.save()
 
 def get_scraper():
