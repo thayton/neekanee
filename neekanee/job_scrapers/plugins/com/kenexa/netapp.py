@@ -1,35 +1,35 @@
-import re
-
-from neekanee.jobscrapers.kenexa.kenexa import KenexaJobScraper
+from neekanee.jobscrapers.brassring.brassring import BrassringJobScraper
+from neekanee.htmlparse.soupify import soupify
 
 COMPANY = {
     'name': 'NetApp',
     'hq': 'Sunnyvale, CA',
 
     'ats': 'Kenexa',
-    'benefits': {'vacation': [(1,12),(2,15),(6,20),(10,25)]},
 
     'home_page_url': 'http://www.netapp.com',
-    'jobs_page_url': 'https://careers.netapp.com/1033/ASP/TG/cim_home.asp?partnerid=25093&siteid=5100',
-
-    'bptw_glassdoor': True,
-    'gptwcom_fortune': True,
+    'jobs_page_url': 'https://careers.netapp.com/tgwebhost/home.aspx?partnerid=25093&siteid=5100',
 
     'empcnt': [5001,10000]
 }
 
-class NetAppJobScraper(KenexaJobScraper):
+class NetAppJobScraper(BrassringJobScraper):
     def __init__(self):
         super(NetAppJobScraper, self).__init__(COMPANY)
+        self.soupify_search_form = True
 
-    def get_location_from_td(self, td):
-        y = re.sub('\(.*?\)', '', td[-1].text)
-        y = y.split(',')[0]
-        
-        return self.parse_location(y)
+    def get_url_from_formtext(self, x):
+        s = soupify(x['AutoReq'])
+        return s.a
 
-    def get_title_from_td(self, td):
-        return td[3].text
+    def get_title_from_formtext(self, x):
+        return x['FORMTEXT2']
+
+    def get_location_from_formtext(self, x):
+        l = x['FORMTEXT3']
+        l = self.parse_location(l)
+
+        return l
 
 def get_scraper():
     return NetAppJobScraper()
