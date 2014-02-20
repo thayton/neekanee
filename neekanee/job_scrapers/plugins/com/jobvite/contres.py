@@ -43,12 +43,13 @@ class ContresJobScraper(JobScraper):
         s = soupify(self.br.response().read())
         r = re.compile(r"jvGoToPage\('Job Description','','(.*)'\)")
         x = {'onclick': r}
+        y = {'class': 'joblocation'}
 
         for a in s.findAll('a', attrs=x):
-            tr = a.findParent('tr')
-            td = tr.findAll('td')
-        
-            l = self.parse_location(td[-1].text)
+            p = a.findParent('li')
+            p = p.find('span', attrs=y)
+            l = self.parse_location(p.text)
+
             if not l:
                 continue
 
