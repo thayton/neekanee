@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Springfield, MA',
 
     'home_page_url': 'http://deerfield.edu',
-    'jobs_page_url': 'http://deerfield.edu/heritage/people/faculty-staff/working-at-deerfield/staff-employment/',
+    'jobs_page_url': 'http://deerfield.edu/jobs',
 
     'empcnt': [51,200]
 }
@@ -24,11 +24,13 @@ class DeerfieldJobScraper(JobScraper):
 
         self.br.open(url)
 
-        s = soupify(self.br.response().read())
-        f = lambda x: x.name == 'h2' and x.text == 'Current Openings'
-        h = s.find(f)
-        u = h.findNext('ul')
-        r = re.compile(r'/working-at-deerfield/')
+        # HTML is broken - skipped past to just the <body>
+        d = self.br.response().read()
+        i = d.find('<body')
+        s = soupify(d[i:])
+        x = {'class': 'posts-list'}
+        u = s.find('ul', attrs=x)
+        r = re.compile(r'^/job/[^/]+/$')
 
         for a in u.findAll('a', href=r):
             job = Job(company=self.company)
@@ -47,10 +49,14 @@ class DeerfieldJobScraper(JobScraper):
         for job in new_jobs:
             self.br.open(job.url)
 
-            s = soupify(self.br.response().read())
-            d = s.find('div', id='colContent')
-            x = {'class': re.compile(r'entry_content')}
-            d = d.find('div', attrs=x)
+            # HTML is broken - skipped past to just the <body>
+            d = self.br.response().read()
+            i = d.find('<body')
+            s = soupify(d[i:])
+
+            r = re.compile(r'^/job/[^/]+/$')
+            a = s.find('a', href=r)
+            d = a.findParent('div', id='content_lc')
 
             job.desc = get_all_text(d)
             job.save()
