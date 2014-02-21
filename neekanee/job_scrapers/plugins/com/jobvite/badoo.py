@@ -2,6 +2,7 @@ import re, urllib, urlparse
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
+from neekanee.urlutil import url_query_get
 
 from neekanee_solr.models import *
 
@@ -24,7 +25,7 @@ class BadooJobScraper(JobScraper):
     def new_url(self, url, jobid):
         u = urlparse.urlparse(url)
         l = urlparse.parse_qsl(u.query)
-        x = [ (k,v) for (k,v) in l if k == 'c' ]
+        x = [ (k,v) for (k,v) in l if k != 'jvprefix' ]
 
         x.append(('page', 'Job Description'))
         x.append(('j',     jobid))
@@ -43,6 +44,9 @@ class BadooJobScraper(JobScraper):
         s = soupify(self.br.response().read())
         x = { 'class': 'jvjoblink', 'href': re.compile(r'jvi=') }
 
+        #
+        # https://hire.jobvite.com/CompanyJobs/Careers.aspx?k=JobListing&c=qjc9Vfwj&v=1&jvresize=https%3A%2F%2Fcorpus1.badoo.com%2Fjobvite_resize%2F&j=o7M3XfwD,Job&k=Job
+        #
         for a in s.findAll('a', attrs=x):
             tr = a.findParent('tr')
             td = tr.findAll('td')
@@ -51,9 +55,11 @@ class BadooJobScraper(JobScraper):
             if not l:
                 continue
 
+            jobid = url_query_get(a['href'], 'jvi')['jvi']
+
             job = Job(company=self.company)
             job.title = a.text
-            job.url = self.new_url(self.br.geturl(), a['href'])
+            job.url = self.new_url(self.br.geturl(), jobid)
             job.location = l
             jobs.append(job)
 
