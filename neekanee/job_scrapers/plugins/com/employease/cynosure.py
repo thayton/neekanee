@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Westford, MA',
 
     'home_page_url': 'http://www.cynosure.com',
-    'jobs_page_url': 'http://www.cynosure.com/about-us/careers.php',
+    'jobs_page_url': 'http://www.cynosure.com/about-cynosure/careers/job-openings/',
     'jobs_page_domain': 'eease.com',
 
     'empcnt': [501,1000]
@@ -19,6 +19,8 @@ COMPANY = {
 class BottomlineJobScraper(JobScraper):
     def __init__(self):
         super(BottomlineJobScraper, self).__init__(COMPANY)
+        self.br.addheaders = [('User-agent', 
+                               'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')]
 
     def scrape_job_links(self, url):
         jobs = []
@@ -27,30 +29,32 @@ class BottomlineJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'home.eease.com/recruit/\?id=\d+')
+        d = s.find('div', id='content')
+        r = re.compile(r'/careers/job-openings/[^/]+/$')
+        t = re.compile(r'home\.eease\.adp\.com/recruit/\?id=\d+')
 
-        for a in s.findAll('a', href=r):
+        for a in d.findAll('a', href=r):
             url = urlparse.urljoin(self.br.geturl(), a['href'])
+            self.br.open(url)
 
-            if url in job_links:
-                continue
-            else:
-                job_links.append(url)
+            z = soupify(self.br.response().read())
+            for a in z.findAll('a', href=t):
+                h = a.findPrevious('h3')
 
-            h = a.findPrevious('hr')
-            f = lambda x: x.name == 'strong' and re.search(r'Location', x.text)
-            g = h.findNext(f)
-            if not g:
-                continue
+                if len(h.contents) > 1:
+                    l = re.sub(r'Location\s*:', '', h.contents[-1])
+                    l = self.parse_location(l)
+                    if not l:
+                        continue
+                else:
+                    l = self.company.location
 
-            l = self.parse_location(g.nextSibling)
-            if not l:
-                continue
+                job = Job(company=self.company)
+                job.url = a['href']
+                job.location = l
+                jobs.append(job)
 
-            job = Job(company=self.company)
-            job.url = url
-            job.location = l
-            jobs.append(job)
+            self.br.back()
 
         return jobs
 
