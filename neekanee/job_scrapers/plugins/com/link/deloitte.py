@@ -77,7 +77,10 @@ class DeloitteJobScraper(JobScraper):
         new_jobs = self.new_job_listings(job_list)
 
         for job in new_jobs:
-            self.br.open(job.url)
+            try:
+                self.br.open(job.url)
+            except:
+                continue
 
             s = soupify(self.br.response().read())
             f = s.find('form', id='aspnetForm')
