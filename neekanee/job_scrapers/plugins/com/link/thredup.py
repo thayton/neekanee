@@ -9,10 +9,8 @@ COMPANY = {
     'name': 'thredUP',
     'hq': 'San Francisco, CA',
 
-    'benefits': {'vacation': []},
-
     'home_page_url': 'http://www.thredup.com',
-    'jobs_page_url': 'http://www.thredup.com/about/jobs',
+    'jobs_page_url': 'https://www.thredup.com/jobs/',
 
     'empcnt': [11,50]
 }
@@ -20,34 +18,43 @@ COMPANY = {
 class ThredUpJobScraper(JobScraper):
     def __init__(self):
         super(ThredUpJobScraper, self).__init__(COMPANY)
+        self.br.addheaders = [('User-agent', 
+                               'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')]
 
-    def scrape_jobs(self):
-        self.br.open(self.company.jobs_page_url)
+    def scrape_job_links(self, url):
+        jobs = []
+
+        self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'^#')
-        p = s.h3.findNext('p')
-        d = p.findParent('div')
-        d.extract()
+        r = re.compile(r'^/jobs/\d+-[^?]+\?gh_jid=\d+$')
 
-        self.company.job_set.all().delete()
-
-        for a in p.findAll('a', href=r):
+        for a in s.findAll('a', href=r):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
             job.location = self.company.location
-            job.desc = ''
+            jobs.append(job)
 
-            x = d.find(attrs={'id' : a['href'][1:]})
-            x = x.next
+        return jobs
 
-            while x and getattr(x, 'name', None) != 'h2':
-                if hasattr(x, 'name') is False: 
-                    job.desc += x
-                x = x.next
+    def scrape_jobs(self):
+        job_list = self.scrape_job_links(self.company.jobs_page_url)
+        self.prune_unlisted_jobs(job_list)
+        new_jobs = self.new_job_listings(job_list)
 
+        for job in new_jobs:
+            self.br.open(job.url)
+
+            s = soupify(self.br.response().read())
+            d = s.find('div', id='right_column')
+
+            job.desc = get_all_text(d)
             job.save()
 
 def get_scraper():
     return ThredUpJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
