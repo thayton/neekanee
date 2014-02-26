@@ -98,6 +98,13 @@ class BrassringJobScraper(JobScraper):
 
             numResults += len(j)
 
+            if self.soupify_search_form:
+                f = s.find('form', attrs={'name': 'frmMassSelect'})
+                html = f.prettify()
+                resp = mechanize.make_response(html, [("Content-Type", "text/html")],
+                                               self.br.geturl(), 200, "OK")
+                self.br.set_response(resp)
+
             self.br.select_form('frmMassSelect')
 
             if numResults >= int(self.br.form['totalrecords']):
