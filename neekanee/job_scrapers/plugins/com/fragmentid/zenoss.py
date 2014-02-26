@@ -9,7 +9,7 @@ COMPANY = {
     'hq': 'Annapolis, MD',
 
     'home_page_url': 'http://www.zenoss.com',
-    'jobs_page_url': 'http://www.zenoss.com/about/careers',
+    'jobs_page_url': 'http://zenoss.com/about/jobs',
 
     'empcnt': [51,200]
 }
