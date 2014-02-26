@@ -25,11 +25,19 @@ class ZeroMotorcyclesJobScraper(JobScraper):
         s = soupify(self.br.response().read())
         d = s.find('div', id='main-content')
         x = {'class': 'section'}
+        r = re.compile(r'^mailto:hr@')
         d.extract()
 
         self.company.job_set.all().delete()
 
         for v in d.findAll('div', attrs=x):
+            if not v.h2:
+                continue
+
+            a = v.find('a', href=r)
+            if not a:
+                continue
+
             job = Job(company=self.company)
             job.title = v.h2.text
             job.url = self.br.geturl()
