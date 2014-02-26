@@ -25,17 +25,14 @@ class ArincJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        x = {'class': 'jobTitle'}
+        x = {'class': 'jobTitle-link'}
         y = {'class': 'jobLocation'}
 
         pageno = 2
 
         while True:
-            for p in s.findAll('span', attrs=x):
-                if not p.a:
-                    continue
-
-                tr = p.findParent('tr')
+            for a in s.findAll('a', attrs=x):
+                tr = a.findParent('tr')
                 l = tr.find('span', attrs=y)
                 l = self.parse_location(l.text)
 
@@ -43,8 +40,8 @@ class ArincJobScraper(JobScraper):
                     continue
 
                 job = Job(company=self.company)
-                job.title = p.a.text
-                job.url = urlparse.urljoin(self.br.geturl(), p.a['href'])
+                job.title = a.text
+                job.url = urlparse.urljoin(self.br.geturl(), a['href'])
                 job.location = l
                 jobs.append(job)
 
