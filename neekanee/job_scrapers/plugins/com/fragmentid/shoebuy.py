@@ -23,12 +23,13 @@ class ShoeBuyJobScraper(JobScraper):
         self.br.open(self.company.jobs_page_url)
 
         s = soupify(self.br.response().read())
-        p = s.find('span', attrs={'class': 'anc_text'})
+        x = {'class': re.compile(r'infoEmployment')}
+        d = s.find('div', attrs=x)
         r = re.compile(r'^#')
 
         self.company.job_set.all().delete()
 
-        for a in p.findAll('a', href=r):
+        for a in d.findAll('a', href=r):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
@@ -50,3 +51,7 @@ class ShoeBuyJobScraper(JobScraper):
 
 def get_scraper():
     return ShoeBuyJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
