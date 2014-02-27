@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Albuquerque, NM',
 
     'home_page_url': 'http://www.sandia.gov/',
-    'jobs_page_url': 'https://ws03snlntz.sandia.gov/psp/applicant/EMPLOYEE/HRMS/c/HRS_HRAM.HRS_CE.GBL',
+    'jobs_page_url': 'https://ws11snlntz.sandia.gov/psp/applicant/EMPLOYEE/HRMS/c/HRS_HRAM.HRS_CE.GBL',
 
     'empcnt': [5001,10000]
 }
@@ -23,7 +23,7 @@ class SandiaJobScraper(JobScraper):
         jobs = []
 
         self.br.open(url)
-        self.br.follow_link(self.br.find_link(name='TargetContent', nr=1))
+        self.br.follow_link(self.br.find_link(name='TargetContent'))
 
         b = '/psp/applicant/EMPLOYEE/HRMS/c/HRS_HRAM.HRS_CE.GBL?Page=HRS_CE_JOB_DTL&Action=A&JobOpeningId=%d&SiteId=1&PostingSeq=1'
 
@@ -70,7 +70,7 @@ class SandiaJobScraper(JobScraper):
 
         for job in new_jobs:
             self.br.open(job.url)
-            self.br.follow_link(self.br.find_link(name='TargetContent', nr=1))
+            self.br.follow_link(self.br.find_link(name='TargetContent'))
 
             s = soupify(self.br.response().read())
             x = {'id': 'ACE_width', 'class': 'PSPAGECONTAINER'}
