@@ -10,8 +10,6 @@ COMPANY = {
     'name': 'ERI Economic Research Institute',
     'hq': 'Redmond, WA',
 
-    'benefits': {'vacation': []},
-
     'home_page_url': 'http://www.erieri.com',
     'jobs_page_url': 'http://www.erieri.com/index.cfm?FuseAction=Home.Careers',
 
@@ -71,3 +69,7 @@ class EriJobScraper(JobScraper):
 
 def get_scraper():
     return EriJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
