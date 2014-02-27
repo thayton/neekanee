@@ -20,37 +20,27 @@ class FractalAnalyticsJobScraper(JobScraper):
     def __init__(self):
         super(FractalAnalyticsJobScraper, self).__init__(COMPANY)
 
-    def scrape_job_links(self, url):
-        jobs = []
-
-        self.br.open(url)
+    def scrape_jobs(self):
+        self.br.open(self.company.jobs_page_url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'^/documents/jobs/\S+\.pdf$')
-        x = {'class': 'job_table'}
-        t = s.find('table', attrs=x)
+        r = re.compile(r'\.pdf$')
 
-        for a in t.findAll('a', href=r):
+        self.company.job_set.all().delete()
+
+        for h5 in s.findAll('h5'):
+            li = h5.findParent('li')
+            a = li.find('a', href=r)
+            l = self.parse_location(h5.span.text)
+
+            if not l:
+                continue
+
             job = Job(company=self.company)
-            job.title = a.text
-            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-            job.location = self.company.location
-            jobs.append(job)
-
-        return jobs
-
-    def scrape_jobs(self):
-        job_list = self.scrape_job_links(self.company.jobs_page_url)
-        self.prune_unlisted_jobs(job_list)
-        new_jobs = self.new_job_listings(job_list)
-
-        for job in new_jobs:
-            self.br.open(job.url)
-
-            d = self.br.response().read()
-            s = soupify(pdftohtml(d))
-
-            job.desc = get_all_text(s.html.body)
+            job.title = h5.contents[0]
+            job.url = a['href']
+            job.location = l
+            job.desc = get_all_text(li)
             job.save()
 
 def get_scraper():
