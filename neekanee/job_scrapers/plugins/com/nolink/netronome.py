@@ -9,10 +9,8 @@ COMPANY = {
     'name': 'Netronome',
     'hq': 'Santa Clara, CA',
 
-    'contact': 'careers@netronome.com',
-
     'home_page_url': 'http://www.netronome.com',
-    'jobs_page_url': 'http://www.netronome.com/pages/careers-north-america',
+    'jobs_page_url': 'http://www.netronome.com/careers/',
 
     'empcnt': [51,200]
 }
@@ -25,45 +23,46 @@ class NetronomeJobScraper(JobScraper):
         self.br.open(self.company.jobs_page_url)
 
         s = soupify(self.br.response().read())
-        a = s.find('a', title='North America')
-        u = a.findNext('ul')
-        r = re.compile(r'^/pages/([\w-]+)-jobs$')
+        u = s.find('ul', id='menu-careers')
+        r = re.compile(r'/careers/north-america/([^/]+)/$')
 
         self.company.job_set.all().delete()
 
         for a in u.findAll('a', href=r):
-            u = urlparse.urljoin(self.br.geturl(), a['href'])
             m = re.search(r, a['href'])
-            l = m.group(1)
+            l = self.parse_location(m.group(1))
 
-            self.br.open(u)
-
-            x = soupify(self.br.response().read())
-            m = x.find('div', attrs={'class': 'page-content'})
-            m.extract()
-
-            l = self.parse_location(l)
-            
             if not l:
                 continue
 
-            for h3 in m.findAll('h3'):
+            link = urlparse.urljoin(self.br.geturl(), a['href'])
+            self.br.open(link)
+
+            z = soupify(self.br.response().read())            
+            x = {'style': 'font-size: large;'}
+            y = {'class': 'page-restrict-output'}
+            v = z.find('div', attrs=y)
+            v.extract()
+
+            for p in v.findAll('span', attrs=x):
                 job = Job(company=self.company)
-                job.title = h3.text
+                job.title = p.text
                 job.location = l
                 job.url = self.br.geturl()
                 job.desc = ''
 
-                y = h3.next
+                y = p.next
                 while y:
                     name = getattr(y, 'name', None)
-                    if name == 'h3':
+                    if name == 'div' and y.get('class', None) == 'clear-line':
                         break
                     elif name is None:
                         job.desc += y
                     y = y.next
 
                 job.save()
+
+            self.br.back()
 
 def get_scraper():
     return NetronomeJobScraper()
