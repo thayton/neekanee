@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Shanghai, China',
 
     'home_page_url': 'http://www.bysoftchina.com',
-    'jobs_page_url': 'http://www.bysoftchina.com/about-bysoft-china/careers',
+    'jobs_page_url': 'http://www.bysoftchina.com/content/jobs',
 
     'empcnt': [11,50]
 }
