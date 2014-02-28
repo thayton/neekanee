@@ -73,7 +73,7 @@ class IntuitJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            x = {'class': 'box jobDesc'}
+            x = {'class': 'jobDesc'}
             d = s.find('div', attrs=x)
             
             job.desc = get_all_text(d)
