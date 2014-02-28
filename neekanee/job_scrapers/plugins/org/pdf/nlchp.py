@@ -10,10 +10,8 @@ COMPANY = {
     'name': 'The National Law Center on Homelessness & Poverty',
     'hq': 'Washington, DC',
 
-    'benefits': {'vacation': []},
-
     'home_page_url': 'http://www.nlchp.org',
-    'jobs_page_url': 'http://www.nlchp.org/employment.cfm',
+    'jobs_page_url': 'http://www.nlchp.org/employment',
 
     'empcnt': [11,50]
 }
@@ -28,17 +26,11 @@ class NlchpJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id='page_wrapper')
-        r = re.compile(r'/content/pubs/.*?\.pdf$')
+        r = re.compile(r'\.pdf$')
 
         for a in s.findAll('a', href=r):
-            if len(a.text) == 0:
-                continue
-
-            g = a.findPrevious('strong')
-
             job = Job(company=self.company)
-            job.title = g.text
+            job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
             job.location = self.company.location
             jobs.append(job)
