@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'New York, NY',
 
     'home_page_url': 'http://www.rankabove.com',
-    'jobs_page_url': 'http://www.rankabove.com/careers/',
+    'jobs_page_url': 'http://rankabove.com/why-rankabove/about-us/careers/',
 
     'empcnt': [11,50]
 }
@@ -25,7 +25,7 @@ class RankAboveJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id='content')
+        d = s.find('div', id='page-sidebar')
         x = {'class': 'sub-menu'}
         u = d.find('ul', attrs=x)
         r = re.compile(r'/careers/[^/]+/$')
@@ -48,9 +48,10 @@ class RankAboveJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='main')
+            h = s.find('header', id='post-header')
+            a = h.findParent('article')
 
-            job.desc = get_all_text(d)
+            job.desc = get_all_text(a)
             job.save()
 
 def get_scraper():
