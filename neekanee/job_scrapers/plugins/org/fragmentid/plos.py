@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'San Francisco, CA',
 
     'home_page_url': 'http://www.plos.org',
-    'jobs_page_url': 'http://www.plos.org/about/jobs/',
+    'jobs_page_url': 'http://www.plos.org/careers/',
 
     'empcnt': [51,200]
 }
@@ -23,9 +23,8 @@ class PlosJobScraper(JobScraper):
         self.br.open(self.company.jobs_page_url)
 
         s = soupify(self.br.response().read())
-        x = {'class': 'entry-content'}
-        d = s.find('div', attrs=x)
-        r = re.compile(r'/about/jobs/#')
+        d = s.find('div', id='content')
+        r = re.compile(r'/careers/#')
         d.extract()
 
         self.company.job_set.all().delete()
@@ -52,8 +51,11 @@ class PlosJobScraper(JobScraper):
                 continue
 
             x = x.next
-            while x and getattr(x, 'name', None) != 'h3':
-                if hasattr(x, 'name') is False: 
+            while x:
+                name = getattr(x, 'name', None)
+                if name == 'a' and x.get('name', False):
+                    break
+                elif name is None: 
                     job.desc += x
                 x = x.next
 
@@ -61,3 +63,7 @@ class PlosJobScraper(JobScraper):
 
 def get_scraper():
     return PlosJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
