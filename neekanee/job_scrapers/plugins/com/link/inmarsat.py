@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'London, England',
 
     'home_page_url': 'http://www.inmarsat.com',
-    'jobs_page_url': 'http://www.inmarsat.com/corporate/careers/job-opportunities/index.htm',
+    'jobs_page_url': 'http://www.inmarsat.com/about-us/careers/job-opportunities/',
 
     'empcnt': [501,1000]
 }
@@ -26,15 +26,10 @@ class InmarsatJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        x = {'class': 'primary-list-block'}
-        d = s.find('div', attrs=x)
-        r = re.compile(r'^/corporate/careers/job-opportunities/[a-z0-9-]+$')
+        r = re.compile(r'/career/[^/]+/$')
 
-        for a in d.findAll('a', href=r):
-            if a.parent.name != 'li' or a.h2 is None:
-                continue
-
-            h4 = a.findPrevious('h4')
+        for a in s.findAll('a', href=r):
+            h3 = a.findPrevious('h4')
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
@@ -52,8 +47,8 @@ class InmarsatJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            x = {'class': 'section main-content wysiwyg'}
-            d = s.find('div', attrs=x)
+            h = s.find('h4')
+            d = h.findParent('div')
 
             job.desc = get_all_text(d)
             job.save()
