@@ -89,11 +89,9 @@ class CustomInkJobScraper(JobScraper):
         jvurlargs = m.group(1)
         jvurlargs = HTMLParser.HTMLParser().unescape(jvurlargs)
 
-        v = { 'class': 'jobList' }
-        d = s.find('div', attrs=v)
         r = re.compile(r"jvGoToPage\('(.*)','','(.*)'\)")
 
-        for a in d.findAll('a', attrs={'href': r}):
+        for a in s.findAll('a', attrs={'href': r}):
             tr = a.findParent('tr')
             td = tr.findAll('td')
 
