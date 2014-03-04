@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Los Gatos, CA',
 
     'home_page_url': 'http://www.netflix.com',
-    'jobs_page_url': 'http://jobs.netflix.com/services/index.php/api/costcenter?function_id=1%20active',
+    'jobs_page_url': 'http://jobs.netflix.com/lib/functions.php',
 
     'empcnt': [1001,5000]
 }
@@ -24,19 +24,28 @@ class NetflixJobScraper(JobScraper):
 
         self.br.open(url)
 
-        d = json.loads(self.br.response().read())
+        u = 'http://jobs.netflix.com/lib/categories.php?function_id=%s%%20active'
+        s = json.loads(self.br.response().read())
 
-        for cost_center in d['data']:
-            for j in cost_center['jobs']:
-                l = self.parse_location(j['Location'])
-                if not l:
-                    continue
+        for x in s['data']:
+            function_id = x['function_id']
+            b = u % int(function_id)
 
-                job = Job(company=self.company)
-                job.title = j['Job_Posting_Title']
-                job.location = l
-                job.url = 'http://jobs.netflix.com/jobs.php?id=' + j['Job_Req_Id']
-                jobs.append(job)
+            self.br.open(b)
+
+            d = json.loads(self.br.response().read())
+
+            for cost_center in d['data']:
+                for j in cost_center['jobs']:
+                    l = self.parse_location(j['Location'])
+                    if not l:
+                        continue
+
+                    job = Job(company=self.company)
+                    job.title = j['Job_Posting_Title']
+                    job.location = l
+                    job.url = 'http://jobs.netflix.com/jobs.php?id=' + j['Job_Req_Id']
+                    jobs.append(job)
 
         return jobs
 
