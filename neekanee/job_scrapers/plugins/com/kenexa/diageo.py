@@ -17,11 +17,11 @@ class DiageoJobScraper(BrassringJobScraper):
         self.soupify_search_form = True
 
     def get_url_from_formtext(self, x):
-        s = soupify(x['FormText10'])
+        s = soupify(x['JobTitle'])
         return s.a
 
     def get_title_from_formtext(self, x):
-        s = soupify(x['FormText10'])
+        s = soupify(x['JobTitle'])
         return s.a.text
 
     def get_location_from_formtext(self, x):
