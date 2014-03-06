@@ -43,7 +43,7 @@ class DensoJobScraper(JobScraper):
                 p = a.findParent('li')
                 d = p.find('div', attrs=x)
                 v = d.findAll('div')
-                l = ', '.join(['%s' % x.contents[-1] for x in v[1:3]])
+                l = ', '.join(['%s' % z.contents[-1] for z in v[1:3]])
                 l = self.parse_location(l)
 
                 if not l:
