@@ -105,6 +105,9 @@ class AppleJobScraper(JobScraper):
             r = mechanize.urlopen(resp)
             j = json.loads(r.read())
 
+            if j['reqTextFields'] is None:
+                continue
+
             d = '\n'.join(['%s' % x for x in j['reqTextFields'].values()])
             r = j['requisitionInfo']
 
