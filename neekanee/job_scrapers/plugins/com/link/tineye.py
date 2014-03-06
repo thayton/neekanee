@@ -25,11 +25,10 @@ class TinEyeJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        f = lambda x: x.name == 'strong' and x.text == 'We are currently hiring for:'
-        g = s.find(f)
-        ul = g.findNext('ul')
+        x = {'class': 'careers'}
+        d = s.find('div', attrs=x)
 
-        for a in ul.findAll('a'):
+        for a in d.findAll('a'):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
