@@ -11,7 +11,7 @@ COMPANY = {
     'hq': 'London, England',
 
     'home_page_url': 'http://www.c40cities.org',
-    'jobs_page_url': 'http://www.c40cities.org/careers',
+    'jobs_page_url': 'http://www.c40.org/careers',
 
     'empcnt': [51,200]
 }
@@ -26,12 +26,11 @@ class C40JobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'\.pdf$')
-        t = s.find(text='Job Opportunities')
-        u = t.findNext('ul')
-        x = {'href': r, 'title': True }
+        r = re.compile(r'\.pdf\?\d+$')
+        x = {'class': 'careers'}
+        u = s.find('ul', attrs=x)
 
-        for a in u.findAll('a', attrs=x):
+        for a in u.findAll('a', href=r):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
