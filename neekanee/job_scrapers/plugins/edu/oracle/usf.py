@@ -39,8 +39,6 @@ class UsfJobScraper(JobScraper):
                 parms = '?Page=HRS_CE_JOB_DTL&Action=A&JobOpeningId=%s&SiteId=1&PostingSeq=1'
                 parms = parms % jobid
 
-                url = urlparse.urljoin(self.br.geturl(), parms)
-
                 #
                 # If you click on "Email to Friend" you'll see that
                 # this is the link that is used to refer to a specific
@@ -48,6 +46,8 @@ class UsfJobScraper(JobScraper):
                 #
                 # https://gems.fastmail.usf.edu:4440/psp/gemspro-tam/EMPLOYEE/HRMS/c/HRS_HRAM.HRS_CE.GBL?Page=HRS_CE_JOB_DTL&Action=A&JobOpeningId=3314&SiteId=1&PostingSeq=1
                 #
+                url = urlparse.urljoin(self.br.geturl(), parms)
+
                 job = Job(company=self.company)
                 job.title = a.text
                 job.location = self.company.location
