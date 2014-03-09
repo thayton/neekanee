@@ -54,12 +54,13 @@ class ActionLinkJobScraper(JobScraper):
                 job.location = l
                 jobs.append(job)
 
-            y = {'title': 'Next Page'}
-            i = s.find('input', attrs=y)
-            r = re.compile(r"'([^']+)")
-            m = re.search(r, i['onclick'])
+            f = lambda y: y.name == 'a' and y.text == '>>'
+            a = s.find(f)
 
-            tr = i.findParent('tr')
+            if not a:
+                break
+
+            tr = a.findParent('tr')
             b1 = tr.find('b', text=re.compile(r'\d+-\d+'))
             b2 = b1.findNext('b').text
             b1 = b1.split('-')[1]
@@ -67,7 +68,7 @@ class ActionLinkJobScraper(JobScraper):
             if int(b1) == int(b2):
                 break
 
-            self.br.open(m.group(1))
+            self.br.open(a['href'])
 
         return jobs
 
