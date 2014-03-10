@@ -1,4 +1,4 @@
-import re, urlparse, urlutil
+import re, urlparse, urlutil, mechanize
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Amsterdam, Netherlands',
 
     'home_page_url': 'http://www.booking.com',
-    'jobs_page_url': 'http://www.booking.com/jobs.html?st=top',
+    'jobs_page_url': 'https://workingatbooking.com/vacancies/',
 
     'empcnt': [1001,5000]
 }
@@ -25,41 +25,26 @@ class BookingJobScraper(JobScraper):
         jobs = []
 
         self.br.open(url)
-        self.br.follow_link(self.br.find_link(text='See all jobs'))
 
-        s = soupify(self.br.response().read())
-        x = {'class': 'countries'}
-        u = s.find('ul', attrs=x)
-        r = re.compile(r'country=[a-z]{2}')
-        
-        for a in u.findAll('a', href=r):
-            country = a.text
+        pageno = 2
 
-            u = urlparse.urljoin(self.br.geturl(), a['href'])
+        while True:
+            s = soupify(self.br.response().read())
+            x = {'class': 'article-title'}
 
-            self.br.open(u)
-
-            x = soupify(self.br.response().read())
-            d = x.find('div', id='jobsTmpl')
-            z = re.compile(r'job_id=\d+')
-
-            for a in d.findAll('a', href=z):
-                p = a.parent.span
-                l = p.text.rsplit('-', 1)
-                l = l[1] + ', ' + country
-                l = self.parse_location(l)
-
-                if not l:
-                    continue
-
+            for h in s.findAll('h3', attrs=x):
+                a = h.findParent('article')
+                
                 job = Job(company=self.company)
-                job.title = a.text
-                job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-                job.url = urlutil.url_query_del(job.url, 'sid')
-                job.location = l
+                job.title = a.h3.text
+                job.url = urlparse.urljoin(self.br.geturl(), a.a['href'])
                 jobs.append(job)
 
-            self.br.back()
+            try:
+                self.br.follow_link(self.br.find_link(text='%d' % pageno))
+                pageno += 1
+            except mechanize.LinkNotFoundError:
+                break
 
         return jobs
 
@@ -72,9 +57,15 @@ class BookingJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='job_detail')
+            n = s.find('section', id='vacancy-header')
+            x = {'class': 'location'}
+            h = n.find('h2', attrs=x)
+            l = self.parse_location(h.text)
 
-            job.desc = get_all_text(d)
+            if not l:
+                continue
+
+            job.desc = get_all_text(n.parent)
             job.save()
 
 def get_scraper():
