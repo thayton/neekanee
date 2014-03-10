@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Santa Clara, CA',
 
     'home_page_url': 'http://www.mcafee.com',
-    'jobs_page_url': 'http://careers.mcafee.com/search/?&search=Go&startrow=1',
+    'jobs_page_url': 'http://jobs.mcafee.com/searches.aspx?keyword=advanced+search&ISAdvanceSearch=True&ASCategory=-1&ASPostedDate=-1&ASCountry=-1&ASState=-1&ASCity=-1&ASLocation=-1&ASCompanyName=-1&ASCustom1=-1&ASCustom2=-1&ASCustom3=-1&ASCustom4=-1&ASCustom5=-1&ASIsRadius=False&ASCityStateZipcode=-1&ASDistance=-1&ASLatitude=-1&ASLongitude=-1&ASDistanceType=-1&jobtitlekeyword=filter%20by%20job%20title&locationkeyword=filter%20by%20job%20location&dateKeyword=&categoryKeyword=&issearchpaging=True&isdate=True&pagenumber=',
 
     'empcnt': [5001,10000]
 }
@@ -22,37 +22,44 @@ class McAfeeJobScraper(JobScraper):
     def scrape_job_links(self, url):
         jobs = []
 
-        self.br.open(url)
-        
-        pageno = 2
+        pageno = 1
+        u = url + '%d' % pageno
+        pageno += 1
 
+        self.br.open(u)
+        
         while True:
             s = soupify(self.br.response().read())
-            t = s.find('table', id='searchresults')
-            x = {'class': 'jobTitle'}
+            r = re.compile(r'^search_result_link_\d+$')
 
-            for p in t.findAll('span', attrs=x):
-                tr = p.findParent('tr')
+            for a in s.findAll('a', id=r):
+                tr = a.findParent('tr')
                 td = tr.findAll('td')
 
-                if len(td) == 0:
+                if len(td[1].text.strip()) == 0:
                     continue
 
-                l = self.parse_location(td[-2].text)
+                l = self.parse_location(td[1].text)
                 if not l:
                     continue
 
                 job = Job(company=self.company)
-                job.title = p.text
-                job.url = urlparse.urljoin(self.br.geturl(), p.a['href'])
+                job.title = a.text
+                job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+                job.url = job.url.encode('utf8')
                 job.location = l
                 jobs.append(job)
+                
+            f = lambda x: x.name == 'a' and x.text == '%d' % pageno
+            a = s.find(f)
 
-            try:
-                self.br.follow_link(self.br.find_link(text='Page %d' % pageno))
-                pageno += 1
-            except mechanize.LinkNotFoundError:
+            if not a:
                 break
+
+            u = url + '%d' % pageno
+            pageno += 1
+
+            self.br.open(u)
 
         return jobs
 
@@ -62,14 +69,26 @@ class McAfeeJobScraper(JobScraper):
         new_jobs = self.new_job_listings(job_list)
 
         for job in new_jobs:
-            self.br.open(job.url)
+            try:
+                self.br.open(job.url)
+            except:
+                print 'Exception on open - skipped'
+                continue
 
             s = soupify(self.br.response().read())
-            x = {'class': 'jobDisplay'}
+            x = {'class': 'box jobDesc'}
             d = s.find('div', attrs=x)
+            
+            if not d:
+                continue
 
             job.desc = get_all_text(d)
-            job.save()
+
+            try:
+                job.save()
+            except:
+                print 'Exception on save - skipped'
+                continue
 
 def get_scraper():
     return McAfeeJobScraper()
