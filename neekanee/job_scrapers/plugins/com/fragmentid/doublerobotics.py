@@ -22,24 +22,23 @@ class DoubleRoboticsJobScraper(JobScraper):
         self.br.open(self.company.jobs_page_url)
 
         s = soupify(self.br.response().read())
-        x = {'role': 'main'}
-        d = s.find('div', attrs=x)
+        d = s.find('div', id='page9')
         x = {'class': 'section'}
         d = d.find('div', attrs=x)
-        r = re.compile(r'^#\S+')
+        x = {'name': True}
         d.extract()
 
         self.company.job_set.all().delete()
 
-        for a in d.findAll('a', href=r):
+        for a in d.findAll('a', attrs=x):
+            h4 = a.findNext('h4')
             job = Job(company=self.company)
-            job.title = a.text
-            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.title = h4.text
+            job.url = urlparse.urljoin(self.br.geturl(), '#' + a['name'])
             job.location = self.company.location
             job.desc = ''
 
-            x = d.find('a', attrs={'name' : a['href'][1:]})
-            x = x.findNext('h4').next
+            x = h4.next
 
             while x:
                 name = getattr(x, 'name', None)
