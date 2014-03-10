@@ -54,7 +54,7 @@ class PartnersForCommunityJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            r = re.compile(r'home\.eease\.com/recruit/\?id=\d+$')
+            r = re.compile(r'home\.eease\.adp\.com/recruit/\?id=\d+$')
             
             self.br.follow_link(self.br.find_link(url_regex=r))
 
