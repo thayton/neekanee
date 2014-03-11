@@ -2,6 +2,7 @@ import re, urlparse
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
+from neekanee.txtextract.pdftohtml import pdftohtml
 
 from neekanee_solr.models import *
 
@@ -10,7 +11,7 @@ COMPANY = {
     'hq': 'Tubingen, Germany',
 
     'home_page_url': 'http://www.curevac.com',
-    'jobs_page_url': 'http://www.curevac.com/working_at_curevac.php',
+    'jobs_page_url': 'http://www.curevac.com/careers/open-positions/',
 
     'empcnt': [51,200]
 }
@@ -25,7 +26,7 @@ class CureVacJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'^working_at_curevac\.php\?uid=\d+$')
+        r = re.compile(r'\.pdf$$')
 
         for a in s.findAll('a', href=r):
             job = Job(company=self.company)
@@ -44,10 +45,10 @@ class CureVacJobScraper(JobScraper):
         for job in new_jobs:
             self.br.open(job.url)
 
-            s = soupify(self.br.response().read())
-            d = s.find('div', id='content-right')
+            d = self.br.response().read()
+            s = soupify(pdftohtml(d))
 
-            job.desc = get_all_text(d)
+            job.desc = get_all_text(s.html.body)
             job.save()
 
 def get_scraper():
