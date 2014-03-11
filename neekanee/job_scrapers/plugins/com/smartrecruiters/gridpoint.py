@@ -71,15 +71,16 @@ class GridPointJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', attrs={'class': 'jobAdWrapper'})
-            l = d.find('span', attrs={'class': 'jobAdLocation'})
+            h = s.find('h1', attrs={'class': 'jobName'})
+            n = h.findParent('section')
+            l = n.find('span', attrs={'class': 'jobLocation'})
             l = self.parse_location(l.text)
 
             if not l:
                 continue
 
             job.location = l
-            job.desc = get_all_text(d)
+            job.desc = get_all_text(n)
             job.save()
 
 def get_scraper():
