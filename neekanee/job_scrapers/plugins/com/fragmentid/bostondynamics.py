@@ -36,7 +36,7 @@ class BostonDynamicsJobScraper(JobScraper):
             job.location = self.company.location
             job.desc = ''
 
-            x = d.find(attrs={'name' : a['href'][1:]})
+            x = d.find('a', attrs={'name' : a['id']})
             x = x.next.findNext(text=re.compile(r'[^\n]'))
 
             while x:
@@ -51,3 +51,7 @@ class BostonDynamicsJobScraper(JobScraper):
 
 def get_scraper():
     return BostonDynamicsJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
