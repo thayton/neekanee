@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Atlanta, GA',
 
     'home_page_url': 'http://www.endgame.com',
-    'jobs_page_url': 'http://endgame.com/careers.html',
+    'jobs_page_url': 'http://www.endgame.com/careers/',
 
     'empcnt': [51,200]
 }
@@ -25,10 +25,10 @@ class EndgameJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        ul = s.find('ul', id='ind-jobs')
-        r = re.compile(r'^/job/[^.]+\.html$')
+        d = s.find('div', id='jobs')
+        r = re.compile(r'^/job/[^/]+/[^.]+\.html$')
         
-        for a in ul.findAll('a', href=r):
+        for a in d.findAll('a', href=r):
             job = Job(company=self.company)
             job.title = a.h2.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
