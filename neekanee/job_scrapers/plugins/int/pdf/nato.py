@@ -1,5 +1,6 @@
-import re, urlparse, urllib
+import re, urlparse, urllib, gzip
 
+from StringIO import StringIO
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
 from neekanee.txtextract.pdftohtml import pdftohtml
@@ -20,14 +21,19 @@ class NatoJobScraper(JobScraper):
     def __init__(self):
         super(NatoJobScraper, self).__init__(COMPANY)
         # Server is determined to return gzip no matter the accept-encoding we send
-        self.br.set_handle_gzip(True) 
+        self.br.addheaders = [('User-agent', 
+                               'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')]
 
     def scrape_job_links(self, url):
         jobs = []
 
         self.br.open(url)
 
-        s = soupify(self.br.response().read())
+        d = StringIO(self.br.response().read())
+        g = gzip.GzipFile(fileobj=d)
+        d = g.read()
+
+        s = soupify(d)
         t = s.find('table', id='tablesorterID')
         r = re.compile(r'/recruit/documents/.*\.pdf$')
 
