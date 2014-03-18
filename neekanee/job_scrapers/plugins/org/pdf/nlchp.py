@@ -32,6 +32,7 @@ class NlchpJobScraper(JobScraper):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.url = urllib.quote(job.url, ':/')
             job.location = self.company.location
             jobs.append(job)
 
