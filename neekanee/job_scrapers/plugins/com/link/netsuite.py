@@ -9,8 +9,6 @@ COMPANY = {
     'name': 'NetSuite',
     'hq': 'San Mateo, CA',
 
-    'contact': 'careers@netsuite.com',
-
     'home_page_url': 'http://www.netsuite.com',
     'jobs_page_url': 'http://www.netsuite.com/portal/career/openings.shtml',
 
@@ -27,20 +25,18 @@ class NetSuiteJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', attrs={'class': 'content '})
         r = re.compile(r'^/portal/career/openings-[a-z]{2}\.shtml')
-        x = re.compile(r'^/portal/common/career/\S+\.shtml$')
+        x = re.compile(r'^/portal/common/career/[^/]+/\d+\.shtml$')
 
-        for a in d.findAll('a', href=r):
+        for a in s.findAll('a', href=r):
             country = a.text
             u = urlparse.urljoin(self.br.geturl(), a['href'])
 
             self.br.open(u)
 
             z = soupify(self.br.response().read())
-            v = z.find('div', attrs={'class': 'content '})
 
-            for a in v.findAll('a', href=x):
+            for a in z.findAll('a', href=x):
                 l = a.findAllNext(text=True, limit=2)
                 if len(l) != 2:
                     continue
