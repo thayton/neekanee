@@ -25,14 +25,11 @@ class SfnJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        t = s.find('table', id='job_listing')
-        r = re.compile(r'^/jobs/\d+\.html$')
+        r = re.compile(r'/jobs/\d+\.html$')
 
-        for a in t.findAll('a', href=r):
-            tr = a.findParent('tr')
-            td = tr.findAll('td')
-
-            l = self.parse_location(td[2].text)
+        for a in s.findAll('a', href=r):
+            l = a.div.ul.findAll('li')[1]
+            l = self.parse_location(l.text)
             if not l:
                 continue
 
@@ -53,7 +50,7 @@ class SfnJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            x = {'class': 'content'}
+            x = {'itemprop': 'description'}
             d = s.find('div', attrs=x)
 
             job.desc = get_all_text(d)
