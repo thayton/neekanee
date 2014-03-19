@@ -35,7 +35,7 @@ class TrizettoJobScraper(JobScraper):
             s = soupify(self.br.response().read())
         
             for p in s.findAll('span', attrs=x):
-                if not p.a:
+                if p.parent.name == 'th' or not p.a:
                     continue
 
                 tr = p.findParent('tr')
