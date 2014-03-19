@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Portsmouth, NH',
 
     'home_page_url': 'http://www.bid2win.com',
-    'jobs_page_url': 'http://www.b2wsoftware.com/company/careers.aspx',
+    'jobs_page_url': 'http://www.b2wsoftware.com/company/b2w-careers/',
 
     'empcnt': [51,200]
 }
@@ -25,11 +25,10 @@ class Bid2WinJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        f = lambda x: x.name == 'h1' and x.text == 'B2W Careers'
-        h = s.find(f)
-        u = h.findNext('ul')
+        r = re.compile(r'/company/b2w-careers/[^/]+/$')
+        x = {'class': 'link-standard', 'href': r}
 
-        for a in u.findAll('a'):
+        for a in s.article.findAll('a', attrs=x):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
@@ -47,9 +46,8 @@ class Bid2WinJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            x = {'class': 'title'}
-            p = s.find('p', attrs=x)
-            d = p.findParent('div')
+            x = {'role': 'main'}
+            d = s.find('div', attrs=x)
 
             job.desc = get_all_text(d)
             job.save()
