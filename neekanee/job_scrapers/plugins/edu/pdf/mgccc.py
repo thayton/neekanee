@@ -10,11 +10,6 @@ COMPANY = {
     'name': 'Mississippi Gulf Coast Community College',
     'hq': 'Perkinston, MS',
 
-    'benefits': {
-        'url': 'http://www.mgccc.edu/Documents/HR/BENEFITS_PACKAGE.pdf',
-        'vacation': [(1,10),(4,13),(9,18),(16,19)]
-    },
-
     'home_page_url': 'http://www.mgccc.edu',
     'jobs_page_url': 'https://www.mgccc.edu/employees/employment-opportunities/',
 
@@ -31,10 +26,9 @@ class MgccJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'/wp-content/uploads/\d{4}/\d{2}/\S+\.pdf$')
-        x = {'title': True, 'href': r}
+        r = re.compile(r'/\?wpfb_dl=\d+$')
 
-        for a in s.findAll('a', attrs=x):
+        for a in s.findAll('a', href=r):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
