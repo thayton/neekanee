@@ -32,6 +32,7 @@ class WorkIncJobScraper(JobScraper):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.location = self.company.location
             jobs.append(job)
 
         return jobs
