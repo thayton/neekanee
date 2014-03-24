@@ -11,7 +11,7 @@ COMPANY = {
     'hq': 'Waltham, MA',
 
     'home_page_url': 'http://www.thermofisher.com',
-    'jobs_page_url': 'https://careers.thermofisher.com/joblist.html?erpc=alljobs',
+    'jobs_page_url': 'http://jobs.thermofisher.com',
 
     'empcnt': [10001]
 }
@@ -25,34 +25,22 @@ class ThermoFisherJobScraper(JobScraper):
 
         self.br.open(url)
 
-        while True:
-            s = soupify(self.br.response().read())
-            x = {'name': 'newjoblist'}
-            f = s.find('form', attrs=x)
-            r = re.compile(r'^viewjob\.html\?')
+        s = soupify(self.br.response().read())
+        r = re.compile(r'^/job-detail/[^/]+/\d+/$')
+        x = {'class': 'jobslink', 'href': r}
+        y = {'class': re.compile(r'joblocation')}
 
-            for a in f.findAll('a', href=r):
-                tr = a.findParent('tr')
-                td = tr.findAll('td')
+        for a in s.findAll('a', attrs=x):
+            d = a.find('div', attrs=y)
+            l = self.parse_location(d.get('title', d.text))
+            if not l:
+                continue
 
-                l = td[3].text.split(',')[0]
-                l = self.parse_location(l)
-
-                if not l:
-                    continue
-
-                job = Job(company=self.company)
-                job.title = a.text
-                job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-                job.url = url_query_del(job.url, 'JServSessionIdroot')
-                job.location = l
-                jobs.append(job)
-
-            try:
-                x = re.compile(r'^Next.+Page$')
-                self.br.follow_link(self.br.find_link(text_regex=x))
-            except mechanize.LinkNotFoundError:
-                break
+            job = Job(company=self.company)
+            job.title = a.span.text
+            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.location = l
+            jobs.append(job)
 
         return jobs
 
@@ -65,10 +53,9 @@ class ThermoFisherJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='container')
-            t = d.find('td', attrs={'class': 'tablebackgroundcolor'})
+            a = s.find('article', id='job-details')
 
-            job.desc = get_all_text(d)
+            job.desc = get_all_text(a)
             job.save()
 
 def get_scraper():
