@@ -39,6 +39,10 @@ class JnjJobScraper(JobScraper):
                 tr = p.findParent('tr')
 
                 l = tr.find('span', attrs=y)
+
+                if l.a:
+                    continue
+
                 l = self.parse_location(l.text)
 
                 if not l:
