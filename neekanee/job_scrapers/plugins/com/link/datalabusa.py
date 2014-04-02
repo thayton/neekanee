@@ -9,8 +9,6 @@ COMPANY = {
     'name': 'DataLab USA',
     'hq': 'Germantown, MD',
 
-    'benefits': {'vacation': []},
-
     'home_page_url': 'http://www.datalabusa.com',
     'jobs_page_url': 'http://www.datalabusa.com/careers',
 
@@ -27,10 +25,17 @@ class DataLabJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id='content')
-        r = re.compile(r'/careers/\d+$')
+        d = s.find('article', id='content')
+        r = re.compile(r'^/all-careers/\d+')
+        f = lambda x: x.name == 'a' and re.search(r, x.get('href', '')) and x.parent.name == 'span'
 
-        for a in d.findAll('a', href=r):
+        for a in d.findAll(f):
+            if len(a.text.strip()) == 0:
+                continue
+
+            if a.get('title'):
+                continue
+
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
@@ -48,7 +53,7 @@ class DataLabJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='content')
+            d = s.find('article', id='content')
 
             job.desc = get_all_text(d)
             job.save()
@@ -56,3 +61,6 @@ class DataLabJobScraper(JobScraper):
 def get_scraper():
     return DataLabJobScraper()
 
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
