@@ -12,7 +12,7 @@ COMPANY = {
     'ats': 'submit4jobs',
 
     'home_page_url': 'http://www.idirect.net',
-    'jobs_page_url': 'http://www.idirect.net/Company/Careers/Current-Positions.aspx',
+    'jobs_page_url': 'http://idirect.submit4jobs.com',
 
     'empcnt': [201,500]
 }
@@ -25,35 +25,25 @@ class iDirectJobScraper(JobScraper):
         jobs = []
 
         self.br.open(url)
-        self.br.select_form('jobsearchform')
-        self.br.form.set_all_readonly(False)
-        self.br.form['gojobsearch'] = '1'
-        self.br.submit()
 
-        pageno = 2
+        r = re.compile(r'^index\.cfm\?fuseaction=\d+\.viewjobdetail')
+        x = {'class': 'joblink', 'href': r}
+        
+        s = soupify(self.br.response().read())
 
-        while True:
-            for l in self.br.links(url_regex=re.compile(r'viewjobdetail')):
-                m = re.search(r'(.*)\W+\((.*)\)', l.text)
-                x = self.parse_location(m.group(2))
+        for a in s.findAll('a', attrs=x):
+            tr = a.findParent('tr')
+            td = tr.findAll('td')
 
-                if x is None:
-                    continue
+            l = self.parse_location(td[-2].text)
+            if l is None:
+                continue
 
-                job = Job(company=self.company)
-                job.title = m.group(1)
-                job.location = x
-                job.url = urlparse.urljoin(l.base_url, l.url)
-                jobs.append(job)
-
-            # Navigate to the next page
-            try:
-                p = r'gopage=' + str(pageno)
-                pageno += 1
-                n = self.br.find_link(url_regex=p)
-                self.br.follow_link(n)
-            except mechanize.LinkNotFoundError:
-                break
+            job = Job(company=self.company)
+            job.title = a.text
+            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.location = l
+            jobs.append(job)
 
         return jobs
 
@@ -66,11 +56,15 @@ class iDirectJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', attrs={'class': 'contentBody'})
-            t = d.table
+            x = {'name': 'applyonline'}
+            f = s.find('form', attrs=x)
 
-            job.desc = get_all_text(t)
+            job.desc = get_all_text(f)
             job.save()
 
 def get_scraper():
     return iDirectJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
