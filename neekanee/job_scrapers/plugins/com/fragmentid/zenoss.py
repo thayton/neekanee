@@ -35,6 +35,10 @@ class ZenossJobScraper(JobScraper):
 
             y = {'name' : a['href'][1:]}
             x = s.find(attrs=y)
+
+            if not x:
+                continue
+
             z = {'class': 'career-item-list'}
             u = x.findNext('ul', attrs=z)
 
