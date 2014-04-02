@@ -11,7 +11,7 @@ COMPANY = {
     'hq': 'Roma, Italy',
 
     'home_page_url': 'http://www.idlo.int',
-    'jobs_page_url': 'http://www.idlo.int/english/employment/Pages/EmploymentHome.aspx',
+    'jobs_page_url': 'http://www.idlo.org/english/employment/Pages/EmploymentHome.aspx',
 
     'empcnt': [51,200]
 }
@@ -25,25 +25,24 @@ class NatoJobScraper(JobScraper):
 
         self.br.open(url)
 
-        text = ['Professional Staff', 'General Service Staff', 'Project Consultancies', 
-                'Internship', 'Pro-Bono Opportunities', 'IDLO Consultant' ]
+        s = soupify(self.br.response().read())
+        r = re.compile(r'^ctl\d+_PlaceHolderMain_PageContent__ControlWrapper_RichHtmlField')
+        d = s.find('div', id=r)
+        r = re.compile(r'^/english/employment/apply/[^.]+\.aspx$')
 
-        for t in text:
-            try:
-                self.br.follow_link(self.br.find_link(text=t))
-            except mechanize.LinkNotFoundError:
-                continue
+        for a in d.findAll('a', href=r):
+            u = urlparse.urljoin(self.br.geturl(), a['href'])
+            self.br.open(u)
 
-            s = soupify(self.br.response().read())
-            r = re.compile(r'/DOCJob/\d+\.pdf$')
+            z = soupify(self.br.response().read())
+            y = re.compile(r'/DOCJob/\d+\.pdf$')
             x = {'href': r, 'target': '_blank'}
 
-            for a in s.findAll('a', href=r):
+            for a in z.findAll('a', href=y):
                 tr = a.findParent('tr')
                 td = tr.findAll('td')
             
                 l = self.parse_location(td[2].text)
-
                 if not l:
                     continue
 
