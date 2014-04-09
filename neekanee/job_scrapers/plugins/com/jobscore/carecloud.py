@@ -1,6 +1,6 @@
 import re, urlparse
 
-from neekanee.jobscrapers.jobscore.jobscore import JobScoreJobScraper
+from neekanee.jobscrapers.jobscore.jobscore2 import JobScoreJobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
 
 from neekanee_solr.models import *

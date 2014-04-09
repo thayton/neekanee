@@ -1,4 +1,4 @@
-from neekanee.jobscrapers.jobscore.jobscore import JobScoreJobScraper
+from neekanee.jobscrapers.jobscore.jobscore2 import JobScoreJobScraper
 
 COMPANY = {
     'name': '500friends',
@@ -12,3 +12,7 @@ COMPANY = {
 
 def get_scraper():
     return JobScoreJobScraper(COMPANY)
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
