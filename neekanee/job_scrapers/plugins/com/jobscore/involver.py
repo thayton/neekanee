@@ -1,4 +1,4 @@
-from neekanee.jobscrapers.jobscore.jobscore import JobScoreJobScraper
+from neekanee.jobscrapers.jobscore.jobscore2 import JobScoreJobScraper
 
 COMPANY = {
     'name': 'Involver',
