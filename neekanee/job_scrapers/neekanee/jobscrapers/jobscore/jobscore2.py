@@ -10,6 +10,8 @@ class JobScoreJobScraper(JobScraper):
         company_dict['ats'] = 'JobScore'
         self.follow_iframe = follow_iframe
         super(JobScoreJobScraper, self).__init__(company_dict)
+        self.br.addheaders = [('User-agent', 
+                               'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')]
 
     def scrape_job_links(self, url):
         jobs = []
