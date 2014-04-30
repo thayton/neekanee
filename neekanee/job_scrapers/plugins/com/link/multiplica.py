@@ -31,6 +31,10 @@ class MultiplicaJobScraper(JobScraper):
         x = {'class': 'adv'}
 
         for p in d.findAll('p', attrs=x):
+            a = p.find('a', href=re.compile(r'(?!^mailto)'))
+            if not a:
+                continue
+
             h6 = p.findPrevious('h6')
             job = Job(company=self.company)
             job.title = h6.text
