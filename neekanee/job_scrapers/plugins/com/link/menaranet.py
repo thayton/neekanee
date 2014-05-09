@@ -9,10 +9,8 @@ COMPANY = {
     'name': 'Menara Networks',
     'hq': 'Dallas, TX',
 
-    'benefits': {'vacation': []},
-
     'home_page_url': 'http://www.menaranet.com',
-    'jobs_page_url': 'http://www.menaranet.com/careers.htm',
+    'jobs_page_url': 'http://menaranet.com/index.php?route=news/ncategory&ncat=60',
 
     'empcnt': [11,50]
 }
@@ -28,10 +26,12 @@ class MenaraNetJobScraper(JobScraper):
 
         s = soupify(self.br.response().read())
         d = s.find('div', id='content')
-        d = d.find('div', attrs={'class': 'feature_home'})
-        r = re.compile(r'^careers_.*\.htm')
+        r = re.compile(r'index\.php\?route=news/article&ncat=\d+&news_id=\d+$')
 
         for a in d.findAll('a', href=r):
+            if a.span:
+                continue
+
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(url, a['href'])
@@ -48,18 +48,15 @@ class MenaraNetJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='content')
-            l = d.find(text=re.compile(r'Location:'))
-
-            if l:
-                l = self.parse_location(l.split('Location:')[1])
-                if not l:
-                    continue
-
-                job.location = l
+            x = {'class': 'feature'}
+            d = s.find('div', attrs=x)
                 
             job.desc = get_all_text(d)
             job.save()
 
 def get_scraper():
     return MenaraNetJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
