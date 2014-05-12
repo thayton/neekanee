@@ -120,6 +120,10 @@ class JohnstonEquipmentJobScraper(JobScraper):
             s = soupify(self.br.response().read())
             x = {'class': 'job-info'}
             d = s.find('div', attrs=x)
+
+            if not d:
+                continue
+
             d = d.findParent('div')
 
             job.desc = get_all_text(d)
