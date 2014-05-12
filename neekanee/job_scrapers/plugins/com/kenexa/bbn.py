@@ -1,7 +1,5 @@
-import re, urllib, urlparse, mechanize, urllib
-
-from neekanee.jobscrapers.jobscraper import JobScraper
-from neekanee.htmlparse.soupify import soupify, get_all_text, extract_form_fields
+from neekanee.jobscrapers.brassring.brassring import BrassringJobScraper
+from neekanee.htmlparse.soupify import soupify
 
 from neekanee_solr.models import *
 
@@ -12,65 +10,29 @@ COMPANY = {
     'ats': 'Kenexa',
 
     'home_page_url': 'http://www.bbn.com',
-    'jobs_page_url': 'http://careers.bbn.com/',
+    'jobs_page_url': 'http://careers.bbn.com/TGWebHost/home.aspx?partnerid=25938&siteid=5179',
 
     'empcnt': [501, 1000]
 }
 
-class BbnJobScraper(JobScraper):
+class BbnJobScraper(BrassringJobScraper):
     def __init__(self):
         super(BbnJobScraper, self).__init__(COMPANY)
-
-    def scrape_job_links(self, url):
-        jobs = []
-
-        self.br.open(url)
-        self.br.select_form('search')
-        self.br.submit()
-
-        r = re.compile(r'/servlet/av/jd\?ai=\d+&ji=\d+')
-
-        while True:
-            s = soupify(self.br.response().read())
-
-            for a in s.findAll('a', href=r):
-                tr = a.findParent('tr')
-                td = tr.findAll('td')
-
-                l = self.parse_location(td[-2].text + ',' + td[-1].text)
-                if not l:
-                    continue
-
-                job = Job(company=self.company)
-                job.title = a.text
-                job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-                job.location = l
-                jobs.append(job)
-
-            # Navigate to the next page
-            try:
-                self.br.find_link(text='Next')
-                self.br.select_form('GetNextPage')
-                self.br.submit()
-            except mechanize.LinkNotFoundError:
-                break    
-
-        return jobs
-
-    def scrape_jobs(self):
-        job_list = self.scrape_job_links(self.company.jobs_page_url)
-        self.prune_unlisted_jobs(job_list)
-        new_jobs = self.new_job_listings(job_list)
-
-        for job in new_jobs:
-            self.br.open(job.url)
-
-            s = soupify(self.br.response().read())
-            t = s.table
-
-            job.desc = get_all_text(t)
-            job.save()
+        self.soupify_search_form = True
             
+    def get_url_from_formtext(self, x):
+        s = soupify(x['JobTitle'])
+        return s.a
+
+    def get_title_from_formtext(self, x):
+        s = soupify(x['JobTitle'])
+        a = s.findAll('a')
+        return a[-1].text
+
+    def get_location_from_formtext(self, x):
+        l = self.parse_location(x['FORMTEXT3'])
+        return l
+
 def get_scraper():
     return BbnJobScraper()
 
