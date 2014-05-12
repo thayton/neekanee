@@ -41,8 +41,11 @@ class JohnstonEquipmentJobScraper(JobScraper):
                 if not l:
                     continue
 
+                x = {'class': None}
+                p = a.h3.find('span', attrs=x)
+
                 job = Job(company=self.company)
-                job.title = a.h3.span.text
+                job.title = p.text
                 job.url = urlparse.urljoin(self.br.geturl(), a['href'])
                 job.location = l
                 jobs.append(job)
