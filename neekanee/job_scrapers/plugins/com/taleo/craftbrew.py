@@ -12,7 +12,7 @@ COMPANY = {
     'ats': 'Taleo',
 
     'home_page_url': 'http://www.craftbrew.com',
-    'jobs_page_url': 'http://tbe.taleo.net/NA9/ats/careers/jobSearch.jsp?org=CRAFTBREWERS&cws=1',
+    'jobs_page_url': 'http://ch.tbe.taleo.net/CH09/ats/careers/jobSearch.jsp?org=CRAFTBREW&cws=1',
 
     'empcnt': [501,1000]
 }
