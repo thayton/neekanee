@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Annapolis, MD',
 
     'home_page_url': 'http://www.sjca.edu',
-    'jobs_page_url': 'http://www.sjca.edu/admin/AN/openings.shtml',
+    'jobs_page_url': 'http://www.sjc.edu/annapolis/personnel/openings/',
 
     'empcnt': [51,200]
 }
@@ -23,9 +23,10 @@ class SjcaJobScraper(JobScraper):
         self.br.open(self.company.jobs_page_url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id='main-content')
         r = re.compile(r'^#\S+')
-        f = lambda x: x.name == 'a' and re.search(r, x['href']) and x.parent.name == 'li'
+        f = lambda x: x.name == 'a' and re.search(r, x.get('href', '')) and x.parent.name == 'li'
+        a = s.find(f)
+        d = a.findParent('div')
         d.extract()
 
         self.company.job_set.all().delete()
@@ -37,12 +38,17 @@ class SjcaJobScraper(JobScraper):
             job.location = self.company.location
             job.desc = ''
 
-            x = d.find('p', id=a['href'][1:])
+            y = {'name': a['href'][1:]}
+            x = d.find('a', attrs=y)
+
+            if x is None:
+                continue
+
             x = x.next
 
             while x:
                 name = getattr(x, 'name', None)
-                if name == 'p' and x.get('id', None):
+                if name == 'h3':
                     break
                 elif name is None:
                     job.desc += x
