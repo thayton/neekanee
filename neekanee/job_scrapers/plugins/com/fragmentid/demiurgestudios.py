@@ -9,9 +9,6 @@ COMPANY = {
     'name': 'Demiurge Studios',
     'hq': 'Cambridge, MA',
 
-    'contact': 'jobs@demiurgestudios.com',
-    'benefits': {'vacation': []},
-
     'home_page_url': 'http://www.demiurgestudios.com',
     'jobs_page_url': 'http://www.demiurgestudios.com/careers',
 
@@ -40,7 +37,12 @@ class DemiurgeStudiosJobScraper(JobScraper):
             job.location = self.company.location
             job.desc = ''
 
-            x = d.find('a', attrs={'name' : a['href'][1:]})
+            y = {'name' : a['href'][1:]}
+            x = d.find('a', attrs=y)
+            
+            if not x:
+                continue
+
             x = x.findNext('h3').next
 
             while x:
@@ -56,3 +58,6 @@ class DemiurgeStudiosJobScraper(JobScraper):
 def get_scraper():
     return DemiurgeStudiosJobScraper()
 
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
