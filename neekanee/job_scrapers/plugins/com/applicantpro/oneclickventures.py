@@ -25,21 +25,14 @@ class OneClickVenturesJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        t = s.find('table', id='job_listing')
-        r = re.compile(r'^/jobs/\d+\.html$')
+        d = s.find('div', id='job_listings')
+        r = re.compile(r'/jobs/\d+\.html$')
 
-        for a in t.findAll('a', href=r):
-            tr = a.findParent('tr')
-            td = tr.findAll('td')
-
-            l = self.parse_location(td[1].text)
-            if l is None:
-                l = self.company.location
-
+        for a in d.findAll('a', href=r):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-            job.location = l
+            job.location = self.company.location
             jobs.append(job)
 
         return jobs
@@ -53,7 +46,8 @@ class OneClickVenturesJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', attrs={'class': 'panel'})
+            x = {'itemprop': 'description'}
+            d = s.find('div', attrs=x)
 
             job.desc = get_all_text(d)
             job.save()
