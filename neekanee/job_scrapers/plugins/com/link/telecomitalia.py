@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Milano, Italy',
 
     'home_page_url': 'http://www.telecomItalia.com',
-    'jobs_page_url': 'http://www.telecomItalia.com/tit/en/career/joiningTI/opportunities/vacancies.html',
+    'jobs_page_url': 'http://www.telecomitalia.com/tit/en/career/per-candidarti/opportunita.html',
 
     'empcnt': [10001]
 }
@@ -25,7 +25,8 @@ class TelecomItaliaJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        t = s.find('table', id='ti_table')
+        x = {'class': 'footable'}
+        t = s.find('table', attrs=x)
         r = re.compile(r'/en/career/')
 
         for a in t.findAll('a', href=r):
@@ -60,3 +61,7 @@ class TelecomItaliaJobScraper(JobScraper):
 
 def get_scraper():
     return TelecomItaliaJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
