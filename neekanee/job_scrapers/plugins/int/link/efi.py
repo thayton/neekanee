@@ -30,6 +30,9 @@ class WhoJobScraper(JobScraper):
 
         for a in s.findAll('a', href=r):
             t = a.span.text.split(',', 1)
+            if len(t) < 2:
+                continue
+
             l = re.sub(r'\(.*\)', '', t[1])
             l = self.parse_location(l)
 
