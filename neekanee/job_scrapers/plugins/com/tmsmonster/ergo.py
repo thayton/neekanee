@@ -67,9 +67,9 @@ class ErgoJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='content')
+            p = s.find('span', id='monsterIA')
 
-            job.desc = get_all_text(d)
+            job.desc = get_all_text(p)
             job.save()
 
 def get_scraper():
