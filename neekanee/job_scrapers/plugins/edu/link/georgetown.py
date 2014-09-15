@@ -9,15 +9,8 @@ COMPANY = {
     'name': 'Georgetown University',
     'hq': 'Washington, DC',
 
-    'benefits': {
-        'vacation': [(0,21),(1,22),(2,23),(3,24),(4,25),(5,26)],
-        'holidays': 13
-    },
-
     'home_page_url': 'http://www.georgetown.edu',
-    'jobs_page_url': 'http://www12.georgetown.edu/hr/employment_services/joblist/jobs.cfm',
-
-    'gctw_chronicle': True,
+    'jobs_page_url': 'https://jobs.georgetown.edu/index.php',
 
     'empcnt': [5001,10000]
 }
@@ -29,12 +22,15 @@ class GeorgetownJobScraper(JobScraper):
     def scrape_job_links(self, url):
         jobs = []
 
+        def select_form(form):
+            return form.attrs.get('id', None) == 'jobSearch'
+
         self.br.open(url)
-        self.br.select_form('FormCategory')
+        self.br.select_form(predicate=select_form)
         self.br.submit()
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'job_description\.cfm\?CategoryID=')
+        r = re.compile(r'PD\.php\?posNo=\d+$')
 
         for a in s.findAll('a', href=r):
             job = Job(company=self.company)
@@ -54,11 +50,14 @@ class GeorgetownJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            t = s.find(text='Job Title: ')
-            t = t.findParent('table')
+            t = s.find('table', id='pdTab')
 
             job.desc = get_all_text(t)
             job.save()
 
 def get_scraper():
     return GeorgetownJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
