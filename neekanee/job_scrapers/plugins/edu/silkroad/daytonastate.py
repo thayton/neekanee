@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Daytona Beach, FL',
 
     'home_page_url': 'http://www.daytonastate.edu',
-    'jobs_page_url': 'http://www.daytonastate.edu/hr/',
+    'jobs_page_url': 'https://daytonastate-openhire.silkroad.com/epostings/',
 
     'empcnt': [1001,5000]
 }
@@ -22,29 +22,29 @@ class DaytonaStateJobScraper(JobScraper):
     def scrape_job_links(self, url):
         jobs = []
 
+        def select_form(form):
+            return form.attrs.get('id', None) == 'frmsearch'
+
         self.br.open(url)
+        self.br.select_form(predicate=select_form)
+        self.br.submit('Search')
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id='content')
-        r = re.compile(r'^/hr/\S+\.html$')
+        r = re.compile(r'^index\.cfm\?fuseaction=app\.jobinfo')
 
-        for a in d.findAll('a', href=r):
-            u = urlparse.urljoin(self.br.geturl(), a['href'])
-            self.br.open(u)
+        for a in s.findAll('a', href=r):
+            tr = a.findParent('tr')
+            td = tr.findAll('td')
 
-            x = soupify(self.br.response().read())
-            v = x.find('div', id='content')
+            l = self.parse_location(td[-2].text)
+            if not l:
+                continue
 
-            for a in v.findAll('a', href=r):
-                job = Job(company=self.company)
-                job.title = a.text
-                job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-
-                if job.url.find(' ') != -1:
-                    job.url = urllib.quote(job.url, '/:')
-
-                job.location = self.company.location
-                jobs.append(job)
+            job = Job(company=self.company)
+            job.title = a.text
+            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.location = l
+            jobs.append(job)
 
         return jobs
 
@@ -57,14 +57,14 @@ class DaytonaStateJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='content')
+            f = s.find('form', id='applyJob')
 
-            if not d:
-                x = {'class': 'rightbody2'}
-                d = s.find('div', attrs=x)
-
-            job.desc = get_all_text(d)
+            job.desc = get_all_text(f)
             job.save()
 
 def get_scraper():
     return DaytonaStateJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
