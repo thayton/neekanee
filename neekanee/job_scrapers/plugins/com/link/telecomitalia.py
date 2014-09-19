@@ -25,11 +25,11 @@ class TelecomItaliaJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        x = {'class': 'footable'}
-        t = s.find('table', attrs=x)
+        x = {'class': 'table-inner'}
+        d = s.find('div', attrs=x)
         r = re.compile(r'/en/career/')
 
-        for a in t.findAll('a', href=r):
+        for a in d.table.findAll('a', href=r):
             tr = a.findParent('tr')
             td = tr.findAll('td')
             
