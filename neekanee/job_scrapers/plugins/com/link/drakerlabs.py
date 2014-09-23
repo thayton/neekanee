@@ -9,11 +9,8 @@ COMPANY = {
     'name': 'Draker Laboratories',
     'hq': 'Burlington, VT',
 
-    'contact': 'careers@drakerlabs.com',
-    'benefits': {'vacation': [(1,15)]},
-
     'home_page_url': 'http://www.drakerlabs.com',
-    'jobs_page_url': 'http://www.drakerlabs.com/company/jobs',
+    'jobs_page_url': 'http://www.drakerenergy.com/company/careers/',
 
     'empcnt': [11,50]
 }
