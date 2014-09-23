@@ -11,7 +11,7 @@ COMPANY = {
     'hq': 'London, England',
 
     'home_page_url': 'http://thecommonwealth.org',
-    'jobs_page_url': 'http://thecommonwealth.org/jobsubsite/191203/167709/vacancies/',
+    'jobs_page_url': 'http://thecommonwealth.org/jobs',
 
     'empcnt': [51,200]
 }
@@ -25,11 +25,14 @@ class CommonWealthJobScraper(JobScraper):
 
         self.br.open(url)
 
-        s = soupify(self.br.response().read())
-        d = s.find('div', id='pageContent')
-        x = {'class': 'faqList'}
-        d = d.find('dl', attrs=x)
-        r = re.compile(r'^/job/')
+        r = self.br.response().read()
+        b = r[r.find('<body'):]
+        s = soupify(b)
+
+        r = re.compile(r'\bview-job-vacancies\b')
+        x = {'class': r}
+        d = s.find('div', attrs=x)
+        r = re.compile(r'^/jobs/[^/]+$')
 
         for a in d.findAll('a', href=r):
             job = Job(company=self.company)
@@ -47,17 +50,18 @@ class CommonWealthJobScraper(JobScraper):
         for job in new_jobs:
             self.br.open(job.url)
 
-            s = soupify(self.br.response().read())
-            d = s.find('div', id='pageContent')
-            f = lambda x: x.name == 'strong' and x.text == 'Location:'
-            t = s.find(f)
+            r = self.br.response().read()
+            b = r[r.find('<body'):]
+            s = soupify(b)
 
+            r = re.compile(r'^node-\d+$')
+            d = s.find('div', id=r)
+            f = lambda x: x.name == 'strong' and x.text == 'Location:'
+            t = d.find(f)
             if not t:
                 continue
 
-            l = t.nextSibling.split('|')[0]
-            l = self.parse_location(l)
-
+            l = self.parse_location(t.nextSibling)
             if not l:
                 continue
 
