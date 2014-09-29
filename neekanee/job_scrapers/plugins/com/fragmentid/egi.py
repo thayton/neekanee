@@ -9,8 +9,6 @@ COMPANY = {
     'name': 'Electrical Geodesics Incorporated',
     'hq': 'Eugene, OR',
 
-    'benefits': {'vacation': []},
-
     'home_page_url': 'http://www.egi.com',
     'jobs_page_url': 'http://www.egi.com/company/company-employment',
 
@@ -25,14 +23,14 @@ class EgiJobScraper(JobScraper):
         self.br.open(self.company.jobs_page_url)
 
         s = soupify(self.br.response().read())
-        x = attrs={'class': 'contentpaneopen'}
-        t = s.find('table', attrs=x)
-        r = re.compile(r'/company/company\-employment#\w+')
-        t.extract()
+        x = attrs={'itemprop': 'articleBody'}
+        d = s.find('div', attrs=x)
+        r = re.compile(r'^#')
+        d.extract()
 
         self.company.job_set.all().delete()
 
-        for a in t.findAll('a', href=r):
+        for a in d.findAll('a', href=r):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
@@ -40,7 +38,8 @@ class EgiJobScraper(JobScraper):
             job.desc = ''
 
             i = a['href'].find('#') + 1
-            x = t.find(attrs={'name' : a['href'][i:]})
+            x = {'name' : a['href'][i:]}
+            x = d.find(attrs=x)
 
             if x is None:
                 continue
@@ -59,3 +58,7 @@ class EgiJobScraper(JobScraper):
 
 def get_scraper():
     return EgiJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
