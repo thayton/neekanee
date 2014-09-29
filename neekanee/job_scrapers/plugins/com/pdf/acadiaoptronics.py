@@ -11,7 +11,7 @@ COMPANY = {
     'hq': 'Rockville, MD',
 
     'home_page_url': 'http://www.acadiaoptronics.com',
-    'jobs_page_url': 'http://www.acadiaoptronics.com/careers',
+    'jobs_page_url': 'http://www.acadiacyber.com/careers.html',
 
     'empcnt': [1,10],
 }
@@ -23,18 +23,10 @@ class AcadiaOptronicsJobScraper(JobScraper):
     def scrape_job_links(self, url):
         jobs = []
 
-        def select_link(link):
-            if link.tag == 'iframe':
-                d = dict(link.attrs)
-                return d.get('title', None) == 'Acadia Careers'
-
-            return False
-
         self.br.open(url)
-        self.br.follow_link(self.br.find_link(predicate=select_link))
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'googledrive\S+\.pdf$')
+        r = re.compile(r'/careers/[^.]+\.pdf$')
     
         for a in s.findAll('a', href=r):
             job = Job(company=self.company)
