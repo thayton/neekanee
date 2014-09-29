@@ -40,6 +40,9 @@ class OakleyJobScraper(JobScraper):
                 if not p.a:
                     continue
 
+                if p.a['class'].find('sort') != -1:
+                    continue
+
                 tr = p.findParent('tr')
                 td = tr.find('td', attrs=y)
 
