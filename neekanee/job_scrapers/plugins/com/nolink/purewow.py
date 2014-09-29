@@ -27,6 +27,8 @@ class PureWowJobScraper(JobScraper):
         y = {'class': 'slide-jobs'}
         d = s.find('div', attrs=x)
 
+        self.company.job_set.all().delete()
+
         for j in d.findAll('div', attrs=y):
             job = Job(company=self.company)
             job.title = j.a.text
