@@ -168,7 +168,31 @@ class JobScraper(object):
 
         self.logger.info('Deleted %d unlisted jobs' % num_deleted)
 
-    def new_job_listings(self, listed_jobs, use_job_cmp=False):
+    def new_job_listings(self, listed_jobs):
+        """
+        for each job in listed_jobs
+          if job is not currently in the database then
+            add job to new_jobs
+
+        Callers can set use_job_cmp=True and then define get_job_cmp()
+        to return a comparison function of their choosing if the url,url_data
+        comparison used here does not suffice.
+        """
+        self.logger.debug('Extracting new jobs from %d jobs listed' % len(listed_jobs))
+
+        cmp = self.get_job_cmp()
+        new_jobs = []
+
+        for job in listed_jobs:
+            if not find(cmp, job, self.company.job_set.all()) and \
+               not find(cmp, job, new_jobs): # don't allow dups in new_jobs
+                self.logger.debug('New job (%s) at company %s' % (job.url, self.company))
+                new_jobs.append(job)
+
+        self.logger.info('%d new job listings' % len(new_jobs))            
+        return new_jobs
+
+    def new_job_listings_old(self, listed_jobs, use_job_cmp=False):
         """
         for each job in listed_jobs
           if job is not currently in the database then
