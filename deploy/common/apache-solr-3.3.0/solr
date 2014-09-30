@@ -1,9 +1,16 @@
 #!/bin/sh
 
+# Reference: http://stackoverflow.com/questions/2150767/how-to-start-solr-automatically
+
 # Prerequisites:
 # 1. Solr needs to be installed at /opt/solr/example
 # 2. daemon needs to be installed
 # 3. Script needs to be executed by root
+
+# Copy this script to /etc/init.d/solr. Then run
+# $ update-rc.d solr defaults 
+# to install this script on Ubuntu
+# 
 
 # This script will launch Solr in a mode that will automatically respawn if it
 # crashes. Output will be sent to /var/log/solr/solr.log. A pid file will be 
