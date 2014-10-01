@@ -35,6 +35,7 @@ class MenaraNetJobScraper(JobScraper):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(url, a['href'])
+            job.location = self.company.location
             jobs.append(job)
 
         return jobs
