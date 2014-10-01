@@ -26,21 +26,13 @@ class PodioJobScraper(JobScraper):
 
         s = soupify(self.br.response().read())
         x = {'class': 'jobs'}
-        y = {'class': 'locations'}
         r = re.compile(r'^/jobs/[^/]+$')
 
         for u in s.findAll('ul', attrs=x):
-            p = u.findParent('ul', attrs=y)
-            l = self.parse_location(p.strong.text)
-
-            if not l:
-                continue
-
             for a in u.findAll('a', href=r):
                 job = Job(company=self.company)
                 job.title = a.text
                 job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-                job.location = l
                 jobs.append(job)
 
         return jobs
@@ -54,10 +46,23 @@ class PodioJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            x = {'class': 'show-job'}
+            f = lambda x: x.name == 'h3' and x.text == 'Location'
+            h = s.find(f)
+
+            if not h:
+                continue
+
+            l = h.findNext('p').text
+            l = self.parse_location(l)
+
+            if not l:
+                continue
+
+            x = {'class': re.compile(r'show-job')}
             d = s.find('div', attrs=x)
 
             job.desc = get_all_text(d)
+            job.location = l
             job.save()
 
 def get_scraper():
