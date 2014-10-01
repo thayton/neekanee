@@ -228,58 +228,6 @@
 
         <div class="col-md-3 visible-md visible-lg">
           <div style="height: 180px; margin-bottom: 40px;" id="map_canvas"></div>
-	  {% if user.is_authenticated and query.urlencode != "" %}
-	  <div class="well">
-	    <h6 style="margin-bottom: 10px;" align="center">Email Job Alerts</h6>	    
-	    <p>Get emailed when new jobs match this query.</p>
-	    <div align=center>
-	      <a rel="nofollow" class="btn btn-success" href="/account/job_alerts/create/{{ query.urlencode|qstring_del:'page'|urlencode }}"> Get Alerts</a>
-	    </div>
-	  </div>
-	  {% endif %}
-          <div id="jobs-sidebar-right">
-            <div class="panel-group" id="tag-accordion">
-              <div class="panel panel-default">
-		<div class="panel-heading" style="background-color: whiteSmoke">
-                  <a class="panel-title" data-toggle="collapse" href="#company-tags"><i class="glyphicon glyphicon-chevron-right"></i>Company Tags</a>
-		</div>
-		<div id="company-tags" class="accordion-body collapse">
-                  <div class="panel-body">
-		    <ul style="list-style: none none; margin: 0;">
-  	            {% for tag,cnt in facet_counts.company_tags|slice:":32" %}
-                      <li>
-			<a rel="nofollow" href="/jobs/?{{ query.tags|add_tag:tag|qstring_set:query.urlencode }}">
-			  #{{ tag }}
-			  <span class="facet-count">{{ cnt }}</span>
-			</a>
-                      </li>
-		    {% endfor %}
-		    </ul>
-                  </div>
-		</div>
-	      </div>
-
-              <div class="panel panel-default">
-		<div class="panel-heading" style="background-color: whiteSmoke">
-                  <a class="panel-title" data-toggle="collapse" href="#location-tags"><i class="glyphicon glyphicon-chevron-right"></i>Location Tags</a>
-		</div>
-		<div id="location-tags" class="accordion-body collapse">
-                  <div class="panel-body">
-                    <ul style="list-style: none none; margin: 0;">
-                    {% for tag,cnt in facet_counts.company_location_tags|slice:":32" %}
-                      <li>
-			<a rel="nofollow" href="/jobs/?{{ query.ltags|add_location_tag:tag|qstring_set:query.urlencode }}">
-                          #{{ tag }}
-                          <span class="facet-count">{{ cnt }}</span>
-			</a>
-                      </li>
-                    {% endfor %}
-                    </ul>
-                  </div>
-		</div>
-	      </div>
-	    </div>
-          </div> <!-- jobs-sidebar-right -->
         </div>
       </div><!--.row-->
 {% endblock %}
