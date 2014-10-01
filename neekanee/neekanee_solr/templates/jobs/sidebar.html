@@ -287,49 +287,5 @@
         </div> <!-- current-filters -->
       </div> <!-- accordion-group -->                                 
       {% endifnotequal %}
-
-      <div class="panel panel-default">
-        <div class="panel-heading" style="background-color: whiteSmoke">
-          <a class="panel-title" data-toggle="collapse" href="#vacation"><i class="glyphicon glyphicon-chevron-right"></i>Vacation</a>
-        </div>
-        <div id="vacation" class="panel-collapse collapse">
-          <div class="panel-body">
-            <ul class="nav nav-list">
-              {% for numdays,cnt in facet_counts.vacation_year_1|slice:":8" %}
-                <li>
-                    <a rel="nofollow" href="/jobs/?{{ 'vacation='|add:numdays|qstring_set:query.urlencode }}">
-                    {{ numdays }}-{{ numdays|add:4 }} days
-                    <span class="facet-count">{{ cnt }}</span>
-                  </a>
-                </li>
-              {% endfor %}
-            </ul>
-          </div> <!-- panel-body -->
-        </div> <!-- current-filters -->
-      </div> <!-- accordion-group -->                                 
-
-      <div class="panel panel-default">
-        <div class="panel-heading" style="background-color: whiteSmoke">
-          <a class="panel-title" data-toggle="collapse" href="#awards"><i class="glyphicon glyphicon-chevron-right"></i>Awards</a>
-        </div>
-        <div id="awards" class="panel-collapse collapse">
-          <div class="panel-body">
-            <ul class="nav nav-list">
-              {% for award,cnt in facet_counts.company_awards|slice:":6" %}
-                <li>
-                   {% if query.awards %}
-                    <a rel="nofollow" href="/jobs/?{{ query.awards|split_and_remove:award|append:award|join:'+'|prepend:'awards='|qstring_set:query.urlencode }}">
-                  {% else %}
-                    <a rel="nofollow" href="/jobs/?{{ 'awards='|add:award|qstring_set:query.urlencode }}">
-                  {% endif %}
-                    {{ award|award_string }}
-                    <span class="facet-count">{{ cnt }}</span>
-                  </a> 
-                </li>
-              {% endfor %}
-            </ul>
-          </div> <!-- panel-body -->
-        </div> <!-- current-filters -->
-      </div> <!-- accordion-group -->                                 
     </div> <!-- accordion -->
   </div>
