@@ -1,4 +1,4 @@
-import re, urlparse, mechanize
+import re, urlparse, mechanize, json
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'New York, NY',
 
     'home_page_url': 'http://www.americanexpress.com',
-    'jobs_page_url': 'http://jobs.americanexpress.com/group/?inav=SearchJobs',
+    'jobs_page_url': 'https://jobs.americanexpress.com/api/jobs?limit=10&offset=0&page=1',
 
     'empcnt': [10001]
 }
@@ -18,66 +18,42 @@ COMPANY = {
 class AmericanExpressJobScraper(JobScraper):
     def __init__(self):
         super(AmericanExpressJobScraper, self).__init__(COMPANY)
+        self.br.set_handle_gzip(True)
+        self.br.addheaders = [('User-agent',
+                               'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7'),
+                              ('Referer',
+                               'https://jobs.americanexpress.com/jobs'),
+                              ('Accept-Language', 'en-US'),
+                              ('Accept', 'application/json, text/plain, */*'),]
 
-    def scrape_job_links(self, url):
-        jobs = []
-
-        def select_form(form):
-            return form.attrs.get('id', None) == 'search-form'
-
-        self.br.open(url)
-        self.br.select_form(predicate=select_form)
-        self.br.submit()
-
-        r = re.compile(r'^/job/[\w-]+/\d+/')
-
-        pageno = 2
-
-        while True:
-            s = soupify(self.br.response().read())
-
-            for a in s.findAll('a', href=r):
-                tr = a.findParent('tr')
-                td = tr.findAll('td')
-
-                l = self.parse_location(td[1].text)
-                
-                if l is None:
-                    l = self.company.location
-
-                job = Job(company=self.company)
-                job.title = a.text
-                job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-                job.location = l
-                jobs.append(job)
-
-            # Navigate to the next page
-            try:
-                p = r'Page ' + str(pageno) + ' \(\d+ -'
-                pageno += 1
-                a = s.find('a', attrs={'title': re.compile(p)})
-                if a is None:
-                    break
-                n = self.br.find_link(url=a['href'])
-                self.br.follow_link(n)
-            except mechanize.LinkNotFoundError:
-                break
-        
-        return jobs
+#        import sys, logging
+#        logger = logging.getLogger("mechanize")
+#        logger.addHandler(logging.StreamHandler(sys.stdout))
+#        logger.setLevel(logging.DEBUG)
+#        self.br.set_debug_http(True)
+#        self.br.set_debug_responses(True)
+#        self.br.set_debug_redirects(True)
 
     def scrape_jobs(self):
-        job_list = self.scrape_job_links(self.company.jobs_page_url)
-        self.prune_unlisted_jobs(job_list)
-        new_jobs = self.new_job_listings(job_list)
+        self.company.job_set.all().delete()
 
-        for job in new_jobs:
-            self.br.open(job.url)
+        self.br.open('https://jobs.americanexpress.com')
+        self.br.open('https://jobs.americanexpress.com/api/jasession')
+        self.br.open(self.company.jobs_page_url)
 
-            s = soupify(self.br.response().read())
-            a = {'class': 'jobDisplay'}
-            d = s.find('div', attrs=a)
+        r = self.br.response()
+        d = json.loads(r.read())
 
-            job.desc = get_all_text(d)
+        for j in d['jobs']:
+            l = self.parse_location(j['location'])
+            if not l:
+                continue
+            
+            job = Job(company=self.company)
+            job.title = j['title']
+            job.url = j['apply_url']
+            job.location = l
+            job.desc = get_all_text(soupify(j['description']))
             job.save()
 
 def get_scraper():
