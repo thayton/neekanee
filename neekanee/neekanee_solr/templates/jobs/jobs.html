@@ -69,11 +69,6 @@
                     <div style="color: #46a546;">
                       from {{ j.company.home_page_url|remove_scheme }}
                     </div>
-                    <br />
-                    <div style="color: #46a546;">
-                      {% include "jobs/huntsy_add_job.html" %}
-                      <a rel="nofollow" style="position: relative; float:right;" href="/account/job_basket/add/{{ j.id }}/">+ Save Job</a>
-                    </div>
                   </td>
                 </tr>
               {% endfor %}
