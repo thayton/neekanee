@@ -26,10 +26,9 @@ class IversityJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        t = s.find(text='We are looking for')
-        u = t.findNext('ul')
+        r = re.compile(r'/pages/job-')
 
-        for a in u.findAll('a'):
+        for a in s.findAll('a', href=r):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
@@ -47,7 +46,7 @@ class IversityJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='content')
+            d = s.find('div', id='main')
 
             job.desc = get_all_text(d)
             job.save()
