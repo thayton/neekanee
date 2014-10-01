@@ -1,7 +1,0 @@
-<form id="huntsy_job_form_{{ j.id }}" class="huntsy_job_form" action="http://huntsy.com/api/v1/jobs/" method="post" target="_blank">
-  <input name="job[company]" type="hidden" value="{{ j.company.name }}">
-  <input name="job[title]" type="hidden" value="{{ j.title }}">
-  <input name="job[url]" type="hidden" value="{{ j.url }}">
-  <input style="font-weight: normal;" id="submitbutton" name="submit1" type="submit" value="Huntsy: Add Job" class="lower">
-</form>
-<a href="javascript:void(0)" onclick="javascript:(function(){ document.getElementById('huntsy_job_form_{{ j.id }}').submit() })()">+ Huntsy: Add Job</a>
