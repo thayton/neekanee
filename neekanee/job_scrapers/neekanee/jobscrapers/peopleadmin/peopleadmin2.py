@@ -142,7 +142,7 @@ class PeopleAdminJobScraper(JobScraper):
     def scrape_jobs(self):
         job_list = self.scrape_job_links(self.company.jobs_page_url)
         self.prune_unlisted_jobs(job_list, use_job_cmp=True)
-        new_jobs = self.new_job_listings(job_list, use_job_cmp=True)
+        new_jobs = self.new_job_listings(job_list)
 
         for job in new_jobs:
             self.br.open(job.url)
