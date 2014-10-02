@@ -102,21 +102,6 @@
         {% endfor %}
       </tbody>
     </table>
-    <h3 id="by_company_tag">Browse Jobs by Company Tags</h3>
-    <br />
-    <table class="table table-bordered table-striped table-hover">
-      <tbody>
-	{% for tag in company_tags %}
-	{% if forloop.counter0|modulus:3 == 0 %}
-	<tr>
-	{% endif %}
-	  <td><a href="/jobs/?tags={{ tag|urlencode:"" }}">{{ tag }}</a></td>
-	{% if forloop.counter0|modulus:3 == 2 %}
-	</tr>
-	{% endif %}
-        {% endfor %}
-      </tbody>
-    </table>
   </div><!--.span12-->
 </div><!--.row-->
 
