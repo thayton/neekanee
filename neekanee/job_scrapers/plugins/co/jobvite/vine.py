@@ -19,7 +19,7 @@ class VineJobScraper(JobScraper):
     def __init__(self):
         super(VineJobScraper, self).__init__(COMPANY)
 
-    def scrape_jobs(self, url):
+    def scrape_jobs(self):
         # Vine acquired by Twitter
         self.company.job_set.all().delete()
 
