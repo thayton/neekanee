@@ -9,10 +9,8 @@ COMPANY = {
     'name': 'Nexage',
     'hq': 'Waltham, MA',
 
-    'benefits': {'vacation': []},
-
     'home_page_url': 'http://www.nexage.com',
-    'jobs_page_url': 'http://www.nexage.com/careers/job-listings',
+    'jobs_page_url': 'http://www.nexage.com/careers/job-listings/',
 
     'empcnt': [11,50]
 }
@@ -27,14 +25,17 @@ class NexageJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', attrs={'class': 'main_content'})
-        r = re.compile(r'/careers/job-listings/')
+        x = {'class': 'box'}
 
-        for a in d.findAll('a', href=r):
+        for b in s.findAll('article', attrs=x):
+            l = self.parse_location(b.p.contents[0])
+            if not l:
+                continue
+
             job = Job(company=self.company)
-            job.title = a.text
-            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-            job.location = self.company.location
+            job.title = b.h4.text
+            job.url = urlparse.urljoin(self.br.geturl(), b.a['href'])
+            job.location = l
             jobs.append(job)
 
         return jobs
@@ -48,8 +49,7 @@ class NexageJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            a = {'class': 'main_content'}
-            d = s.find('div', attrs=a)
+            d = s.h1.parent
 
             job.desc = get_all_text(d)
             job.save()
@@ -57,3 +57,6 @@ class NexageJobScraper(JobScraper):
 def get_scraper():
     return NexageJobScraper()
 
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
