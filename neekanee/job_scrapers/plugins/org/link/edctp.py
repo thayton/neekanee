@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'The Hague, The Netherlands',
 
     'home_page_url': 'http://www.edctp.org',
-    'jobs_page_url': 'http://www.edctp.org/Vacancies.143.0.html',
+    'jobs_page_url': 'http://www.edctp.org/about-edctp/the-organisation/vacancies/',
 
     'empcnt': [11,50]
 }
