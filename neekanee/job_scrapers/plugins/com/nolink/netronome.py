@@ -40,7 +40,7 @@ class NetronomeJobScraper(JobScraper):
 
             z = soupify(self.br.response().read())            
             x = {'style': 'font-size: large;'}
-            y = {'class': 'page-restrict-output'}
+            y = {'class': 'span9'}
             v = z.find('div', attrs=y)
             v.extract()
 
