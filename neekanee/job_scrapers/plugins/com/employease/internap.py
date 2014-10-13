@@ -12,7 +12,7 @@ COMPANY = {
     'ats': 'Employease',
 
     'home_page_url': 'http://www.internap.com',
-    'jobs_page_url': 'http://www.internap.com/about-us-internap/careers/job-openings/',
+    'jobs_page_url': 'http://www.internap.com/about/careers/current-openings/',
 
     'empcnt': [201,500]
 }
@@ -27,8 +27,9 @@ class InternapJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id='content')
-        r = re.compile(r'/recruit/\?id=\d+')
+        x = {'class': 'section__general-content'}
+        d = s.find('div', attrs=x)
+        r = re.compile(r'/jobs/apply/posting\.html\?\S+jobId=\d+')
 
         for a in d.findAll('a', href=r):
             p = a.parent
@@ -45,6 +46,7 @@ class InternapJobScraper(JobScraper):
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
             job.location = l
             jobs.append(job)
+            break
 
         return jobs
 
@@ -56,10 +58,17 @@ class InternapJobScraper(JobScraper):
         for job in new_jobs:
             self.br.open(job.url)
 
-            s = soupify(self.br.response().read())
-            f = s.find('form')
+            s = self.br.response().read()
+            r = re.compile(r'"(/jobs/apply/common/jobLanding\.faces[^"]+)"')
+            m = re.search(r, s)
+            u = urlparse.urljoin(self.br.geturl(), m.group(1))
 
-            job.desc = get_all_text(f)
+            self.br.open(u)
+
+            s = soupify(self.br.response().read())
+            b = s.html.body
+
+            job.desc = get_all_text(b)
             job.save()
 
 def get_scraper():
