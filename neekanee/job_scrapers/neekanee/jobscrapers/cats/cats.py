@@ -19,9 +19,10 @@ class CatsJobScraper(JobScraper):
         r = re.compile(r'/careers/index\.php\?m=portal&a=details&jobOrderID=\d+')
 
         for a in s.findAll('a', href=r):
-            t = a.findNext('td').text
-            l = self.parse_location(t)
+            tr = a.findParent('tr')
+            td = tr.findAll('td')
 
+            l = self.parse_location(td[-1].text)
             if l is None:
                 continue
 
