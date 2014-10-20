@@ -31,9 +31,12 @@ class CsumJobScraper(JobScraper):
             self.br.follow_link(self.br.find_link(text=t))
 
             s = soupify(self.br.response().read())
+            x = {'class': 'datagrid'}
+            d = s.find('div', attrs=x)
+            t = d.table
             r = re.compile(r'get_file\?uuid=[a-z0-9-]+')
 
-            for a in s.findAll('a', href=r):
+            for a in t.findAll('a', href=r):
                 tr = a.findParent('tr')
                 td = tr.findAll('td')
 
@@ -42,7 +45,6 @@ class CsumJobScraper(JobScraper):
                 job.url = urlparse.urljoin(self.br.geturl(), td[0].a['href'])
                 job.location = self.company.location
                 jobs.append(job)
-                break
 
             self.br.back()
 
