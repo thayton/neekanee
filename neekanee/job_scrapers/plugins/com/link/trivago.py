@@ -2,23 +2,22 @@ import re, urlparse
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
-from neekanee.txtextract.pdftohtml import pdftohtml
 
 from neekanee_solr.models import *
 
 COMPANY = {
-    'name': 'Faulkner University',
-    'hq': 'Montgomery, AL',
+    'name': 'Trivago',
+    'hq': 'Dusseldorf, Germany',
 
-    'home_page_url': 'http://www.faulkner.edu',
-    'jobs_page_url': 'http://www.faulkner.edu/aboutfaulkner/humanresources/openings.aspx',
+    'home_page_url': 'http://www.trivago.com',
+    'jobs_page_url': 'http://www.trivago.com/jobs/',
 
-    'empcnt': [501,1000]
+    'empcnt': [201,500]
 }
 
-class FaulknerJobScraper(JobScraper):
+class TrivagoJobScraper(JobScraper):
     def __init__(self):
-        super(FaulknerJobScraper, self).__init__(COMPANY)
+        super(TrivagoJobScraper, self).__init__(COMPANY)
 
     def scrape_job_links(self, url):
         jobs = []
@@ -26,13 +25,21 @@ class FaulknerJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'_aboutFaulkner/.*\.pdf$')
-
+        r = re.compile(r'^/jobs/details/\d+')
+        x = {'class': 'location'}
+        
         for a in s.findAll('a', href=r):
+            tr = a.findParent('tr')
+            td = tr.find('td', attrs=x)
+
+            l = self.parse_location(td.text)
+            if not l:
+                continue
+
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-            job.location = self.company.location
+            job.location = l
             jobs.append(job)
 
         return jobs
@@ -45,11 +52,15 @@ class FaulknerJobScraper(JobScraper):
         for job in new_jobs:
             self.br.open(job.url)
 
-            data = self.br.response().read()
-            s = soupify(pdftohtml(data))
+            s = soupify(self.br.response().read())
+            d = s.find('div', id='main_content')
 
-            job.desc = get_all_text(s.html.body)
+            job.desc = get_all_text(d)
             job.save()
 
 def get_scraper():
-    return FaulknerJobScraper()
+    return TrivagoJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
