@@ -9,9 +9,6 @@ COMPANY = {
     'name': 'SeatGeek',
     'hq': 'New York, NY',
 
-    'contact': 'hi@seatgeek.com',
-    'benefits': {'vacation': []},
-
     'home_page_url': 'http://www.seatgeek.com',
     'jobs_page_url': 'http://seatgeek.com/jobs/',
 
@@ -48,8 +45,8 @@ class SeatGeekJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            a = {'class': 'static-content'}
-            d = s.find('div', attrs=a)
+            x = {'class': 'job-description'}
+            d = s.find('div', attrs=x)
 
             job.desc = get_all_text(d)
             job.save()
@@ -57,3 +54,6 @@ class SeatGeekJobScraper(JobScraper):
 def get_scraper():
     return SeatGeekJobScraper()
 
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
