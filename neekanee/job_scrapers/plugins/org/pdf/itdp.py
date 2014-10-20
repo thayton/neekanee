@@ -29,13 +29,13 @@ class ItdpJobScraper(JobScraper):
 
         s = soupify(self.br.response().read())
         r = re.compile(r'/uploads/[^\.]+\.pdf$')
+        x = {'font-weight': 'bold;'}
 
         for a in s.findAll('a', href=r):
             p = a.findPrevious('span')
             h = a.findPrevious('h3')
-            g = a.findPrevious('strong')
 
-            m = re.search(re.compile(r'\(([^)]+)'), g.text)
+            m = re.search(re.compile(r'\(([^)]+)'), p.text)
             if m:
                 l = m.group(1) + ', ' + h.text
                 l = self.parse_location(l)
