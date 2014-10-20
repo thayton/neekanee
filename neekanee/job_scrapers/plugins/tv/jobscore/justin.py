@@ -12,5 +12,13 @@ COMPANY = {
     'empcnt': [11,50]
 }
 
+class JustinTVJobScraper(JobScraper):
+    def __init__(self):
+        super(JustinTVJobScraper, self).__init__(COMPANY)
+
+    def scrape_jobs(self):
+        # Shut down in 2014
+        self.company.job_set.all().delete()
+
 def get_scraper():
-    return JobScoreJobScraper(COMPANY)
+    return JustinTVJobScraper(COMPANY)
