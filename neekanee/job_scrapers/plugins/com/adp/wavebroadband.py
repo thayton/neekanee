@@ -2,7 +2,6 @@ import re, urlparse, urllib
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
-from neekanee.txtextract.pdftohtml import pdftohtml
 
 from neekanee_solr.models import *
 
@@ -11,7 +10,7 @@ COMPANY = {
     'hq': 'Seattle, WA',
 
     'home_page_url': 'http://www.wavebroadband.com',
-    'jobs_page_url': 'http://www.wavebroadband.com/about/careers.php',
+    'jobs_page_url': 'https://workforcenow.adp.com/jobs/apply/posting.html?client=wavebb',
 
     'empcnt': [201,500],
 }
