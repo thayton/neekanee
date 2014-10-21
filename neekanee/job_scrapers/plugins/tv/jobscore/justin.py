@@ -1,4 +1,4 @@
-from neekanee.jobscrapers.jobscore.jobscore import JobScoreJobScraper
+from neekanee.jobscrapers.jobscraper import JobScraper
 
 COMPANY = {
     'name': 'Jusin.tv',
@@ -21,4 +21,8 @@ class JustinTVJobScraper(JobScraper):
         self.company.job_set.all().delete()
 
 def get_scraper():
-    return JustinTVJobScraper(COMPANY)
+    return JustinTVJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
