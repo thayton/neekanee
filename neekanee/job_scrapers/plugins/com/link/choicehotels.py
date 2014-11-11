@@ -40,6 +40,10 @@ class ChoiceHotelsJobScraper(JobScraper):
                 tr = a.findParent('tr')
                 td = tr.findAll('td')
 
+                # Skip featured/latest jobs
+                if a.parent['class'].find('highlight') != -1:
+                    continue
+
                 l = self.parse_location(td[-2].text)
                 if not l:
                     continue
