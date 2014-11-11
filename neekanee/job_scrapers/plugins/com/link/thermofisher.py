@@ -26,7 +26,7 @@ class ThermoFisherJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'^/job-detail/[^/]+/\d+/$')
+        r = re.compile(r'/job-detail/[^/]+/\d+/$')
         x = {'class': 'jobslink', 'href': r}
         y = {'class': re.compile(r'joblocation')}
 
