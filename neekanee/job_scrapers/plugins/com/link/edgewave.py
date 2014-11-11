@@ -9,15 +9,8 @@ COMPANY = {
     'name': 'EdgeWave',
     'hq': 'San Diego, CA',
 
-    'ats': 'Employease',
-
-    'contact': 'resumes@edgewave.com',
-    'benefits': {
-        'vacation': [(1,15),(4,20)]
-    },
-
     'home_page_url': 'http://www.edgewave.com',
-    'jobs_page_url': 'http://www.edgewave.com/employment/default.asp',
+    'jobs_page_url': 'http://www.edgewave.com/company/careers/',
 
     'empcnt': [51,200]
 }
@@ -32,10 +25,9 @@ class EdgeWaveJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'^/employment/.*.asp')
-        d = { 'class': 'link', 'href': r }
+        r = re.compile(r'^/company/careers/[^/]+/$')
 
-        for a in s.findAll('a', attrs=d):
+        for a in s.findAll('a', href=r):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
@@ -53,12 +45,21 @@ class EdgeWaveJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='swap_banner')
-            t = d.findNextSibling('table')
-            t = t.tr.findAll('td', limit=2)[1]
+            m = s.find('main', id='main')
+            x = {'class': 'career-posting__location'}
+            h = m.find('h2', attrs=x)
+            l = self.parse_location(h.text)
 
-            job.desc = get_all_text(t)
+            if not l:
+                continue
+
+            job.location = l
+            job.desc = get_all_text(m)
             job.save()
 
 def get_scraper():
     return EdgeWaveJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
