@@ -1,4 +1,4 @@
-import re, urlparse
+import re, urlparse, urllib2
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
@@ -32,6 +32,7 @@ class OlinJobScraper(JobScraper):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.url = urllib2.quote(job.url, '/:?&=,')
             job.location = self.company.location
             jobs.append(job)
 
