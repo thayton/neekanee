@@ -26,11 +26,9 @@ class HarvestJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        x = {'class': 'pageContent'}
-        d = s.find('div', attrs=x)
-        r = re.compile(r'^/pdf/\S+\.pdf$')
+        r = re.compile(r'^/uploads/pdf/[^.]+\.pdf$')
     
-        for a in d.findAll('a', href=r):
+        for a in s.findAll('a', href=r):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
