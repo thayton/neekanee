@@ -27,13 +27,17 @@ class SilverTechJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id='careers')
-        r = re.compile(r'^/careers/\S+\.aspx$')
-        x = {'class': 'position', 'href': r}
+        x = {'class': 'careers'}
+        d = s.find('div', attrs=x)
 
-        for a in d.findAll('a', attrs=x):
+        r = re.compile(r'^/careers/[^/]+/$')
+        y = {'class': 'career'}
+
+        for a in d.findAll('a', href=r):
+            p = a.findParent('div', attrs=y)
+            
             job = Job(company=self.company)
-            job.title = a.div.text
+            job.title = p.h4.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
             job.location = self.company.location
             jobs.append(job)
@@ -49,9 +53,9 @@ class SilverTechJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='careers')
+            a = s.article
 
-            job.desc = get_all_text(d)
+            job.desc = get_all_text(a)
             job.save()
 
 def get_scraper():
