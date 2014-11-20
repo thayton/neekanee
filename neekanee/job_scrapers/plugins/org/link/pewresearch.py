@@ -9,9 +9,6 @@ COMPANY = {
     'name': 'Pew Research Center', 
     'hq': 'Washington, DC',
 
-    'contact': 'careers@pewresearch.org',
-    'benefits': {'vacation': []},
-
     'home_page_url': 'http://pewresearch.org',
     'jobs_page_url': 'http://pewresearch.org/careers/',
 
