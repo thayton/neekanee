@@ -36,7 +36,8 @@ class BostonDynamicsJobScraper(JobScraper):
             job.location = self.company.location
             job.desc = ''
 
-            x = d.find('a', attrs={'name' : a['id']})
+            y = {'name': re.compile(r'^%s$' % a['id'], re.I)}
+            x = d.find('a', attrs=y)
             x = x.next.findNext(text=re.compile(r'[^\n]'))
 
             while x:
