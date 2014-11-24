@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'San Francisco, CA',
 
     'home_page_url': 'http://www.140proof.com',
-    'jobs_page_url': 'http://www.140proof.com/jobs',
+    'jobs_page_url': 'http://www.140proof.com/jobs.html',
 
     'empcnt': [11,50]
 }
@@ -25,8 +25,8 @@ class ProofJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'^/jobs/[^/]+$')
-        f = lambda x: x.name == 'a' and re.search(r, x['href']) and x.parent.name == 'li'
+        r = re.compile(r'^\./jobs/[^.]+\.html$')
+        f = lambda x: x.name == 'a' and re.search(r, x.get('href', '')) and x.parent.name == 'li'
         
         for a in s.findAll(f):
             job = Job(company=self.company)
