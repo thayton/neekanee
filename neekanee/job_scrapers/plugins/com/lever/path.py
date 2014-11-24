@@ -1,7 +1,7 @@
 import re, urlparse
 
 from neekanee.jobscrapers.jobscraper import JobScraper
-from neekanee.htmlparse.soupify import soupify, get_all_text, get_mailto
+from neekanee.htmlparse.soupify import soupify, get_all_text
 
 from neekanee_solr.models import *
 
@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'San Francisco, CA',
 
     'home_page_url': 'http://www.path.com',
-    'jobs_page_url': 'https://www.path.com/jobs',
+    'jobs_page_url': 'https://jobs.lever.co/path/',
 
     'empcnt': [11,50]
 }
@@ -25,15 +25,20 @@ class PathJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        x = {'class': 'positions cols'}
-        n = s.find('nav', attrs=x)
-        r = re.compile(r'/jobs/join/[^/]+$')
+        x = {'class': 'posting-title'}
+        r = re.compile(r'\bsort-by-location\b')
+        y = {'class': r}
+        
+        for a in s.findAll('a', attrs=x):
+            sp = a.find('span', attrs=y)
+            l = self.parse_location(sp.text)
+            if not l:
+                continue
 
-        for a in n.findAll('a', href=r):
             job = Job(company=self.company)
-            job.title = a.text
+            job.title = a.h5.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-            job.location = self.company.location
+            job.location = l
             jobs.append(job)
 
         return jobs
@@ -47,7 +52,8 @@ class PathJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='content')
+            x = {'class': 'content'}
+            d = s.find('div', attrs=x)
 
             job.desc = get_all_text(d)
             job.save()
