@@ -1,8 +1,6 @@
 from neekanee.jobscrapers.brassring.brassring import BrassringJobScraper
 from neekanee.htmlparse.soupify import soupify
 
-from neekanee.jobscrapers.brassring.brassring import BrassringJobScraper
-
 COMPANY = {
     'name': 'Duke University',
     'hq': 'Durham, NC',
