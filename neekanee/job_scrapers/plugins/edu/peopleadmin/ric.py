@@ -1,21 +1,18 @@
-from neekanee.jobscrapers.peopleadmin.PeopleAdminATS import PeopleAdminJobScraper
+from neekanee.jobscrapers.peopleadmin.peopleadmin3 import PeopleAdminJobScraper
 
 COMPANY = {
     'name': 'Rhode Island College',
     'hq': 'Providence, RI',
 
-    'benefits': {
-        'vacation': [(1,22)],
-        'holidays': 10,
-        'sick_days': 15,
-        'tuition_assistance': True
-    },
-
     'home_page_url': 'http://www.ric.edu',
-    'jobs_page_url': 'https://employment.ric.edu/applicants/jsp/shared/Welcome_css.jsp',
+    'jobs_page_url': 'https://employment.ric.edu/',
 
     'empcnt': [501,1000]
 }
 
 def get_scraper():
     return PeopleAdminJobScraper(COMPANY)
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
