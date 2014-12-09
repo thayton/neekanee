@@ -2,7 +2,6 @@ import re, urlparse
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text, get_mailto
-from neekanee.txtextract.pdftohtml import pdftohtml
 
 from neekanee_solr.models import *
 
@@ -10,17 +9,15 @@ COMPANY = {
     'name': 'Vecima',
     'hq': 'Saskatoon, SK, Canada',
 
-    'contact': 'human.resources@vecima.com',
-
     'home_page_url': 'http://www.vecima.com',
-    'jobs_page_url': 'http://www.vecima.com/careers.php',
+    'jobs_page_url': 'http://www.vecima.com/career-opportunities/',
 
     'empcnt': [501,1000],
 }
 
 class VecimaJobScraper(JobScraper):
     def __init__(self):
-        super(VecimaJobScraper, self).__init__(COMPANY, return_usa_only=False)
+        super(VecimaJobScraper, self).__init__(COMPANY)
 
     def scrape_job_links(self, url):
         jobs = []
@@ -28,24 +25,20 @@ class VecimaJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        f = lambda x: x.name == 'h2' and x.text == 'Current Opportunities'
-        h = s.find(f)
-        d = h.findParent('div')
-        r = re.compile(r'/careers/\S+\.pdf$')
-    
-        for a in d.findAll('a', href=r):
-            x = a.text.split('-')
-            l = None
+        r = re.compile(r'^post-\d+$')
+#        x = {'class': 'vcm-article', 'id': r}
 
-            if len(x) > 1:
-                l = self.parse_location(x[1])
+        for a in s.findAll('article', id=r):
+            l = a.nextSibling.text
+            l = re.sub(r'&#.*', '', l)
+            l = self.parse_location(l)
 
             if l is None:
                 continue
 
             job = Job(company=self.company)
             job.title = a.text
-            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.url = urlparse.urljoin(self.br.geturl(), a.a['href'])
             job.location = l
             jobs.append(job)
 
@@ -59,10 +52,11 @@ class VecimaJobScraper(JobScraper):
         for job in new_jobs:
             self.br.open(job.url)
 
-            d = self.br.response().read()
-            s = soupify(pdftohtml(d))
+            s = soupify(self.br.response().read())
+            r = re.compile(r'^post-\d+$')
+            a = s.find('article', id=r)
 
-            job.desc = get_all_text(s.html.body)
+            job.desc = get_all_text(a)
             job.save()
 
 def get_scraper():
