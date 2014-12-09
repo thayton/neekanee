@@ -38,6 +38,7 @@ class USIGroupJobScraper(JobScraper):
             job = Job(company=self.company)
             job.title = p.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.url = urllib.quote(job.url, ':/')
             job.location = self.company.location
             jobs.append(job)
 
