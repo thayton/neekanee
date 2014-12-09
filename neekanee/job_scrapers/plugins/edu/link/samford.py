@@ -86,8 +86,13 @@ class SamfordJobScraperFaculty(JobScraper):
         for job in new_jobs:
             self.br.open(job.url)
 
-            data = self.br.response().read()
-            s = soupify(pdftohtml(data))
+            d = self.br.response().read()
+            h = pdftohtml(d)
+
+            if h.len == 0:
+                continue
+
+            s = soupify(h)
 
             job.desc = get_all_text(s.html.body)
             job.save()
