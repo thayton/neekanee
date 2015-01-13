@@ -1,4 +1,4 @@
-import re, urlparse
+import re, urlparse, mechanize
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
@@ -63,6 +63,16 @@ class RaytheonJobScraper(JobScraper):
                 r = re.compile(r'ctl\d+_HiddenField')
                 return bool(re.match(r, control.name))
 
+            form = s.find('form', id='form1')
+            html = str(form)
+            resp = mechanize.make_response(
+                html, 
+                [("Content-Type", "text/html")],
+                self.br.geturl(),
+                200, "OK"
+            )
+
+            self.br.set_response(resp)
             self.br.select_form(predicate=select_form)
             self.br.form.set_all_readonly(False)
 
