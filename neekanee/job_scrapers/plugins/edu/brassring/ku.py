@@ -8,7 +8,7 @@ COMPANY = {
     'hq': 'Lawrence, KS',
 
     'home_page_url': 'http://www.ku.edu',
-    'jobs_page_url': 'https://sjobs.brassring.com/TGWebHost/home.aspx?partnerid=25752&siteid=5447',
+    'jobs_page_url': 'https://sjobs.brassring.com/TGWebHost/home.aspx?partnerid=25752&siteid=5541',
 
     'empcnt': [10001]
 }
@@ -16,17 +16,20 @@ COMPANY = {
 class KuJobScraper(BrassringJobScraper):
     def __init__(self):
         super(KuJobScraper, self).__init__(COMPANY)
-        self.use_company_location = True
         self.soupify_search_form = True
         self.br.addheaders = [('User-agent', 
                                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')]
 
     def get_title_from_formtext(self, x):
-        s = soupify(x['FORMTEXT8'])
+        s = soupify(x['JobTitle'])
         return s.a.text
 
+    def get_location_from_formtext(self, x):
+        l = self.parse_location(x['Location'])
+        return l
+
     def get_url_from_formtext(self, x):
-        s = soupify(x['FORMTEXT8'])
+        s = soupify(x['JobTitle'])
         return s.a
 
 def get_scraper():
