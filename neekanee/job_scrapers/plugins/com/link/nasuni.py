@@ -18,6 +18,8 @@ COMPANY = {
 class NasuniJobScraper(JobScraper):
     def __init__(self):
         super(NasuniJobScraper, self).__init__(COMPANY)
+        self.br.addheaders = [('User-agent', 
+                               'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')]
 
     def scrape_job_links(self, url):
         jobs = []
@@ -26,7 +28,7 @@ class NasuniJobScraper(JobScraper):
 
         s = soupify(self.br.response().read())
         r = re.compile(r'^/company/careers/[^/]+/$')
-        f = lambda x: x.name == 'a' and re.search(r, x['href']) and x.get('title', False)
+        f = lambda x: x.name == 'a' and x.get('title', False) and re.search(r'Learn More', x.text)
         
         for a in s.findAll(f):
             job = Job(company=self.company)
