@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'The Hague, The Netherlands',
 
     'home_page_url': 'http://www.edctp.org',
-    'jobs_page_url': 'http://www.edctp.org/about-edctp/the-organisation/vacancies/',
+    'jobs_page_url': 'http://www.edctp.org/vacancies/',
 
     'empcnt': [11,50]
 }
@@ -25,12 +25,12 @@ class EdctpJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        t = s.find('ul', id='submenu').find(text='Vacancies')
-        u = t.findNext('ul')
+        r = re.compile(r'Read more')
+        f = lambda x: x.name == 'a' and re.search(r, x.text)
 
-        for a in u.findAll('a'):
+        for a in s.findAll(f):
             job = Job(company=self.company)
-            job.title = a.text
+            job.title = a['title']
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
             job.location = self.company.location
             jobs.append(job)
@@ -46,10 +46,9 @@ class EdctpJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='page_title')
-            t = d.findParent('td')
+            a = s.article
 
-            job.desc = get_all_text(t)
+            job.desc = get_all_text(a)
             job.save()
 
 def get_scraper():
