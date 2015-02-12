@@ -23,14 +23,23 @@ class TimHortonsJobScraper(JobScraper):
         jobs = []
 
         self.br.open(url)
-        self.br.select_form('search')
+
+        s = soupify(self.br.response().read())
+        f = s.find('form', id='WSTM_search')
+
+        html = f.prettify()
+        resp = mechanize.make_response(html, [("Content-Type", "text/html")],
+                                       self.br.geturl(), 200, "OK")
+
+        self.br.set_response(resp)
+        self.br.select_form('WSTM_search')
         self.br.submit()
 
         pageno = 2
 
         while True:
             s = soupify(self.br.response().read())
-            r = re.compile(r'^JobDescription\.asp\?JobNumber=\d+$')
+            r = re.compile(r'JobDescription\.asp\?.*JobNumber=\d+')
         
             for a in s.findAll('a', href=r):
                 tr = a.findParent('tr')
@@ -71,7 +80,8 @@ class TimHortonsJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='realLunchBreak')
+            x = {'class': 'WSTM_JobDescDiv'}
+            d = s.find('div', attrs=x)
 
             job.desc = get_all_text(d)
             job.save()
