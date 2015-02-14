@@ -1,4 +1,4 @@
-import re, time, urllib, urlparse, mechanize, urlutil, copy
+import re, time, urllib, urlparse, mechanize, urlutil, copy, json
 
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text, extract_form_fields
@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Kalamazoo, MI',
 
     'home_page_url': 'http://www.stryker.com',
-    'jobs_page_url': 'http://jobs.brassring.com/1033/ASP/TG/cim_home.asp?partnerid=11721&siteid=78',
+    'jobs_page_url': 'http://jobs.brassring.com/TGWebHost/home.aspx?partnerid=25787&siteid=5361',
 
     'empcnt': [10001]
 }
@@ -37,69 +37,76 @@ class StrykerJobScraper(JobScraper):
 
         return url
 
-    def scrape_job_links(self, url):
-        jobs = []
-
-        self.br.open(url)
-        self.br.follow_link(self.br.find_link(text_regex=re.compile(r'Search openings', re.I)))
-
+    def fix_current_html(self):
         m = [(re.compile('<!=+=>'), lambda match: '<!-- -->')]
         mm = copy.copy(BeautifulSoup.MARKUP_MASSAGE)
         mm.extend(m)
 
         s = BeautifulSoup(self.br.response().read(), markupMassage=mm)
-        s = soupify(s.prettify())
 
         html = s.prettify()
         resp = mechanize.make_response(html, [("Content-Type", "text/html")],
-                                           self.br.geturl(), 200, "OK")
-
+                                       self.br.geturl(), 200, "OK")
         self.br.set_response(resp)        
-        self.br.select_form('frmAgent')
+        
+    def scrape_job_links(self, url):
+        jobs = []
+
+        self.br.open(url)
+        self.fix_current_html()
+
+        self.br.follow_link(self.br.find_link(text_regex=re.compile(r'Search openings', re.I)))
+        self.fix_current_html()
+
+        self.br.select_form('aspnetForm')
+        self.br.form.new_control('hidden', 'submit2', {'value':''})
+        self.br.form.new_control('hidden', 'GTGLanguageList', {'value':'1||1033'})
         self.br.submit()
 
-        r = re.compile(r'^cim_jobdetail\.asp')
+        r = re.compile(r'^jobdetails\.asp')
+        numResults = 0
 
         while True:
-            s = BeautifulSoup(self.br.response().read(), markupMassage=mm)
-
-            html = s.prettify()
-            resp = mechanize.make_response(html, [("Content-Type", "text/html")],
-                                           self.br.geturl(), 200, "OK")
-
-            self.br.set_response(resp)        
+            self.fix_current_html()
             s = soupify(self.br.response().read())
+            i = s.find('input', id='ctl00_MainContent_GridFormatter_json_tabledata')
+            j = json.loads(i['value'])
 
-            for a in s.findAll('a', href=r):
-                tr = a.findParent('tr')
-                if not tr:
-                    continue
-
-                td = tr.findAll('td')
-
-                l = '-'.join(['%s' % x.text for x in td[-5:-2] if x.text != '-'])
+            for x in j:
+                l = x['FORMTEXT22'] + ', ' + x['FORMTEXT26']
                 l = self.parse_location(l)
-                
+
                 if not l:
                     continue
 
+                a = soupify(x['AutoReq'])
+                a = a.findAll('a')
+
                 job = Job(company=self.company)
-                job.title = td[3].text
+                job.title = x['JobTitle']
+                job.url = self.mkurl(urlparse.urljoin(self.br.geturl(), a[-1]['href']))
                 job.location = l
-                job.url = self.mkurl(urlparse.urljoin(self.br.geturl(), a['href']))
                 jobs.append(job)
 
-            # Navigate to the next page
-            try:
-                n = self.br.find_link(text='Next')
-                m = re.search(r'(\d+)', n.url)
-            except mechanize.LinkNotFoundError:
+            numResults += len(j)
+
+            f = s.find('form', attrs={'name': 'frmMassSelect'})
+            html = f.prettify()
+            resp = mechanize.make_response(html, [("Content-Type", "text/html")],
+                                           self.br.geturl(), 200, "OK")
+            self.br.set_response(resp)
+            self.br.select_form('frmMassSelect')
+
+            if numResults >= int(self.br.form['totalrecords']):
                 break
 
-            self.br.select_form('frmMassSelect')
             self.br.form.set_all_readonly(False)
-            self.br.form['recordstart'] = m.group(0)
-            self.br.submit()
+            self.br.form['recordstart'] = '%d' % (numResults + 1)
+
+            try:
+                self.br.submit()
+            except:
+                break
 
         return jobs
 
@@ -110,17 +117,13 @@ class StrykerJobScraper(JobScraper):
 
         for job in new_jobs:
             self.br.open(job.url)
+            self.fix_current_html()
 
-            m = [(re.compile('<!=+=>'), lambda match: '<!-- -->')]
-            mm = copy.copy(BeautifulSoup.MARKUP_MASSAGE)
-            mm.extend(m)
+            s = soupify(self.br.response().read())
+            d = s.find('div', id='PrimaryContentBlock')
+            t = d.findParent('table')
 
-            s = BeautifulSoup(self.br.response().read(), markupMassage=mm)
-            s = soupify(s.prettify())
-            a = {'name': 'frmJobDetail'}
-            f = s.find('form', attrs=a)
-
-            job.desc = get_all_text(f)
+            job.desc = get_all_text(t)
             job.save()
 
 def get_scraper():
