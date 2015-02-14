@@ -31,6 +31,9 @@ class LyftJobScraper(JobScraper):
         
         for a in s.findAll('a', attrs=x):
             sp = a.find('span', attrs=y)
+            if not sp:
+                continue
+
             l = self.parse_location(sp.text)
             if not l:
                 continue
