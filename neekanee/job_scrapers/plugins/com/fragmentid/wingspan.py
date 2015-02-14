@@ -9,15 +9,8 @@ COMPANY = {
     'name': 'Wingspan',
     'hq': 'Blue Bell, PA',
 
-    'ats': 'Online Form',
-
-    'benefits': {
-        'vacation': [],
-        'holidays': 10
-    },
-
     'home_page_url': 'http://www.wingspan.com',
-    'jobs_page_url': 'http://www.wingspan.com/about/careers/',
+    'jobs_page_url': 'http://www.wingspan.com/career_open_positions/',
 
     'empcnt': [11,50]
 }
@@ -25,12 +18,14 @@ COMPANY = {
 class WingSpanJobScraper(JobScraper):
     def __init__(self):
         super(WingSpanJobScraper, self).__init__(COMPANY)
+        self.br.addheaders = [('User-agent', 
+                               'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')]
 
     def scrape_jobs(self):
         self.br.open(self.company.jobs_page_url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'^#\d+$')
+        r = re.compile(r'^#')
         d = s.find('div', id='content')
         d = d.find('div', attrs={'class': 'entry-content'})
         d.extract()
@@ -44,12 +39,12 @@ class WingSpanJobScraper(JobScraper):
             job.location = self.company.location
             job.desc = ''
 
-            x = d.find(attrs={'name' : a['href'][1:]})
+            x = d.find(id=a['href'][1:])
             x = x.next
 
             while x:
                 name = getattr(x, 'name', None)
-                if name == 'a' and x.get('name', None):
+                if name == 'hr' and x.get('id', None):
                     break
                 elif name is None:
                     job.desc += x
@@ -60,3 +55,6 @@ class WingSpanJobScraper(JobScraper):
 def get_scraper():
     return WingSpanJobScraper()
 
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
