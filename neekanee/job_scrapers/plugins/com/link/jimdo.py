@@ -26,22 +26,21 @@ class JimdoJobScraper(JobScraper):
 
         s = soupify(self.br.response().read())
         r = re.compile(r'/jobs/[^/]+/$')
-        
-        for id in ['cc-m-4645448314', 'cc-m-4665656714']:
-            d = s.find('div', id=id)
-            l = self.parse_location(d.h2.text)
-            
+        x = {'href': r, 'title': True, 'data-mce-href': True}
+        y = re.compile(r'^cc-m-header-\d+$')
+
+        for a in s.findAll('a', attrs=x):
+            h2 = a.findPrevious('h2', id=y)
+            l = self.parse_location(h2.text)
+
             if not l:
                 continue
 
-            d = d.parent
-
-            for a in d.findAll('a', href=r):
-                job = Job(company=self.company)
-                job.title = a.text
-                job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-                job.location = l
-                jobs.append(job)
+            job = Job(company=self.company)
+            job.title = a.text
+            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.location = l
+            jobs.append(job)
 
         return jobs
 
@@ -54,7 +53,8 @@ class JimdoJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='content')
+            r = re.compile(r'^cc-matrix-\d+$')
+            d = s.find('div', id=r)
 
             job.desc = get_all_text(d)
             job.save()
