@@ -10,10 +10,8 @@ COMPANY = {
     'name': 'National Consumer Law Center',
     'hq': 'Boston, MA',
 
-    'benefits': {'vacation': []},
-
     'home_page_url': 'http://www.nclc.org',
-    'jobs_page_url': 'http://www.nclc.org/employment.html',
+    'jobs_page_url': 'http://www.nclc.org/about-us/employment.html',
 
     'empcnt': [11,50]
 }
@@ -28,10 +26,10 @@ class NclcJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id='article_wrap')
-        d.extract()
+        r = re.compile(r'\.pdf$')
+        f = lambda x: x.name == 'a' and re.search(r, x.get('href', '')) and x.parent.name == 'li'
 
-        for a in d.findAll('a'):
+        for a in s.findAll(f):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
@@ -62,3 +60,6 @@ class NclcJobScraper(JobScraper):
 def get_scraper():
     return NclcJobScraper()
 
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
