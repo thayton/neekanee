@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Copenhagen, Denmark',
 
     'home_page_url': 'http://www.issuu.com',
-    'jobs_page_url': 'http://www.issuu.com/careers/positions.html',
+    'jobs_page_url': 'http://issuu.com/careers',
 
     'empcnt': [11,50]
 }
