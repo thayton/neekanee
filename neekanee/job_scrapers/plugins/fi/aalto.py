@@ -25,27 +25,14 @@ class AaltoJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        x = {'class': 'selected active jobs'}
-        y = s.find('li', attrs=x)
-        r = re.compile(r'/en/current/jobs/[^/]+/$')
+        r = re.compile(r'/en/about/careers/jobs/view/\d+/$')
 
-        for l in y.findAll('a', href=r):
-            self.br.open(l['href'])
-
-            s = soupify(self.br.response().read())
-            selected = os.path.basename(os.path.dirname(l['href']))
-            
-            x = {'class': 'selected active %s' % selected}
-            z = s.find('li', attrs=x)
-            p = r'%s[^/]+/$' % urlparse.urlparse(l['href']).path
-            v = re.compile(p)
-
-            for a in s.findAll('a', href=v):
-                job = Job(company=self.company)
-                job.title = a.text
-                job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-                job.location = self.company.location
-                jobs.append(job)
+        for a in s.findAll('a', href=r):
+            job = Job(company=self.company)
+            job.title = a.text
+            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.location = self.company.location
+            jobs.append(job)
 
         return jobs
 
