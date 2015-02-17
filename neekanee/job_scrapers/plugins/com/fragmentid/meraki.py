@@ -22,24 +22,8 @@ class MerakiJobScraper(JobScraper):
                                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')]
 
     def scrape_jobs(self):
-        self.br.open(self.company.jobs_page_url)
-
-        s = soupify(self.br.response().read())
-        n = s.find('section', id='positions')
-        x = {'class': 'job-nav-title'}
-
+        # Now owned by Cisco
         self.company.job_set.all().delete()
-
-        for li in n.findAll('li', attrs=x):
-            y = {'data-tab': li.a['href'][1:]}
-            d = n.find('div', attrs=y)
-
-            job = Job(company=self.company)
-            job.title = li.a.contents[0]
-            job.url = self.br.geturl()
-            job.desc = get_all_text(d)
-            job.location = self.company.location
-            job.save()
 
 def get_scraper():
     return MerakiJobScraper()
