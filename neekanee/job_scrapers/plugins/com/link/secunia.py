@@ -25,10 +25,9 @@ class SecuniaJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id='pageContent')
         r = re.compile(r'^/company/jobs/[^/]+/$')
         
-        for a in d.findAll('a', href=r):
+        for a in s.findAll('a', href=r):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
@@ -46,7 +45,8 @@ class SecuniaJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='pageContent')
+            x = {'class': 'section'}
+            d = s.find('div', attrs=x)
 
             job.desc = get_all_text(d)
             job.save()
