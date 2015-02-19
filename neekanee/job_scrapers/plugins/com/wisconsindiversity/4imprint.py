@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Oshkosh, WI',
 
     'home_page_url': 'http://www.4imprint.com',
-    'jobs_page_url': 'http://info.4imprint.com/employment/',
+    'jobs_page_url': 'http://www.wisconsindiversity.com/jobs.asp?pbid=67775',
 
     'empcnt': [51,200]
 }
@@ -25,15 +25,22 @@ class FourImprintJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        t = s.find('table', id='Employment_tblJobsBox')
-        r = re.compile(r'/employment/')
-        v = { 'href': r, 'title': True }
+        r = re.compile(r"javascript:self\.popup\('([^']+)")
 
-        for a in t.findAll('a', attrs=v):
+        for a in s.findAll('a', href=r):
+            m = re.search(r, a['href'])
+
+            tr = a.findParent('tr')
+            td = tr.findAll('td')
+
+            l = self.parse_location(td[-2].text)
+            if not l:
+                continue
+
             job = Job(company=self.company)
             job.title = a.text
-            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-            job.location = self.company.location
+            job.url = m.group(1)
+            job.location = l
             jobs.append(job)
 
         return jobs
@@ -47,8 +54,8 @@ class FourImprintJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            a = { 'class': 'post' }
-            d = s.find('div', attrs=a)
+            x = {'itemprop': 'description'}
+            d = s.find('div', attrs=x)
 
             job.desc = get_all_text(d)
             job.save()
