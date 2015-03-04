@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Oxfordshire, England',
 
     'home_page_url': 'http://www.diamond.ac.uk/Home.html',
-    'jobs_page_url': 'http://www.diamond.ac.uk/Home/Jobs/Current.html',
+    'jobs_page_url': 'http://www.diamond.ac.uk/Careers/Vacancies.html',
 
     'empcnt': [201,500]
 }
@@ -25,10 +25,11 @@ class DiamondJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id='mainColumn')
-        r = re.compile(r'^/Home/Jobs/Current/\w+\.html$')
-        
-        for a in d.findAll('a', href=r):
+        d = s.find('div', id='jobindex')
+        r = re.compile(r'^/Careers/Vacancies/All/[^.]+\.html$')
+        f = lambda x: x.name == 'a' and x.parent.name == 'h3' and re.search(r, x.get('href', ''))
+
+        for a in d.findAll(f):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
@@ -46,7 +47,7 @@ class DiamondJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='mainColumn')
+            d = s.find('div', id='main')
 
             job.desc = get_all_text(d)
             job.save()
