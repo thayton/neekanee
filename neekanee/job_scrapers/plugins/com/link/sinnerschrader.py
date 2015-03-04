@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Hamburg, Germany',
 
     'home_page_url': 'http://www.sinnerschrader.com',
-    'jobs_page_url': 'http://www.sinnerschrader.com/en/api/jobs/get_all_jobs/',
+    'jobs_page_url': 'https://sinnerschrader.com/en/careers/',
 
     'empcnt': [201,500]
 }
@@ -24,18 +24,28 @@ class SinnerSchraderJobScraper(JobScraper):
 
         self.br.open(url)
 
-        r = self.br.response()
-        j = json.loads(r.read())
-        j.pop('status')
+        s = soupify(self.br.response().read())
 
-        for k,v in j.items():
-            l = self.parse_location(v['location'])
+        r1 = re.compile(r'\bjobs--title\b')
+        r2 = re.compile(r'\bjobs--location\b')
+
+        x = {'class': r1}
+        y = {'class': r2}
+
+        for td1 in s.findAll('td', attrs=x):
+            tr = td1.findParent('tr')
+            td2 = tr.find('td', attrs=y)
+
+            l = self.parse_location(td2.text)
             if not l:
                 continue
 
+            link = re.sub(r'\.', '', td1.text)
+            link = '-'.join(link.lower().strip().split())
+
             job = Job(company=self.company)
-            job.title = v['title']
-            job.url = v['link']
+            job.title = td1.text
+            job.url = urlparse.urljoin(self.br.geturl(), '/en/job/' + link)
             job.location = l
             jobs.append(job)
 
@@ -50,7 +60,8 @@ class SinnerSchraderJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='post_content')
+            x = {'class': 'post__main'}
+            d = s.find('div', attrs=x)
 
             job.desc = get_all_text(d)
             job.save()
