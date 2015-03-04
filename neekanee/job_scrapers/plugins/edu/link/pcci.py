@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Pensacola, FL',
 
     'home_page_url': 'http://www.pcci.edu',
-    'jobs_page_url': 'http://www.pcci.edu/EmploymentOpportunities/Default.html',
+    'jobs_page_url': 'http://www.pcci.edu/employmentopportunities/',
 
     'empcnt': [201,500]
 }
@@ -25,8 +25,8 @@ class PcciJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id='bodycopy')
-        r = re.compile(r'^Descriptions/\S+\.html$')
+        d = s.find('div', id='BodyText')
+        r = re.compile(r'^Descriptions/[^.]+\.aspx$')
 
         for a in d.findAll('a', href=r):
             job = Job(company=self.company)
@@ -46,7 +46,7 @@ class PcciJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='bodycopy')
+            d = s.find('div', id='BodyText')
 
             job.desc = get_all_text(d)
             job.save()
