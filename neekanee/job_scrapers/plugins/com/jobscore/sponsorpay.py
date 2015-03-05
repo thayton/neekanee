@@ -1,4 +1,9 @@
-from neekanee.jobscrapers.jobscore.jobscore2 import JobScoreJobScraper
+import re, urlparse
+
+from neekanee.jobscrapers.jobscraper import JobScraper
+from neekanee.htmlparse.soupify import soupify, get_all_text
+
+from neekanee_solr.models import *
 
 COMPANY = {
     'name': 'SponsorPay',
@@ -10,8 +15,16 @@ COMPANY = {
     'empcnt': [51,200]
 }
 
+class SponsorPayJobScraper(JobScraper):
+    def __init__(self):
+        super(SponsorPayJobScraper, self).__init__(COMPANY)
+
+    def scrape_jobs(self):
+        # Rebranded to Fyber
+        self.company.job_set.all().delete()
+
 def get_scraper():
-    return JobScoreJobScraper(COMPANY)
+    return SponsorPayJobScraper()
 
 if __name__ == '__main__':
     job_scraper = get_scraper()
