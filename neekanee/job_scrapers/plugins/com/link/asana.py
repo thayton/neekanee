@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'San Francisco, CA',
 
     'home_page_url': 'http://asana.com',
-    'jobs_page_url': 'http://asana.com/jobs/',
+    'jobs_page_url': 'https://asana.com/jobs',
 
     'empcnt': [11,50]
 }
@@ -25,10 +25,12 @@ class AsanaJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        u = s.find('ul', id='openPositionsList')
+        r = re.compile(r'\bopen-positions\b')
+        x = {'class': r}
+        d = s.find('div', attrs=x)
         r = re.compile(r'/jobs/[^/]+$')
         
-        for a in u.findAll('a', href=r):
+        for a in d.findAll('a', href=r):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
@@ -46,7 +48,8 @@ class AsanaJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            x = {'class': 'row jobs-top'}
+            r = re.compile(r'\bjob-description\b')
+            x = {'class': r}
             d = s.find('div', attrs=x)
 
             job.desc = get_all_text(d)
