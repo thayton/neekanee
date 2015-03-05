@@ -23,7 +23,7 @@ class DropMySiteJobScraper(JobScraper):
 
         s = soupify(self.br.response().read())
         r = re.compile(r'^#position-\S+$')
-        x = {'class': 'container-general-inner'}
+        x = {'class': 'panel-body'}
         d = s.find('div', attrs=x)
         d.extract()
 
