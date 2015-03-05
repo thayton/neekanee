@@ -28,9 +28,9 @@ class MessageSystemsJobScraper(JobScraper):
         r = re.compile(r'/careers/open-positions/[^/]+$')
         
         for a in s.findAll('a', href=r):
-            x = {'class': 'field-content'}
-            p = a.findNext('span', attrs=x)
-            l = self.parse_location(p.text)
+            x = {'class': 'position-location'}
+            d = a.findNext('div', attrs=x)
+            l = self.parse_location(d.text)
             if not l:
                 continue
 
@@ -51,8 +51,8 @@ class MessageSystemsJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            r = re.compile(r'^node-employment-position-\d+$')
-            a = s.find('article', id=r)
+            x = {'about': True}
+            a = s.find('article', attrs=x)
 
             job.desc = get_all_text(a)
             job.save()
