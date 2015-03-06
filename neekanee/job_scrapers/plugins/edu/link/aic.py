@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Springfield, MA',
 
     'home_page_url': 'http://www.aic.edu',
-    'jobs_page_url': 'http://www.aic.edu/humanresources/employment',
+    'jobs_page_url': 'http://w2.aic.edu/files/jobs/portal/',
 
     'empcnt': [201,500]
 }
@@ -25,12 +25,9 @@ class AicJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        f = lambda x: x.name == 'h1' and x.text == 'Employment'
-        h = s.find(f)
-        t = h.findNext('table')
-        r = re.compile(r'\?id=\d+$')
+        r = re.compile(r'id\d+\.html$')
 
-        for a in t.findAll('a', href=r):
+        for a in s.findAll('a', href=r):
             job = Job(company=self.company)
             job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
@@ -48,12 +45,14 @@ class AicJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            f = lambda x: x.name == 'h1' and x.text == 'Employment'
-            h = s.find(f)
-            d = h.findParent('div')
+            h = s.html
 
-            job.desc = get_all_text(d)
+            job.desc = get_all_text(h)
             job.save()
 
 def get_scraper():
     return AicJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
