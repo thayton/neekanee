@@ -11,7 +11,7 @@ COMPANY = {
     'hq': 'Sherman, TX',
 
     'home_page_url': 'http://www.austincollege.edu',
-    'jobs_page_url': 'http://www.austincollege.edu/campus-offices/human-resources/employment/',
+    'jobs_page_url': 'http://www.austincollege.edu/campus-offices/business-affairs/human-resources/employment/',
 
     'empcnt': [51,200]
 }
@@ -26,8 +26,7 @@ class AustinCollegeJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'/wp-content/uploads/\d{4}/\d{2}/[\w-]+\.pdf')
-        f = lambda tag: tag.name == 'a' and tag.parent.parent.name == 'li'
+        r = re.compile(r'\.pdf$')
 
         for a in s.findAll('a', href=r):
             job = Job(company=self.company)
