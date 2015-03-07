@@ -10,11 +10,8 @@ COMPANY = {
     'name': 'Rogue Wave',
     'hq': 'Boulder, CO',
 
-    'contact': 'staffing@roguewave.com',
-    'benefits': {'vacation': []},
-
     'home_page_url': 'http://www.roguewave.com',
-    'jobs_page_url': 'http://www.roguewave.com/company/careers.aspx',
+    'jobs_page_url': 'https://roguewave.bamboohr.com/jobs/',
 
     'empcnt': [51,200]
 }
@@ -29,25 +26,20 @@ class RogueWaveJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        f = lambda x: x.name == 'h2' and x.text == 'Current Openings:'
-        h = s.find(f)
-        u = h.nextSibling.nextSibling
-        r = re.compile(r'^/documents\.aspx\?Command=Core_Download&EntryId=\d+')
+        r = re.compile(r'^view\.php\?\id=\d+$')
 
-        for a in u.findAll('a', href=r):
-            job = Job(company=self.company)
-            job.title = a.text
-            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-
-            l = self.company.location
-            m = re.search(r'\((.*)\)', a.parent.contents[-1])
-
-            if m:
-                l = self.parse_location(m.group(1))
+        for a in s.findAll('a', href=r):
+            x = { 'itemprop': 'jobLocation'}
+            tr = a.findParent('tr')
+            d = tr.find('div', attrs=x)
+            l = self.parse_location(d.text)
 
             if not l:
                 continue
 
+            job = Job(company=self.company)
+            job.title = a.text
+            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
             job.location = l
             jobs.append(job)
 
@@ -61,11 +53,15 @@ class RogueWaveJobScraper(JobScraper):
         for job in new_jobs:
             self.br.open(job.url)
 
-            d = self.br.response().read()
-            s = soupify(pdftohtml(d))
+            s = soupify(self.br.response().read())
+            d = s.find('div', id='inside-content')
 
-            job.desc = get_all_text(s.html.body)
+            job.desc = get_all_text(d)
             job.save()
         
 def get_scraper():
     return RogueWaveJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
