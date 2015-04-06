@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Zurich, Switzerland',
 
     'home_page_url': 'http://www.getyourguide.com',
-    'jobs_page_url': 'http://www.getyourguide.com/jobs.php',
+    'jobs_page_url': 'http://careers.getyourguide.com/all-jobs',
 
     'empcnt': [201,500]
 }
@@ -25,21 +25,19 @@ class GetYourGuideJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id='jobs-navigation')
-        x = {'class': 'jobs-navigation-block'}
-        r = re.compile(r'/jobs\.php\?id=\d+$')
+        r = re.compile(r'/\?gh_jid=\d+$')
 
-        for v in d.findAll('div', attrs=x):
-            l = self.parse_location(v.h6.text)
+        for a in s.findAll('a', href=r):
+            h3 = a.findPrevious('h3')
+            l = self.parse_location(h3.text)
             if not l:
                 continue
 
-            for a in v.findAll('a', href=r):
-                job = Job(company=self.company)
-                job.title = a.text
-                job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-                job.location = l
-                jobs.append(job)
+            job = Job(company=self.company)
+            job.title = a.text
+            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.location = l
+            jobs.append(job)
 
         return jobs
 
@@ -52,7 +50,11 @@ class GetYourGuideJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='static-pages-content')
+            r = re.compile(r'\bjob_offer_info\b')
+            x = {'class': r}
+            n = s.find('section', attrs=x)
+            x = {'class': 'container'}
+            d = n.findParent('div', attrs=x)
 
             job.desc = get_all_text(d)
             job.save()
