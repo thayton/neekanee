@@ -9,15 +9,8 @@ COMPANY = {
     'name': 'Deleware County Community College',
     'hq': 'Media, PA',
 
-    'benefits': {
-        'url': 'http://www.dccc.edu/about-us/employment-opportunities/benefits',
-        'vacation': []
-    },
-
     'home_page_url': 'http://www.dccc.edu',
-    'jobs_page_url': 'http://www.dccc.edu/about-us/human-resources/employment-opportunities',
-
-    'gctw_chronicle': True,
+    'jobs_page_url': 'http://www.dccc.edu/about/faculty-staff/human-resources/job-openings',
 
     'empcnt': [1001,5000]
 }
@@ -40,13 +33,12 @@ class DcccJobScraper(JobScraper):
 
         self.br.open(url)
 
-        r = re.compile(r'^/about-us/employment-opportunities/job-postings/')
+        r = re.compile(r'^/about-us/employment-opportunities/job-postings/\d+$')
 
         while True:
             s = soupify(self.br.response().read())
-            d = s.find('div', attrs={'class': 'data'})
 
-            for a in d.findAll('a', href=r):
+            for a in s.findAll('a', href=r):
                 job = Job(company=self.company)
                 job.title = a.text
                 job.url = urlparse.urljoin(self.br.geturl(), a['href'])
@@ -72,7 +64,7 @@ class DcccJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', attrs={'class': 'data'})
+            d = s.find('div', id='main-inner')
             t = d.find(text='Campus:')
 
             x = None
@@ -97,4 +89,7 @@ class DcccJobScraper(JobScraper):
 def get_scraper():
     return DcccJobScraper()
             
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
 
