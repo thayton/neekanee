@@ -13,7 +13,7 @@ COMPANY = {
     'ats': 'UltiRecruit',
 
     'home_page_url': 'http://www.resolutenaturalresources.com',
-    'jobs_page_url': 'https://www7.ultirecruit.com/RES1008/JobBoard/SearchJobs.aspx?Page=Search',
+    'jobs_page_url': 'https://rew11.ultipro.com/RES1008/JobBoard/SearchJobs.aspx?Page=Search',
 
     'empcnt': [51,200]
 }
