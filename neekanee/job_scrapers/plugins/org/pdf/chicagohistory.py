@@ -19,6 +19,8 @@ COMPANY = {
 class ChicagoHistoryJobScraper(JobScraper):
     def __init__(self):
         super(ChicagoHistoryJobScraper, self).__init__(COMPANY)
+        self.br.addheaders = [('User-agent', 
+                               'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')]
         
     def scrape_job_links(self, url):
         jobs = []
@@ -26,17 +28,15 @@ class ChicagoHistoryJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id=re.compile(r'parent-fieldname-text'))
-        r = re.compile(r'/documents/home/aboutus/jobs-and-volunteering/jobs/.*\.pdf$')
+        d = s.find('div', id='content')
+        x = {'class': 'internal-link'}
 
-        for a in d.findAll('a', href=r):
+        for a in d.findAll('a', attrs=x):
             if len(a.text.strip()) == 0:
                 continue
 
-            h2 = a.findPrevious('h2')
-
             job = Job(company=self.company)
-            job.title = h2.text
+            job.title = a.text
             job.url = urlparse.urljoin(self.br.geturl(), a['href'])
             job.location = self.company.location
             jobs.append(job)
