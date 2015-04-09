@@ -1,7 +1,7 @@
 import re, urlparse
 
 from neekanee.jobscrapers.jobscraper import JobScraper
-from neekanee.htmlparse.soupify import soupify, get_mailto
+from neekanee.htmlparse.soupify import soupify, get_all_text
 
 from neekanee_solr.models import *
 
@@ -9,10 +9,8 @@ COMPANY = {
     'name': 'RioRey',
     'hq': 'Bethesda, MD',
 
-    'benefits': {'vacation': []},
-
     'home_page_url': 'http://www.riorey.com',
-    'jobs_page_url': 'http://www.riorey.com/company-careers.html',
+    'jobs_page_url': 'http://www.riorey.com/careers',
 
     'empcnt': [11,50]
 }
@@ -25,36 +23,32 @@ class RioReyJobScraper(JobScraper):
         self.br.open(self.company.jobs_page_url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'^#')
-        p = s.find('span', attrs={'class': 'secPara1Resume'})
-        p.extract()
+        x = {'class': 'row sqs-row'}
 
         self.company.job_set.all().delete()
 
-        for a in p.findAll('a', href=r):
+        for h2 in s.findAll('h2'):
+            d = h2.findNext('div', attrs=x)
+            f = lambda y: y.name == 'strong' and re.search(r'Location:', y.text)
+            l = d.find(f)
+
+            if l:
+                l = l.parent.contents[-1]
+                l = self.parse_location(l)
+
+                if not l:
+                    continue
+
             job = Job(company=self.company)
-            job.title = a.text
-            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
-            job.location = self.company.location
-            job.desc = ''
-
-            x = s.find(attrs={'name' : a['href'][1:]})
-            p = x.findNext('p', attrs={'class': 'about'})
-            l = p.contents[2].split('Location:')[1]
-            l = re.sub(r'USA .*', '', l)
-            l = self.parse_location(l)
-            x = p
-
-            if l is None:
-                continue
-
-            while x and getattr(x, 'name', None) != 'h3':
-                if hasattr(x, 'name') is False: 
-                    job.desc += x
-                x = x.next
-
+            job.title = h2.text
+            job.url = self.br.geturl()
             job.location = l
+            job.desc = get_all_text(d)
             job.save()
 
 def get_scraper():
     return RioReyJobScraper()
+
+if __name__ == '__main__':
+    job_scraper = get_scraper()
+    job_scraper.scrape_jobs()
