@@ -1,11 +1,11 @@
-from neekanee.jobscrapers.peopleadmin.peopleadmin2 import PeopleAdminJobScraper
+from neekanee.jobscrapers.peopleadmin.peopleadmin3 import PeopleAdminJobScraper
 
 COMPANY = {
     'name': 'Bowdoin College',
     'hq': 'Portland, Maine',
 
     'home_page_url': 'http://www.bowdoin.edu',
-    'jobs_page_url': 'https://careers.bowdoin.edu/applicants/jsp/shared/index.jsp',
+    'jobs_page_url': 'https://careers.bowdoin.edu',
 
     'empcnt': [201,500]
 }
