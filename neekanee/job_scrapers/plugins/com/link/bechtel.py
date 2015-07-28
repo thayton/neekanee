@@ -40,6 +40,10 @@ class BechtelJobScraper(JobScraper):
 
                 tr = p.findParent('tr')
                 l = tr.find('span', attrs=y)
+
+                if l.a and 'sort' in l.a['class']:
+                    continue
+
                 l = self.parse_location(l.text)
 
                 if not l:
@@ -52,7 +56,7 @@ class BechtelJobScraper(JobScraper):
                 jobs.append(job)
 
             try:
-                self.br.follow_link(self.br.find_link(text='Page %d' % pageno))
+                self.br.follow_link(self.br.find_link(text='%d' % pageno))
                 pageno += 1
             except:
                 break
