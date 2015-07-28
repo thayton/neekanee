@@ -10,7 +10,7 @@ COMPANY = {
     'hq': 'Wilmington, MA',
 
     'home_page_url': 'http://securityinnovation.com',
-    'jobs_page_url': 'https://www.securityinnovation.com/company/about-us/careers/',
+    'jobs_page_url': 'https://securityinnovation.com/company/working-at-security-innovation/careers/',
 
     'empcnt': [51,200]
 }
@@ -25,24 +25,22 @@ class SecurityInnovationJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        d = s.find('div', id='content')
-        d.extract()
+        r = re.compile(r'^company/working-at-security-innovation/careers/[^\.]+\.html$')
 
         locations = {'boston': self.parse_location('boston, ma'),
                      'seattle': self.parse_location('seattle, wa')}
 
-        r = re.compile(r'^company/about-us/careers/\S+\.html$')
 
-        for a in d.findAll('a', href=r):
+        for a in s.findAll('a', href=r):
             h = a.findPrevious('h2')
-            l = locations[h.text.lower()]
+            l = locations.get(h.text.lower(), None)
 
             if not l:
                 continue
 
             job = Job(company=self.company)
             job.title = a.text
-            job.url = urlparse.urljoin(self.company.home_page_url, a['href'])
+            job.url = urlparse.urljoin(self.br.geturl(), s.base['href'] + a['href'])
             job.location = l
             jobs.append(job)
 
@@ -57,7 +55,7 @@ class SecurityInnovationJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            d = s.find('div', id='content')
+            d = s.h2.findParent('div')
 
             job.desc = get_all_text(d)
             job.save()
