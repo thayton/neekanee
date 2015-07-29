@@ -63,8 +63,6 @@ class KikJobScraper(JobScraper):
             job.desc = get_all_text(d)
             job.save()
 
-            self.br.back()
-
 def get_scraper():
     return KikJobScraper()
 
