@@ -1,5 +1,6 @@
 import re, urlparse
 
+from neekanee.urlutil import url_query_add
 from neekanee.jobscrapers.jobscraper import JobScraper
 from neekanee.htmlparse.soupify import soupify, get_all_text
 
@@ -10,7 +11,7 @@ COMPANY = {
     'hq': 'New York, NY',
 
     'home_page_url': 'http://www.workmarket.com',
-    'jobs_page_url': 'https://www.workmarket.com/ats/index',
+    'jobs_page_url': 'https://boards.greenhouse.io/embed/job_board/?for=workmarket',
 
     'empcnt': [11,50]
 }
@@ -25,13 +26,23 @@ class WorkMarketJobScraper(JobScraper):
         self.br.open(url)
 
         s = soupify(self.br.response().read())
-        r = re.compile(r'^/ats/view\?id=\d+$')
-        d = s.find('div', id='current-careers')
+        r = re.compile(r'\?gh_jid=(\d+)$')
+        x = {'class': 'location'}
 
-        for a in d.findAll('a', href=r):
+        for a in s.findAll('a', href=r):
+            d = a.findParent('div')
+            l = d.find('span', attrs=x)
+            l = self.parse_location(l.text)
+
+            m = re.search(r, a['href'])
+
+            url = self.company.jobs_page_url.replace('job_board', 'job_app')
+            url = url_query_add(url, [ ('token', m.group(1)) ])
+
             job = Job(company=self.company)
             job.title = a.text
-            job.url = urlparse.urljoin(self.br.geturl(), a['href'])
+            job.url = url
+            job.location = l
             jobs.append(job)
 
         return jobs
@@ -45,21 +56,8 @@ class WorkMarketJobScraper(JobScraper):
             self.br.open(job.url)
 
             s = soupify(self.br.response().read())
-            x = {'class': 'content topcontent'}
-            d = s.find('div', attrs=x)
-            f = lambda x: x.name == 'b' and x.text == 'Location'
-            b = d.find(f)
+            d = s.find('div', id='app_body')
 
-            if not b:
-                l = self.company.location
-            else:
-                l = b.parent.contents[-1].split(':')[1]
-                l = self.parse_location(l)
-
-                if not l:
-                    continue
-
-            job.location = l
             job.desc = get_all_text(d)
             job.save()
 
