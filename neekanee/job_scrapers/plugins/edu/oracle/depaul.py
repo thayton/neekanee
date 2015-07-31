@@ -25,34 +25,71 @@ class DePaulJobScraper(JobScraper):
 
         self.br.open(url)
 
-        s = soupify(self.br.response().read())
-        r = re.compile(r'^POSTINGLINK\$\d+$')
+        siteid = url_query_get(self.br.geturl(), 'SiteId')
+        siteid = int(siteid['SiteId'])
 
-        for a in s.findAll('a', id=r):
-            # 
-            # Click on 'Email to Friend' and you'll see that the permanent
-            # link for job postings is as follows
-            #
-            # https://pshr.depaul.edu/psp/HRPRD92/EMPLOYEE/HRMS/c/HRS_HRAM.HRS_APP_SCHJOB.GBL?Page=HRS_APP_JBPST&Action=U&FOCUS=Applicant&SiteId=1&JobOpeningId=1664&PostingSeq=1
-            #
-            b = '/psp/HRPRD92/EMPLOYEE/HRMS/c/HRS_HRAM.HRS_APP_SCHJOB.GBL?Page=HRS_APP_JBPST&Action=U&FOCUS=Applicant&SiteId=%d&JobOpeningId=%d&PostingSeq=1'
+        r = self.br.response().read()
+        s = soupify(r)
+        x = {'name': 'win0'}
+
+        stateNumInc = 0
+        saved_form = s.find('form', attrs=x).prettify()
+
+        while True:
+            r = re.compile(r'^POSTINGLINK\$\d+$')
+
+            for a in s.findAll('a', id=r):
+                # 
+                # Click on 'Email to Friend' and you'll see that the permanent
+                # link for job postings is as follows
+                #
+                # /psp/HRPRD92/EMPLOYEE/HRMS/c/HRS_HRAM.HRS_APP_SCHJOB.GBL?Page=HRS_APP_JBPST&Action=U&FOCUS=Applicant&SiteId=1&JobOpeningId=1664&PostingSeq=1
+                #
+                b = '/psp/HRPRD92/EMPLOYEE/HRMS/c/HRS_HRAM.HRS_APP_SCHJOB.GBL?Page=HRS_APP_JBPST&Action=U&FOCUS=Applicant&SiteId=%d&JobOpeningId=%d&PostingSeq=1'
                     
-            x = re.compile(r"javascript:submitAction_win0\(document.win0, '#ICSetFieldHRS_APP_SCHJOB.HRS_JOB_OPEN_ID_PB\.(\d+)'")
-            m = re.search(x, a['href'])
-            jobid = int(m.group(1))
+                x = re.compile(r"javascript:submitAction_win0\(document.win0, '#ICSetFieldHRS_APP_SCHJOB.HRS_JOB_OPEN_ID_PB\.(\d+)'")
+                m = re.search(x, a['href'])
 
-            siteid = url_query_get(self.br.geturl(), 'SiteId')
-            siteid = int(siteid['SiteId'])
+                jobid = int(m.group(1))
 
-            u = b % (siteid, jobid)
-            u = urlparse.urljoin(self.br.geturl(), u)
+                u = b % (siteid, jobid)
+                u = urlparse.urljoin(self.br.geturl(), u)
 
-            job = Job(company=self.company)
-            job.title = a.text
-            job.url = u
-            job.location = self.company.location
-            jobs.append(job)
+                job = Job(company=self.company)
+                job.title = a.text
+                job.url = u
+                job.location = self.company.location
+                jobs.append(job)
 
+            #
+            # Last page doesn't have a "next" button
+            #
+            a = s.find('a', id='HRS_AGNT_RSLT_I$hdown$0')
+            if not a:
+                break
+
+            html = saved_form.encode('utf8')
+            resp = mechanize.make_response(html, [("Content-Type", "text/html")],
+                                           self.br.geturl(), 200, "OK")
+
+            self.br.set_response(resp)
+            self.br.select_form('win0')
+            self.br.form.new_control('hidden', 'ICAJAX', {'value': '1'})
+            self.br.form.new_control('hidden', 'ICNAVTYPEDROPDOWN', {'value': '0'})
+            self.br.form.fixup()
+
+            self.br.set_all_readonly(False)
+            self.br.form['ICAction'] = 'HRS_AGNT_RSLT_I$hdown$0'
+            self.br.form['ICStateNum'] = str( int(self.br.form['ICStateNum']) + stateNumInc )
+            self.br.submit()
+
+            stateNumInc += 1
+
+            r = self.br.response().read()
+            i = r.find("div name='SEARCHACTIONS'")
+            r = r[i:]
+            s = soupify(r)
+            
         return jobs
 
     def scrape_jobs(self):
