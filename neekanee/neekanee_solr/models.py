@@ -424,7 +424,10 @@ def job_save_handler(sender, **kwargs):
 def job_delete_handler(sender, **kwargs):
     job = kwargs['instance']
     conn = Solr('http://127.0.0.1:8983/solr/')
-    conn.delete(q='id:%d' % int(job.id))
+    try:
+        conn.delete(q='id:%d' % int(job.id))
+    except:
+        pass
 
     print 'job_delete_handler - removed job id %d (company %s) from SOLR' % (int(job.id), job.company)
 
