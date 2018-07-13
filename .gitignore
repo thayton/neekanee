@@ -4,3 +4,4 @@ staticfiles
 *~
 *.swp
 *#
+secret_settings.py
